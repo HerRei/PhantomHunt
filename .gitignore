@@ -1,0 +1,25 @@
+# OS-Files
+.DS_Store
+
+# IntelliJ files
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Gradle files
+.gradle/
+build/
+**/build/
+
+# Keep the Jar (wird auf der webseite so verlangr dass alle das genau gleich bauen kénnen)
+!gradle/wrapper/gradle-wrapper.jar
+
+#soll keine .class files haben im repo
+*.class
+
+# ignore log files
+*.log
+hs_err_pid*
+replay_pid*
