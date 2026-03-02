@@ -12,51 +12,28 @@ public final class Packet {
   private final Command cmd;
   private final List<String> args;
 
-  /**
-   * Instantiates a new Packet.
-   *
-   * @param cmd the cmd
-   * @param args the args
-   */
+
 public Packet(Command cmd, List<String> args) {
     this.cmd = cmd;
     this.args = args;
   }
 
-  /**
-   * Cmd command.
-   *
-   * @return  the command
-   */
 // getters
   public Command cmd() {
 
     return cmd;
   }
 
-  /**
-   * Args list.
-   *
-   * @return  the list
-   */
 public List<String> args() {
     return args;
   }
 
-  /**
-   * Argc int.
-   *
-   * @return  the int
-   */
+
 public int argc() {
     return (args == null) ? 0 : args.size();
   }
 
-  /**
-   * Text string.
-   *
-   * @return  the string
-   */
+
 // #todo
   // useful error if package was empty, also idk when this would be the case anyway
   public String text() {
@@ -65,14 +42,7 @@ public int argc() {
     return args.get(0);
   }
 
-  /**
-   * Of packet.
-   *
-   * @param cmd the cmd
-   * @param args the args
-   * @return the packet
-   */
-  // Methode zum einfach instanzen zu machen
+  // Methode zum einfach instanzen zu machen - wird vermutlich oft passieren
   public static Packet of(Command cmd, String... args) {
     return new Packet(cmd, Arrays.asList(args));
   }

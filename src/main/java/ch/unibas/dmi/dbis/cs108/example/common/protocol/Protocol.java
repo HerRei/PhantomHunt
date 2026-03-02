@@ -2,19 +2,14 @@ package ch.unibas.dmi.dbis.cs108.example.common.protocol;
 
 import java.util.List;
 
-/**
- * The type Protocol.
- */
 public class Protocol {
+
+  //this is the serer protocol - its used to encode and decode server packages
+  //so far the server doesnt use this to send packages because it just decodes the type of message with if logic
+  //this should probalby be used right here but im too sure on how to implement this definitley when facing the garbage inputs this should be used
 
   private Protocol() {} // no instances of this class
 
-  /**
-   * Decode packet.
-   *
-   * @param line the line
-   * @return  the packet
-   */
 // line decoder LF -> into a "Packet"
   public static Packet decode(String line) {
     if (line == null || line.isBlank()) {
@@ -29,7 +24,7 @@ public class Protocol {
     String cmdToken;
     String rest;
 
-    // Determine command (workaround for no message)
+    // Determine command (FIX for if no second part)
     if (parts.length >= 2) {
       cmdToken = parts[0];
       rest = parts[1];
@@ -41,19 +36,13 @@ public class Protocol {
     try {
       Command cmd = Command.valueOf(cmdToken); // tests if the command is in the enum
 
-      if (rest.isEmpty()) return new Packet(cmd, List.of()); //
-      return Packet.of(cmd, rest); // keep tail as one arg
-    } catch (IllegalArgumentException e) {
+      if (rest.isEmpty()) return new Packet(cmd, List.of()); //empty list
+      return Packet.of(cmd, rest);
+    } catch (IllegalArgumentException e) { //catch if cmd isnt known
       throw new IllegalArgumentException("Faced with unsupported Command token: " + cmdToken);
     }
   }
 
-  /**
-   * Encode string.
-   *
-   * @param p the p
-   * @return the string
-   */
   // Encode a package into a line
   public static String encode(Packet p) {
     if (p == null || p.cmd() == null)
