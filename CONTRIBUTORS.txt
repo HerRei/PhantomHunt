@@ -1,6 +1,6 @@
 List of all contributors:
 
-- JAN
+- Jan
 - Ismail
 -
 -
