@@ -110,7 +110,7 @@ public class ClientHandler implements Runnable {
 
   private void handleUnicom(Packet p) {
     String msg = (p.argc() >= 1) ? p.args().get(0) : "";
-    registry.broadcast(this, (Packet.of(Command.UNICOM, msg)));
+    registry.broadcast(this, (Packet.of(Command.UNICOM, getName() + ": " + msg)));
   }
 
   private void handleLogout() {
