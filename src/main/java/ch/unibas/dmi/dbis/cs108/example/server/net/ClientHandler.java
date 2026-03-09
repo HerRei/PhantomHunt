@@ -23,7 +23,7 @@ public class ClientHandler implements Runnable {
   private BufferedWriter out; //used for the chat function
   private final Registry registry; //keeps all of the users
   private String name; // nickname
-  private long lastSeen; //used for PingPong
+  private long lastSeen = System.currentTimeMillis();//used for PingPong
   private ScheduledExecutorService scheduler;
 
   //getter for the name as to keep access private
@@ -36,6 +36,7 @@ public class ClientHandler implements Runnable {
   public ClientHandler(Socket socket, Registry registry) {
     this.socket = socket;
     this.registry = registry;
+    this.name = NameGenerator.randomName();
   }
 
 
@@ -84,26 +85,7 @@ public class ClientHandler implements Runnable {
             return; // triggers finally which cleans up
           }
 
-          case NICK -> {
-            String nick = (p.argc() >= 1) ? p.args().get(0) : "";
-
-            if (nick.isBlank()) {
-              sendMessage((Packet.of(Command.REJECT, "Error - no name found")));
-              continue;
-            }
-            if (!registry.claimName(nick, this)) {
-              sendMessage((Packet.of(Command.REJECT, "Name taken")));
-              registry.claimName(NameGenerator.randomName(), this);
-              continue;
-            }
-
-            if(this.name != null){
-              registry.releaseName(this.name, this);
-            }
-            this.name = nick;
-
-            sendMessage((Packet.of(Command.CLEARED, "NICK", this.name)));
-
+          case NICK -> { handleNickChange(p);
           }
 
           default -> {
@@ -144,12 +126,33 @@ public class ClientHandler implements Runnable {
     registry.claimName(name, this);
   }
 
+  private void handleNickChange(Packet p) {
+    String newNick = (p.argc() >= 1) ? p.args().get(0) : "";
+
+    if (newNick.isBlank()) {
+      sendMessage(Packet.of(Command.REJECT, "Error - no name found"));
+      return;
+    }
+
+    if (registry.claimName(newNick, this)) {
+      if (this.name != null) {
+        registry.releaseName(this.name, this);
+      }
+      this.name = newNick;
+      sendMessage(Packet.of(Command.CLEARED, "NICK", this.name));
+    } else {
+      sendMessage(Packet.of(Command.REJECT, "Name taken"));
+      // If the requested name is taken, we stay with the old random name of the NameGenerator (Ideally the user is prompted to pick a new name at the start)
+    }
+  }
+
 
   //this is just resetting the bufferdwriter and clearing the register and sockets
   //Maybe this should not be public????
   public void disconnect() {
 
     try {
+      scheduler.shutdown();
       this.out = null;
       registry.unregister(this);
       socket.close();
