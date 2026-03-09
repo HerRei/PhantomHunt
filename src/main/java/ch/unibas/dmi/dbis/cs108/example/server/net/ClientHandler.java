@@ -5,8 +5,10 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 //# todo do the pings/pongs and kick dead clients
@@ -21,6 +23,8 @@ public class ClientHandler implements Runnable {
   private BufferedWriter out; //used for the chat function
   private final Registry registry; //keeps all of the users
   private String name; // nickname
+  private long lastSeen; //used for PingPong
+  private ScheduledExecutorService scheduler;
 
   //getter for the name as to keep access private
 
@@ -48,16 +52,7 @@ public class ClientHandler implements Runnable {
       this.out = out;
       registry.register(this); //hand the client to the register
       String line;
-
-
-
-
-      //#todo ping
-
-
-
-
-
+      pinging();
 
       //input loop, as soon as a commamd is entered this will run.
       //#todo input validation, reject garbage inputs!(i
@@ -74,6 +69,11 @@ public class ClientHandler implements Runnable {
 
         switch (p.cmd()) {
 
+          case PONG -> {
+            lastSeen = System.currentTimeMillis();
+            break;
+          }
+
           case UNICOM -> {
             String msg = (p.argc() >= 1) ? p.args().get(0) : "";
             registry.broadcast(this, (Packet.of(Command.UNICOM, msg)));
@@ -81,6 +81,7 @@ public class ClientHandler implements Runnable {
 
           case LOGOUT -> {
             sendMessage(Packet.of(Command.UNICOM, "Okay, Bye") );
+            disconnect();
             return; // triggers finally which cleans up
           }
 
@@ -114,13 +115,39 @@ public class ClientHandler implements Runnable {
 
     } catch (IOException e) { //this is for the try with resources to be memorysafe
       // do nothing
-    } finally { //this is just resetting the bufferdwriter and clearing the register and sockets
-      try {
-        this.out = null;
-        registry.unregister(this);
-        socket.close();
-      } catch (IOException e) { // do nothing
+    } finally {
+      disconnect();
+    }
+  }
+
+  //pings the player all 15 seconds and handles if he left
+  public void pinging(){
+    sendMessage(Packet.of(Command.PING));
+    this.scheduler = Executors.newSingleThreadScheduledExecutor();
+    scheduler.scheduleAtFixedRate(() -> {
+      long now = System.currentTimeMillis();
+      if (now - lastSeen > 16000)//checks if lastpong > 16 seconds
+      {
+        disconnect();
+        System.err.println("Timeout: No Pong received from " + (name != null ? name : "client"));
       }
+      else {
+        // Send the Ping again
+        sendMessage(Packet.of(Command.PING));
+      }
+    }, 15, 15, TimeUnit.SECONDS);
+  }
+
+
+  //this is just resetting the bufferdwriter and clearing the register and sockets
+  public void disconnect() {
+
+    try {
+      this.out = null;
+      registry.unregister(this);
+      socket.close();
+    } catch (IOException e) {
+      //do nothing
     }
   }
 

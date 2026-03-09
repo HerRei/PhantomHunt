@@ -6,8 +6,8 @@ These are the first few basic tokens, there will definietly be more to add, esp 
  */
 public enum Command {
     // health / connection
-    BEACON,        // ping
-    BEACON_ACK,    // pong
+    PING,    // ping
+    PONG,    // pong
 
     // identity
     CHECKIN,       // CHECKIN <name>

@@ -11,30 +11,19 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Handles communication with the server in a separate thread.
- * Listens for incoming packets and provides methods to send packets.
- */
 public class ServerHandler implements Runnable {
 
     private final Socket socket;
     private BufferedWriter out;
 
-    /**
-     * Constructs a new ServerHandler and starts its execution in a new thread.
-     *
-     * @param socket the established connection to the server
-     */
+    //Constructor
     public ServerHandler(Socket socket) {
         this.socket = socket;
         Thread thread = new Thread(this);
         thread.start();
     }
 
-    /**
-     * Main loop that reads incoming lines from the server, decodes them into packets,
-     * and dispatches them to the handler.
-     */
+    //Receives Packets from server and sends Packets back
     @Override
     public void run() {
         try (
@@ -56,15 +45,11 @@ public class ServerHandler implements Runnable {
         }
     }
 
-    /**
-     * Processes commands received from the server.
-     *
-     * @param packet the received packet to process
-     */
+    //Manages the Packets received from server
     private void managePacket(Packet packet) {
         switch (packet.cmd()) {
-            case BEACON:
-                send(Packet.of(Command.BEACON_ACK));
+            case PING:
+                send(Packet.of(Command.PONG));
                 break;
             case UNICOM:
                 System.out.println("Chat: " + packet.text());
@@ -75,11 +60,7 @@ public class ServerHandler implements Runnable {
         }
     }
 
-    /**
-     * Sends a packet to the server.
-     *
-     * @param packet the packet to be encoded and sent
-     */
+    //Sends Packet to server
     public void send(Packet packet) {
         try {
             if (out != null) {
@@ -92,9 +73,7 @@ public class ServerHandler implements Runnable {
         }
     }
 
-    /**
-     * Ensures the socket is closed when the handler stops.
-     */
+   //Closes Socket
     private void closeSocket() {
         try {
             if (!socket.isClosed()) {
