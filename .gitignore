@@ -22,4 +22,6 @@ build/
 # ignore log files
 *.log
 hs_err_pid*
-replay_pid*
+replay_pid*.classpath
+.project
+*.eml
