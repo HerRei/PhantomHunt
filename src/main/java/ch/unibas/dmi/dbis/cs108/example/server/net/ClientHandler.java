@@ -22,7 +22,7 @@ public class ClientHandler implements Runnable {
   private final Registry registry; //keeps all of the users
   private String name; // nickname
 
-  //getter for the name as to keep acces private
+  //getter for the name as to keep access private
 
   public String getName(){
     if (name == null) return "UKNW";
@@ -74,10 +74,6 @@ public class ClientHandler implements Runnable {
 
         switch (p.cmd()) {
 
-          case BEACON -> {
-            sendMessage(Packet.of(Command.BEACON_ACK, ""));
-
-          }
           case UNICOM -> {
             String msg = (p.argc() >= 1) ? p.args().get(0) : "";
             registry.broadcast(this, (Packet.of(Command.UNICOM, msg)));
