@@ -121,9 +121,15 @@ public class ClientHandler implements Runnable {
   private void handleWhisper(Packet p) {
     String payload = p.argc() >= 1 ? p.args().get(0) : "";
     int space = payload.indexOf(' ');
+
+
+
     String target  = payload.substring(0, space);
     String message = payload.substring(space + 1);
-    if (!registry.whisper(this, target, message)) {
+
+    if (registry.whisper(this, target, message)) {
+      sendMessage(Packet.of(Command.WHISPER, "[You → " + target + "]: " + message));
+    } else {
       sendMessage(Packet.of(Command.REJECT, "User not found: " + target));
     }
   }
