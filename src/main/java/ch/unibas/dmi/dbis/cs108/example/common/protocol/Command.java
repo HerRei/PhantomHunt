@@ -15,5 +15,7 @@ public enum Command {
     REJECT,        // REJECT <text...>
 
     // chat
-    UNICOM         // UNICOM <text...>
+    UNICOM,         // UNICOM <text...>
+    LOGOUT,
+    NICK
 }

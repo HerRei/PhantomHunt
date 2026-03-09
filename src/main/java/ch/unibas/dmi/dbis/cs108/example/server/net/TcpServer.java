@@ -18,7 +18,7 @@ public class TcpServer {
   //this starts the server
   public void start() throws IOException {
     try (ServerSocket serverSocket = new ServerSocket(port)) {
-      System.out.println("Serer listening on port" + port);
+      System.out.println("Server listening on port" + port);
 
       Registry registry = new Registry();
 
