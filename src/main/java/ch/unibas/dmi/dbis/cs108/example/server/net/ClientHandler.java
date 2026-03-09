@@ -44,11 +44,11 @@ public class ClientHandler implements Runnable {
   public void run() {
     //try with resources to not get a leak
     try (BufferedReader in =
-             new BufferedReader(
-                 new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+                 new BufferedReader(
+                         new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
          BufferedWriter out =
-             new BufferedWriter(
-                 new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
+                 new BufferedWriter(
+                         new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
       this.out = out;
       registry.register(this); //hand the client to the register
       String line;
@@ -70,26 +70,28 @@ public class ClientHandler implements Runnable {
         switch (p.cmd()) {
 
           case PONG -> {
-            lastSeen = System.currentTimeMillis();
+            handlePong();
             break;
           }
 
           case UNICOM -> {
-            String msg = (p.argc() >= 1) ? p.args().get(0) : "";
-            registry.broadcast(this, (Packet.of(Command.UNICOM, msg)));
+            handleUnicom(p);
           }
 
           case LOGOUT -> {
-            sendMessage(Packet.of(Command.UNICOM, "Okay, Bye") );
-            disconnect();
+            handleLogout();
             return; // triggers finally which cleans up
           }
 
           case NICK -> { handleNickChange(p);
           }
 
+          case WHISPER -> {
+            handleWhisper(p);
+          }
+
           default -> {
-            sendMessage((Packet.of(Command.REJECT, "Unsupported command: " + p.cmd())));
+            handleDefault(p);
           }
         }
       }
@@ -100,6 +102,34 @@ public class ClientHandler implements Runnable {
     } finally {
       disconnect();
     }
+  }
+
+  private void handlePong() {
+    lastSeen = System.currentTimeMillis();
+  }
+
+  private void handleUnicom(Packet p) {
+    String msg = (p.argc() >= 1) ? p.args().get(0) : "";
+    registry.broadcast(this, (Packet.of(Command.UNICOM, msg)));
+  }
+
+  private void handleLogout() {
+    sendMessage(Packet.of(Command.UNICOM, "Okay, Bye") );
+    disconnect();
+  }
+
+  private void handleWhisper(Packet p) {
+    String payload = p.argc() >= 1 ? p.args().get(0) : "";
+    int space = payload.indexOf(' ');
+    String target  = payload.substring(0, space);
+    String message = payload.substring(space + 1);
+    if (!registry.whisper(this, target, message)) {
+      sendMessage(Packet.of(Command.REJECT, "User not found: " + target));
+    }
+  }
+
+  private void handleDefault(Packet p) {
+    sendMessage((Packet.of(Command.REJECT, "Unsupported command: " + p.cmd())));
   }
 
   //pings the player all 15 seconds and handles if he left

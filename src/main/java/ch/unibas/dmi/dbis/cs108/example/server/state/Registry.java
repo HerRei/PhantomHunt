@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.example.server.state;
 
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
@@ -52,5 +53,18 @@ public final class Registry {
       
       h.sendMessage(p);
     }
+  }
+
+  public boolean whisper(ClientHandler sender, String targetName, String message){
+    ClientHandler recipient = byName.get(targetName);
+    if (recipient == null) return false;
+
+    //all of this needs to be tested at some point!!!! #todo test this mess
+    String attributed = "[Whisper from " + sender.getName() + "]: " + message;
+    recipient.sendMessage(Packet.of(Command.WHISPER, attributed));
+    sender.sendMessage(Packet.of(Command.WHISPER, "[You → " + targetName + "]: " + message));
+    return true;
+
+
   }
 }

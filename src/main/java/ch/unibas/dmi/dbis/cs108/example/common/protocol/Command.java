@@ -16,6 +16,7 @@ public enum Command {
 
     // chat
     UNICOM,         // UNICOM <text...>
+    WHISPER, //WHISPER <recipient> <text...>
     LOGOUT,
     NICK
 }
