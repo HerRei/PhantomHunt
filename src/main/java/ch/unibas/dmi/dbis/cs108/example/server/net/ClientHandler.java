@@ -27,7 +27,6 @@ public class ClientHandler implements Runnable {
   private ScheduledExecutorService scheduler;
 
   //getter for the name as to keep access private
-
   public String getName(){
     if (name == null) return "UKNW";
     return name;
@@ -94,6 +93,7 @@ public class ClientHandler implements Runnable {
             }
             if (!registry.claimName(nick, this)) {
               sendMessage((Packet.of(Command.REJECT, "Name taken")));
+              registry.claimName(NameGenerator.randomName(), this);
               continue;
             }
 
@@ -138,8 +138,15 @@ public class ClientHandler implements Runnable {
     }, 15, 15, TimeUnit.SECONDS);
   }
 
+  private void assignName(){
+    double x = Math.random() * 10;
+    String name = Double.toString(x);
+    registry.claimName(name, this);
+  }
+
 
   //this is just resetting the bufferdwriter and clearing the register and sockets
+  //Maybe this should not be public????
   public void disconnect() {
 
     try {
