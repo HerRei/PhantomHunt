@@ -49,7 +49,7 @@ public final class Registry {
     String str = Protocol.encode(p);
     for (ClientHandler h : sessions.keySet()) {
       if (h == sender) continue;
-      str = sender.getName() + ": " + str; //this breaks the protcol
+      
       h.sendMessage(p);
     }
   }
