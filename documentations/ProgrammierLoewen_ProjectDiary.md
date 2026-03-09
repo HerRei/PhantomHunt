@@ -46,9 +46,36 @@
 Individuelle Vertiefung: Jeder arbeitet an seiner zugeteilten Aufgabe und verschafft sich einen detaillierten Überblick über das Gesamtprojekt.
 Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 
-## 2026-03-04 - ALL##
-**Dauer:** ~2h
+## 26-02-23 — Jan##
+**Dauer:** ~?
+**Rapportstruktur festgelegt:**
+- Vorlage für die wöchentlichen Berichte erstellt, um den Fortschritt und die investierten Stunden pro Teammitglied sauber zu dokumentieren.
 
+
+## 2026-02-25 — Silas und Ismail##
+**Dauer: ~3h**
+**Ziel:** Detaillierte Projektplanung und Zeitmanagement
+**Was gemacht**
+- Projekt-Timeline erstellt:
+    - Festlegung der internen Deadlines basierend auf den offiziellen Meilensteinen (MS1 bis MS6).
+    - Einplanung von Pufferzeiten vor den Abgaben, um auf unvorhergesehene technische Hürden reagieren zu können.
+- Gantt-Chart finalisiert:
+    - Visualisierung der Arbeitspakete in YouTrack.
+    - Abhängigkeiten zwischen den Aufgaben definiert (z. B. "Server-Basis-Logik" muss vor "Client-Anbindung" stehen).
+    - Zuweisung der Verantwortlichkeiten: Wer arbeitet an der Spielmechanik, wer am Netzwerk-Layer?
+
+## 2026-04-03 — Team-Sitzung##
+**Dauer: ~4h**
+**Ziel:** Vorbereitung der ersten Präsentation und Strukturierung der Dokumentation
+**Was gemacht**
+- Präsentation (MS1) vorbereitet:
+    - Erstellung der Folien für die Projektvorstellung.
+    - Inhaltlicher Fokus: Spielidee "Phantom Hunt", Architekturdiagramm (Client/Server-Trennung) und Risikomanagement.
+    - Vorbereitung einer kurzen Demo-Skizze (Mockups), wie das UI in JavaFX später aussehen könnte.
+
+
+## 2026-03-04 - Team-Sitzung##
+**Dauer:** ~2h
 **Ziel:** Finalisierung und Besrechung der individeuell erarbeiteten Dokumente. Pushen aller finalisierten Dokumente.
 **Was gemacht**
 - Beschrechung und Fortschritt breefing:
@@ -60,5 +87,7 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - **Visualisierung des Gantt-Charts:** Das Gantt-Chart sinnvoll zu visualisieren, hat uns Probleme bereitet.
 - **Minimizierung der Aufgaben Ueberschnitte:** Viele aufgaben die wir uns verteilt haben, hatten in gewissen bereichen Abhaengigkeiten voneinander. So gab es Aufgaben, die sich ueberschneiden.
 
+
+    
 
 
