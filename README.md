@@ -1,16 +1,21 @@
 # README
+
 ## PhantomHunt - Multiplayer Game ##
-PhantomHunt ist ein strategisches, rundenbasiertes 2D-Multiplayer-Spiel, das im Rahmen des CS108 Programmierprojekts entwickelt wird. Erlebe packende Verfolgungsjagden in einem verfluchten Schloss, in denen Teamarbeit auf puren Überlebensinstinkt trifft.
 
-## Das Spielprinzip ##
-In PhantomHunt treten zwei ungleiche Teams gegeneinander an. Drei Geister gegen einen Menschen. Das Setting: Ein ahnungsloser Mensch befindet sich in einem spukenden Schoss. Während die Geister versuchen, den Eindringling in den Wahnsinn zu treiben, zählt für den Menschen jede Sekunde auf der Flucht.
+PhantomHunt is a strategic, turn-based 2D multiplayer game developed as part of the CS108 programming project. Experience thrilling chases inside a cursed castle where teamwork meets pure survival instinct.
 
-## Kernmechaniken ##
-**Asymmetrisches Gameplay:** 3 vs. 1 – unterschiedliche Fähigkeiten und Ziele je nach Rolle.
+## The Game Concept ##
 
-**Punktesystem:** 
-- Der Mensch punktet durch Überlebensdauer und das erfolgreiche Beenden einer Runde.
+In PhantomHunt, two unequal teams compete against each other: three ghosts versus one human. The setting: an unsuspecting human finds themselves inside a haunted castle. While the ghosts try to drive the intruder into madness, every second counts for the human trying to escape.
 
-- Die Geister sammeln Punkte, indem sie den Menschen aufspüren und erschrecken.
+## Core Mechanics ##
 
-**Fairness** durch Rotation: Ein Spiel besteht aus vier Runden. Jeder Spieler schlüpft genau einmal in die Rolle des Menschen. Wer nach dem Finale die meisten Gesamtpunkte hat, gewinnt das Match.
+**Asymmetric Gameplay:**
+3 vs. 1 – each role has different abilities and objectives.
+
+**Scoring System:**
+- The human earns points by surviving as long as possible and successfully finishing a round.
+- The ghosts earn points by locating and scaring the human.
+
+**Fairness through rotation:**
+A match consists of four rounds. Each player takes the role of the human exactly once. After the final round, the player with the highest total score wins the match.
