@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.cs108.example.client;
+package ch.unibas.dmi.dbis.cs108.example.client.net;
 
 import java.io.IOException;
 import java.net.Socket;

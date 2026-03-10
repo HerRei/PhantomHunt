@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.cs108.example.client;
+package ch.unibas.dmi.dbis.cs108.example.client.net;
 
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
