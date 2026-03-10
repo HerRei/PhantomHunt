@@ -49,15 +49,49 @@ public class ServerHandler implements Runnable {
     private void managePacket(Packet packet) {
         switch (packet.cmd()) {
             case PING:
-                send(Packet.of(Command.PONG));
+                handlePing();
                 break;
             case UNICOM:
-                System.out.println("Chat: " + packet.text());
+                handleUnicom(packet);
+                break;
+            case WHISPER:
+                handleWhisper(packet);
+                break;
+            case CLEARED:
+                handleCleared(packet);
+                break;
+            case REJECT:
+                handleReject(packet);
                 break;
             default:
-                // Unknown Packets
+                handleUnknown(packet);
                 break;
         }
+    }
+
+    // helper functions
+    private void handlePing() {
+        send(Packet.of(Command.PONG));
+    }
+
+    private void handleUnicom(Packet packet) {
+        System.out.println("Chat: " + packet.text());
+    }
+
+    private void handleWhisper(Packet packet) {
+        System.out.println(packet.text());
+    }
+
+    private void handleCleared(Packet packet) {
+        System.out.println("System: " + packet.text());
+    }
+
+    private void handleReject(Packet packet) {
+        System.err.println("Error: " + packet.text());
+    }
+
+    private void handleUnknown(Packet packet) {
+        System.out.println("Received unknown command: " + packet.cmd());
     }
 
     //Sends Packet to server

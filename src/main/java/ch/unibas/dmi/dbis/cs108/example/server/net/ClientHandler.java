@@ -128,7 +128,7 @@ public class ClientHandler implements Runnable {
     String message = payload.substring(space + 1);
 
     if (registry.whisper(this, target, message)) {
-      sendMessage(Packet.of(Command.WHISPER, "[You → " + target + "]: " + message));
+      // this used to be here for debugging , might need this later when registry has errors
     } else {
       sendMessage(Packet.of(Command.REJECT, "User not found: " + target));
     }
@@ -162,6 +162,7 @@ public class ClientHandler implements Runnable {
     registry.claimName(name, this);
   }
 
+
   private void handleNickChange(Packet p) {
     String newNick = (p.argc() >= 1) ? p.args().get(0) : "";
 
@@ -170,15 +171,22 @@ public class ClientHandler implements Runnable {
       return;
     }
 
-    if (registry.claimName(newNick, this)) {
-      if (this.name != null) {
-        registry.releaseName(this.name, this);
-      }
-      this.name = newNick;
-      sendMessage(Packet.of(Command.CLEARED, "NICK", this.name));
-    } else {
-      sendMessage(Packet.of(Command.REJECT, "Name taken"));
-      // If the requested name is taken, we stay with the old random name of the NameGenerator (Ideally the user is prompted to pick a new name at the start)
+    String oldName = this.name;
+    String assignedNick = registry.claimName(newNick, this);
+
+    this.name = assignedNick;
+
+    // Alten Namen aus der Registry löschen
+    if (oldName != null && !oldName.equals(assignedNick)) {
+      registry.releaseName(oldName, this);
+    }
+
+    sendMessage(Packet.of(Command.CLEARED, "NICK", this.name));
+    System.out.println("NICK CHANGED TO:" + this.name);
+
+
+    if (!assignedNick.equals(newNick)) {
+      sendMessage(Packet.of(Command.REJECT, "Name was taken. You are now: " + this.name));
     }
   }
 

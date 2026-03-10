@@ -1,6 +1,9 @@
 package ch.unibas.dmi.dbis.cs108.example.client;
 
 import ch.unibas.dmi.dbis.cs108.example.client.net.TcpClient;
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.NameGenerator;
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
 
 
@@ -16,6 +19,12 @@ public class ClientApp {
 
         System.out.println("Connecting to " + host + ":" + port);
         TcpClient client = new TcpClient(host, port);
+
+        String systemName = System.getProperty("user.name");
+        if (systemName == null || systemName.isBlank()) {
+            systemName = NameGenerator.randomName();
+        }
+        client.getServerHandler().send(Packet.of(Command.NICK, systemName));
 
         try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
             while (scanner.hasNextLine()) {

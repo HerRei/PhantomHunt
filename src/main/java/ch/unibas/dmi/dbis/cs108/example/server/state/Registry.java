@@ -19,10 +19,23 @@ public final class Registry {
   private final ConcurrentHashMap<String, ClientHandler> byName =
       new ConcurrentHashMap<>(); // Nickname handling
 
-  // nickname logic - every person that is in the sessions need to  e in byName etc
-  public boolean claimName(String name, ClientHandler h) {
-    return byName.putIfAbsent(name, h)
-        == null; // returns null when it works thus == null returns true if succesfull
+
+  public String claimName(String requestedName, ClientHandler h) {
+    String attempt = requestedName;
+    int counter = 1;
+
+    // putIfAbsent gibt null zurück, wenn der Key noch nicht existierte und erfolgreich eingefügt wurde
+    while (byName.putIfAbsent(attempt, h) != null) {
+      // Wenn dieser ClientHandler den Namen bereits besitzt, gib ihn direkt zurück
+      if (byName.get(attempt) == h) {
+        return attempt;
+      }
+
+      attempt = requestedName + counter;
+      counter++;
+    }
+
+    return attempt;
   }
 
   public String names() {
