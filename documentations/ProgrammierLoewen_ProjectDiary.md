@@ -5,7 +5,7 @@
 ## 2026-02-20 — Hermes ##
 **Dauer:** ~6h
 **Ziel:** Einrichten einer Einheitlichen Arbeitsumgebung
-**Was gemacht**
+**Was gemacht:**
 - IntelliJ IDEA eingerichtet:
     - JDK installiert/ausgewählt (Java 25)
     - Style Check und Plugins dazu festgelegt
@@ -24,8 +24,9 @@
 - Konzept und Präsentation schreiben
 - Erster Code schreiben (sinnvoll)
 
+
 ## 026-02-21 — Team-Sitzung ##
-**Dauer:**  ~2h
+**Dauer:** ~2h
 
 **Ziel:** Projektinitialisierung, Rollenverteilung und Konzept-Finalisierung
 **Was gemacht**
@@ -46,16 +47,17 @@
 Individuelle Vertiefung: Jeder arbeitet an seiner zugeteilten Aufgabe und verschafft sich einen detaillierten Überblick über das Gesamtprojekt.
 Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 
-## 26-02-23 — Jan##
-**Dauer:** ~?
+
+## 26-02-23 — Jan ##
+**Dauer:** ~45min
 **Rapportstruktur festgelegt:**
 - Vorlage für die wöchentlichen Berichte erstellt, um den Fortschritt und die investierten Stunden pro Teammitglied sauber zu dokumentieren.
 
 
-## 2026-02-25 — Silas und Ismail##
-**Dauer: ~3h**
+## 2026-02-25 — Silas und Ismail ##
+**Dauer:** ~3h
 **Ziel:** Detaillierte Projektplanung und Zeitmanagement
-**Was gemacht**
+**Was gemacht:**
 - Projekt-Timeline erstellt:
     - Festlegung der internen Deadlines basierend auf den offiziellen Meilensteinen (MS1 bis MS6).
     - Einplanung von Pufferzeiten vor den Abgaben, um auf unvorhergesehene technische Hürden reagieren zu können.
@@ -64,20 +66,21 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
     - Abhängigkeiten zwischen den Aufgaben definiert (z. B. "Server-Basis-Logik" muss vor "Client-Anbindung" stehen).
     - Zuweisung der Verantwortlichkeiten: Wer arbeitet an der Spielmechanik, wer am Netzwerk-Layer?
 
-## 2026-04-03 — Team-Sitzung##
-**Dauer: ~4h**
+
+## 2026-04-03 — Team-Sitzung ##
+**Dauer:** ~4h
 **Ziel:** Vorbereitung der ersten Präsentation und Strukturierung der Dokumentation
-**Was gemacht**
+**Was gemacht:**
 - Präsentation (MS1) vorbereitet:
     - Erstellung der Folien für die Projektvorstellung.
     - Inhaltlicher Fokus: Spielidee "Phantom Hunt", Architekturdiagramm (Client/Server-Trennung) und Risikomanagement.
     - Vorbereitung einer kurzen Demo-Skizze (Mockups), wie das UI in JavaFX später aussehen könnte.
 
 
-## 2026-03-04 - Team-Sitzung##
+## 2026-03-04 - Team-Sitzung ##
 **Dauer:** ~2h
 **Ziel:** Finalisierung und Besrechung der individeuell erarbeiteten Dokumente. Pushen aller finalisierten Dokumente.
-**Was gemacht**
+**Was gemacht:**
 - Beschrechung und Fortschritt breefing:
     - Jede Person Präsentiert kurz, kanpp und klar deren Fortschritte.
     - Falls Niemand Anmerkungen/Verbesserungsvorschläge hatte, wurden diese Dokumente commitet.
@@ -88,6 +91,11 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - **Minimizierung der Aufgaben Ueberschnitte:** Viele aufgaben die wir uns verteilt haben, hatten in gewissen bereichen Abhaengigkeiten voneinander. So gab es Aufgaben, die sich ueberschneiden.
 
 
-    
+## 2026-03-09 - Ismail ## 
+**Dauer:** ~2h
+**Ziel:** Pipeline mit GitLab CI/CD zum bauen, testen & deployen des Java-Projekts mit Gradle.
+**Was gemacht:** 
+- Pipeline-Basis: .gitlab-ci.yml erstellt, damit das Projekt bei jedem Push automatisch gebaut wird.
+- Image: Die Pipeline läuft in einem Container mit Java 25 auf einem kleinen Alpine-Linux.
 
 

@@ -1,9 +1,16 @@
 # README
-This is a readme file. It typically includes some information about your project. 
-For more information about readmes, you can either [read a guide](https://github.com/18F/open-source-guide/blob/18f-pages/pages/making-readmes-readable.md) or have a look at the readmes of popular open-source projects such as [Swift by Apple](https://github.com/apple/swift) or [Tensorflow](https://github.com/tensorflow/tensorflow).
+## PhantomHunt - Multiplayer Game ##
+PhantomHunt ist ein strategisches, rundenbasiertes 2D-Multiplayer-Spiel, das im Rahmen des CS108 Programmierprojekts entwickelt wird. Erlebe packende Verfolgungsjagden in einem verfluchten Schloss, in denen Teamarbeit auf puren Überlebensinstinkt trifft.
 
-Readme files are typically formatted in Markdown. 
-However, there are platform-specific flavors, so for this project, you can make full use of the [Gitlab markdown syntax](https://docs.gitlab.com/ee/user/markdown.html), for example when talking about a :bug: (bug) or if your code is slow like a :snail:.
-You can also tag people using @username and reference issues using '#1', where 1 is the issue number. For more features, consult the linked Gitlab syntax guide. 
+## Das Spielprinzip ##
+In PhantomHunt treten zwei ungleiche Teams gegeneinander an. Drei Geister gegen einen Menschen. Das Setting: Ein ahnungsloser Mensch befindet sich in einem spukenden Schoss. Während die Geister versuchen, den Eindringling in den Wahnsinn zu treiben, zählt für den Menschen jede Sekunde auf der Flucht.
 
-If you don't like reading documentation, [here's a cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
+## Kernmechaniken ##
+**Asymmetrisches Gameplay:** 3 vs. 1 – unterschiedliche Fähigkeiten und Ziele je nach Rolle.
+
+**Punktesystem:** 
+- Der Mensch punktet durch Überlebensdauer und das erfolgreiche Beenden einer Runde.
+
+- Die Geister sammeln Punkte, indem sie den Menschen aufspüren und erschrecken.
+
+**Fairness** durch Rotation: Ein Spiel besteht aus vier Runden. Jeder Spieler schlüpft genau einmal in die Rolle des Menschen. Wer nach dem Finale die meisten Gesamtpunkte hat, gewinnt das Match.
