@@ -5,13 +5,21 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
+/**
+ * Translates between strings and packet objects.
+ */
 public class Protocol {
 
   private static final Logger LOGGER = LogManager.getLogger(Protocol.class);
 
   private Protocol() {} // no instances of this class
 
-  // line decoder LF -> into a "Packet"
+  /**
+   * Converts a text line into a packet.
+   * @param line The text line from the network.
+   * @return The decoded Packet.
+   * @throws IllegalArgumentException If the line is empty or the command is unknown.
+   */
   public static Packet decode(String line) {
     if (line == null || line.isBlank()) {
       LOGGER.error("Decoding failed: input line is null or blank");
@@ -47,7 +55,12 @@ public class Protocol {
     }
   }
 
-  // Encode a package into a line
+  /**
+   * Converts a package into a string to be sent to the network.
+   * @param p The packet to encode.
+   * @return The formatted string.
+   * @throws IllegalArgumentException If the packet or its command is null.
+   */
   public static String encode(Packet p) {
     if (p == null || p.cmd() == null) {
       LOGGER.error("Encoding failed: Packet or Command is null");

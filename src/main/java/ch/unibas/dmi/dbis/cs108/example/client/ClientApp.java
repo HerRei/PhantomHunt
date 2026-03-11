@@ -8,13 +8,23 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * The main class of the client.
+ * It connects to the game server, sets the player's name,
+ * and reads input from the console to send it to the server.
+ */
 public class ClientApp {
 
   private static final String DEFAULT_HOST = "localhost"; // Loopback domain
   private static final int DEFAULT_PORT = 2222; // Port which we also use in ServerApp
   private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
 
-  // Creates a Client on host DEFAULT_HOST and port DEFAULTPORT
+  /**
+   * Starts the client.
+   * It connects to the server, sends the username, and waits for
+   * user input in a loop.
+   * @param args
+   */
   public static void main(String[] args) {
     String host = DEFAULT_HOST;
     int port = DEFAULT_PORT;

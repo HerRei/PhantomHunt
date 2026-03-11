@@ -16,6 +16,11 @@ public final class Packet {
   private final Command cmd;
   private final List<String> args;
 
+  /**
+   * Creates a new packet.
+   * @param cmd The command of this packet.
+   * @param args The list of arguments for this command.
+   */
   public Packet(Command cmd, List<String> args) {
     this.cmd = cmd;
     this.args = args;
@@ -37,6 +42,8 @@ public final class Packet {
   }
 
   // #todo
+
+
   // useful error if package was empty, also idk when this would be the case anyway
   public String text() {
 
@@ -45,7 +52,13 @@ public final class Packet {
     return args.get(0);
   }
 
-  // Methode zum einfach instanzen zu machen
+  /**
+   * A helper method to easily create a new packet.
+   * * @param cmd
+   * @param cmd  The command of the packet.
+   * @param args The arguments
+   * @return A new packet instance.
+   */
   public static Packet of(Command cmd, String... args) {
     LOGGER.debug("Static factory Packet.of called for command: {}", cmd);
     return new Packet(cmd, Arrays.asList(args));

@@ -11,19 +11,31 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Manages the client's active network connection to the server.
+ * This class runs in its own thread, constantly listens for incoming
+ * messages from the server, and provides a method for sending packets.
+ */
 public class ServerHandler implements Runnable {
 
     private final Socket socket;
     private BufferedWriter out;
 
-    //Constructor
+    /**
+     * Creates a new handler for the server connection and starts immediately
+     * the read thread.
+     * @param socket The connected Socket, through which communication with the server takes place.
+     */
     public ServerHandler(Socket socket) {
         this.socket = socket;
         Thread thread = new Thread(this);
         thread.start();
     }
 
-    //Receives Packets from server and sends Packets back
+
+    /**
+     * Receives Packets from server and sends Packets back
+     */
     @Override
     public void run() {
         try (
@@ -94,7 +106,11 @@ public class ServerHandler implements Runnable {
         System.out.println("Received unknown command: " + packet.cmd());
     }
 
-    //Sends Packet to server
+
+    /**
+     * Sends Packet to server
+     * @param packet
+     */
     public void send(Packet packet) {
         try {
             if (out != null) {

@@ -14,7 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 // # todo do the pings/pongs and kick dead clients
 
-/** The type Client handler. */
+/**
+ * Handles the connection to a single client on the server.
+ * Listens for incoming packets, processes them, and can send packets back.
+ */
 public class ClientHandler implements Runnable {
 
   private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
@@ -31,7 +34,11 @@ public class ClientHandler implements Runnable {
     return name;
   }
 
-  // constructor
+  /**
+   * Creates a new handler for a connected client.
+   * @param socket   The socket connection to the client.
+   * @param registry The server registry that manages all connected players.
+   */
   public ClientHandler(Socket socket, Registry registry) {
     this.socket = socket;
     this.registry = registry;
@@ -39,6 +46,11 @@ public class ClientHandler implements Runnable {
     LOGGER.info("New client connected. {}", name);
   }
 
+  /**
+   * The main loop for this client thread.
+   * It constantly reads incoming text, decodes it into Packets,
+   * and triggers the correct action based on the command.
+   */
   @Override
   public void run() {
     // try with resources to not get a leak
@@ -141,7 +153,9 @@ public class ClientHandler implements Runnable {
     sendMessage((Packet.of(Command.REJECT, "Unsupported command: " + p.cmd())));
   }
 
-  // pings the player all 15 seconds and handles if he left
+  /**
+   * pings the player all 15 seconds and handles if he left
+   */
   public void pinging() {
     LOGGER.trace("Pinging... {}", name);
     sendMessage(Packet.of(Command.PING));
@@ -201,8 +215,10 @@ public class ClientHandler implements Runnable {
     }
   }
 
-  // this is just resetting the bufferdwriter and clearing the register and sockets
-  // Maybe this should not be public????
+
+  /**
+   * this is just resetting the buffered writer and clearing the register and sockets
+   */
   public void disconnect() {
 
     try {
@@ -215,6 +231,12 @@ public class ClientHandler implements Runnable {
     }
   }
 
+  /**
+   * Sends a packet to this client.
+   * This method is synchronized to safely allow other threads
+   * to send messages to this client.
+   * @param p The packet to send.
+   */
   public void sendMessage(Packet p) {
     // synchronising fixes the thread issue of the thread-per-client server that this here is
     // is used to send messages to people conneected to the server with then the according logic

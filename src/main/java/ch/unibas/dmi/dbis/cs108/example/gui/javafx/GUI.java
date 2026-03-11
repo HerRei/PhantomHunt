@@ -19,6 +19,10 @@ public class GUI extends Application {
         launch(args);
     }
 
+    /**
+     * Sets up and opens the main game window.
+     * @param stage
+     */
     @Override
     public void start(Stage stage) {
         String javaVersion = System.getProperty("java.version");
