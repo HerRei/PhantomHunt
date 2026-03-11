@@ -4,6 +4,9 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * A class that generates random names for players.
+ */
 public class NameGenerator {
 
   private static final String[] PREFIXES = {
@@ -14,6 +17,10 @@ public class NameGenerator {
   private static final Random RANDOM = new Random();
   private static final Logger LOGGER = LogManager.getLogger(NameGenerator.class);
 
+  /**
+   * Generates and returns a random name.
+   * @return A randomly generated name string.
+   */
   public static String randomName() {
     return generateName();
   }

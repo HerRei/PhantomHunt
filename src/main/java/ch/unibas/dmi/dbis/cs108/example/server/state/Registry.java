@@ -9,6 +9,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Manages all connected clients and their nicknames.
+ * It provides methods to broadcast messages to everyone or send private whispers.
+ */
 public final class Registry {
 
   // hash map that is thread safe as we dont want a O(n) lookup with e.g. vector that is also
@@ -25,6 +29,13 @@ public final class Registry {
   private final ConcurrentHashMap<String, ClientHandler> byName =
       new ConcurrentHashMap<>(); // Nickname handling
 
+  /**
+   * Assign a requested nickname to a client.
+   * If the name is taken, it adds a number to the end
+   * @param requestedName Name the player wants
+   * @param h Client handler requesting the name
+   * @return final unique nickname
+   */
   public String claimName(String requestedName, ClientHandler h) {
     String attempt = requestedName;
     int counter = 1;
@@ -48,26 +59,41 @@ public final class Registry {
     return byName.keySet().toString(); // this should return all the people that are in the registry
   }
 
+  /**
+   * Makes nickname available.
+   * @param name Nickname to release.
+   * @param h Client handler with this nickname.
+   */
   public void releaseName(String name, ClientHandler h) {
     byName.remove(name, h);
     log.debug("Nickname: {} released.", name); // remove name
   }
 
-  // keeping track of all of the people that got a client handler.
+  /**
+   * keeping track of all the people that got a client handler.
+   * @param h Client handler to add.
+   */
   public void register(ClientHandler h) {
     sessions.put(h, true); // autoboxing of Boolean.TRUE - might bring issues idk
     log.info("New client registered. size is: {}", sessions.size());
   }
 
-  // logged off players should be removed
+  /**
+   * Removes client from the registry when disconnected.
+   * @param h Client handler to remove.
+   */
   public void unregister(ClientHandler h) {
     sessions.remove(h);
     log.info("Client unregistered. size: {}", sessions.size());
   }
 
-  // send messages to everyone exept for the sender with the bufferdrwriter from the ClientHandler
-  // class
 
+
+  /**
+   * Send messages to all clients except for the sender.
+   * @param sender Client who send the broadcast.
+   * @param p message to send.
+   */
   public void broadcast(ClientHandler sender, Packet p) {
     log.debug("registry brioadcat packet from {}: {}", sender.getName(), p.cmd());
     String str = Protocol.encode(p);
@@ -78,6 +104,13 @@ public final class Registry {
     }
   }
 
+  /**
+   * Private message from client to client.
+   * @param sender
+   * @param targetName Nickname of the receiver.
+   * @param message The text.
+   * @return True or false
+   */
   public boolean whisper(ClientHandler sender, String targetName, String message) {
     ClientHandler recipient = byName.get(targetName);
     if (recipient == null) return false;
