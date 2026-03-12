@@ -2,6 +2,9 @@ package ch.unibas.dmi.dbis.cs108.example.gui.javafx;
 
 import javafx.application.Application;
 
+/**
+ *
+ */
 public class Main {
 
     /**

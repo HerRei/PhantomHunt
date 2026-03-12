@@ -5,7 +5,11 @@ import java.net.Socket;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
+/**
+ * Establishes the TCP connection to the game server.
+ * Enclose the socket and after establishing the connection, creates
+ * the ServerHandler for communication.
+ */
 public class TcpClient {
     private static final Logger LOGGER = LogManager.getLogger(TcpClient.class);
     private final int port;
@@ -13,7 +17,11 @@ public class TcpClient {
     private Socket socket;
     private ServerHandler serverHandler;
 
-    //Constructor
+    /**
+     * Attempting to connect to the server.
+     * @param host The IP address or hostname of the server
+     * @param port The port on which the server listens
+     */
     public TcpClient(String host, int port) {
         this.host = host;
         this.port = port;
@@ -24,7 +32,13 @@ public class TcpClient {
         }
     }
 
-    //Connects The client to the server
+    /**
+     * Connects The client to the server
+     * @param host The IP address or hostname of the server
+     * @param port The port on which the server listens
+     * @return
+     * @throws IOException If the connection cannot be established
+     */
     public ServerHandler connect(String host, int port) throws IOException {
         this.socket = new Socket(host, port);
         // Start the counterpart to the ClientHandler

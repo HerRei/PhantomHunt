@@ -8,11 +8,18 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * The main server class that listens for incoming client connections.
+ */
 public class TcpServer {
 
   private static final Logger LOGGER = LogManager.getLogger(TcpServer.class);
   private final int port;
 
+  /**
+   * Creates a new TCP server.
+   * @param port The port the server will listen.
+   */
   public TcpServer(int port) {
     this.port = port;
   }
