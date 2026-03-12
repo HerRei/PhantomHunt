@@ -2,10 +2,12 @@ package ch.unibas.dmi.dbis.cs108.example.client.net;
 
 import java.io.IOException;
 import java.net.Socket;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class TcpClient {
-
+    private static final Logger LOGGER = LogManager.getLogger(TcpClient.class);
     private final int port;
     private final String host;
     private Socket socket;
@@ -18,8 +20,7 @@ public class TcpClient {
         try {
             this.serverHandler = connect(host, port);
         } catch (IOException e) {
-            // Error handling: printing the stack trace for debugging purposes
-            e.printStackTrace();
+            LOGGER.error("Failed to connect to server", e);
         }
     }
 

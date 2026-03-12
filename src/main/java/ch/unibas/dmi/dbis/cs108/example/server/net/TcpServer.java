@@ -18,7 +18,7 @@ public class TcpServer {
   }
 
   // this starts the server
-  public void start() throws IOException {
+  public void start() {
     try (ServerSocket serverSocket = new ServerSocket(port)) {
       LOGGER.info("Server listening on port: {}", port);
 
@@ -39,7 +39,7 @@ public class TcpServer {
         Thread t = new Thread(clientHandler);
         t.start();
       }
-    } catch (Exception e) {
+    } catch (IOException e) {
       LOGGER.error("Error starting server", e);
       throw new RuntimeException(e); // fatal error of the server, should not happen
     }

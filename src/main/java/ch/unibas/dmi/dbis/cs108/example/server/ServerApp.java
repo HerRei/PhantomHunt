@@ -38,10 +38,10 @@ public final class ServerApp {
             "Not a valid port"); // all the valid port, 1-1024 shpuld maye be left out?
       return p;
     } catch (NumberFormatException e) {
-      log.warn("Provided port ist not a valid number.: {}", defaultPort);
+      log.warn("Invalid port format '{}'. Using default port {}.", args[0], defaultPort);
       return defaultPort;
     } catch (IllegalArgumentException e) {
-      log.warn("Port was not in range of ports, using default..: {}", defaultPort);
+      log.warn("Port {} is out of range. Using default port {}.", args[0], defaultPort);
       return defaultPort;
     }
   }
