@@ -51,7 +51,7 @@ public class Protocol {
       return Packet.of(cmd, rest); // keep tail as one arg
     } catch (IllegalArgumentException e) {
       LOGGER.error("Unknown command token received: {}", cmdToken);
-      throw new IllegalArgumentException("Faced with unsupported Command token: " + cmdToken);
+      return null;
     }
   }
 

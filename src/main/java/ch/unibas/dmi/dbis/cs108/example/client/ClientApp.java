@@ -32,15 +32,6 @@ public class ClientApp {
     System.out.println("Connecting to " + host + ":" + port);
     TcpClient client = new TcpClient(host, port);
 
-    String systemName = System.getProperty("user.name");
-    if (systemName == null || systemName.isBlank()) {
-      systemName = NameGenerator.randomName();
-      LOGGER.debug("No system username found, generated random name: {}", systemName);
-    }
-
-    LOGGER.info("Sending NICK command for user: {}", systemName);
-    client.getServerHandler().sendMessage(Packet.of(Command.NICK, systemName));
-
     try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
       while (scanner.hasNextLine()) {
         String input = scanner.nextLine();

@@ -123,7 +123,7 @@ public class ServerHandler implements Runnable {
      */
     public void sendMessage(Packet p) {
         if (p == null){
-            LOGGER.error("User tried sending an empty packet");
+            LOGGER.error("User tried sending an invalid packet");
             return;
         }
         try {

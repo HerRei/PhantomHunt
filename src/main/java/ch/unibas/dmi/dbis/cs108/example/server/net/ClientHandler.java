@@ -208,8 +208,11 @@ public class ClientHandler implements Runnable {
     }
 
     if (!assignedNick.equals(newNick)) {
-      LOGGER.warn("Nick forcefully changed due to duplicate from {} to {}", oldName, newNick);
       sendMessage(Packet.of(Command.REJECT, "Name was taken. You are now: " + this.name));
+      if(oldName!= null) //If not first time assigning.
+      {
+        LOGGER.warn("Nick forcefully changed due to duplicate from {} to {}", newNick, oldName);
+      }
     }
   }
 
