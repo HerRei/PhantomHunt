@@ -239,6 +239,10 @@ public class ClientHandler implements Runnable {
   public void sendMessage(Packet p) {
     // synchronising fixes the thread issue of the thread-per-client server that this here is
     // is used to send messages to people conneected to the server with then the according logic
+    if (p == null){
+      LOGGER.info("Wollte leeres packet schicken");
+      return;
+    }
     String str = Protocol.encode(p);
     synchronized (this.out) {
       try {

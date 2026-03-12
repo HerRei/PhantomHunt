@@ -50,8 +50,13 @@ public class ServerHandler implements Runnable {
             this.out = out;
             String line;
             while ((line = in.readLine()) != null) {
-                Packet packet = Protocol.decode(line);
-                managePacket(packet);
+                try{
+                    Packet packet = Protocol.decode(line);
+                    managePacket(packet);
+                }
+                catch(IllegalArgumentException e){
+                    LOGGER.info("Invalid Input");
+                }
             }
         } catch (IOException e) {
             LOGGER.error("Connection to server lost.", e);
@@ -86,7 +91,7 @@ public class ServerHandler implements Runnable {
 
     // helper functions
     private void handlePing() {
-        send(Packet.of(Command.PONG));
+        sendMessage(Packet.of(Command.PONG));
     }
 
     private void handleUnicom(Packet packet) {
@@ -112,12 +117,16 @@ public class ServerHandler implements Runnable {
 
     /**
      * Sends Packet to server
-     * @param packet
+     * @param p
      */
-    public void send(Packet packet) {
+    public void sendMessage(Packet p) {
+        if (p == null){
+            LOGGER.info("Wollte leeres packet schicken");
+            return;
+        }
         try {
             if (out != null) {
-                out.write(Protocol.encode(packet));
+                out.write(Protocol.encode(p));
                 out.newLine();
                 out.flush();
             }

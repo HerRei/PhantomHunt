@@ -23,7 +23,7 @@ public class Protocol {
   public static Packet decode(String line) {
     if (line == null || line.isBlank()) {
       LOGGER.error("Decoding failed: input line is null or blank");
-      throw new IllegalArgumentException("line cannot be empty");
+      return null;
     }
 
     line = line.trim();
@@ -64,7 +64,7 @@ public class Protocol {
   public static String encode(Packet p) {
     if (p == null || p.cmd() == null) {
       LOGGER.error("Encoding failed: Packet or Command is null");
-      throw new IllegalArgumentException("Packet doesnt exist or has no command");
+      return null;
     }
 
     StringBuilder sb = new StringBuilder();

@@ -39,12 +39,12 @@ public class ClientApp {
     }
 
     LOGGER.info("Sending NICK command for user: {}", systemName);
-    client.getServerHandler().send(Packet.of(Command.NICK, systemName));
+    client.getServerHandler().sendMessage(Packet.of(Command.NICK, systemName));
 
     try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
       while (scanner.hasNextLine()) {
         String input = scanner.nextLine();
-        client.getServerHandler().send(Protocol.decode(input));
+        client.getServerHandler().sendMessage(Protocol.decode(input));
       }
     }
   }
