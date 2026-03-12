@@ -12,8 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-// # todo do the pings/pongs and kick dead clients
-
 /**
  * Handles the connection to a single client on the server.
  * Listens for incoming packets, processes them, and can send packets back.
@@ -42,8 +40,6 @@ public class ClientHandler implements Runnable {
   public ClientHandler(Socket socket, Registry registry) {
     this.socket = socket;
     this.registry = registry;
-    this.name = NameGenerator.randomName();
-    LOGGER.info("New client connected. {}", name);
   }
 
   /**
@@ -61,6 +57,7 @@ public class ClientHandler implements Runnable {
             new BufferedWriter(
                 new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
       this.out = out;
+      getSystemUserName(); // creates username
       registry.register(this); // hand the client to the register
       LOGGER.info("New client connected. {}", name);
       String line;
@@ -179,11 +176,13 @@ public class ClientHandler implements Runnable {
         TimeUnit.SECONDS);
   }
 
-  private void assignName() {
-    double x = Math.random() * 10;
-    String name = Double.toString(x);
-    LOGGER.trace("Assigning name to {}:", name);
-    registry.claimName(name, this);
+  private void getSystemUserName() {
+    String systemName = System.getProperty("user.name");
+    if (systemName == null || systemName.isBlank()) {
+      systemName = NameGenerator.randomName();
+      LOGGER.debug("No system username found, generated random name: {}", systemName);
+    }
+    handleNickChange(Packet.of(Command.NICK, systemName));
   }
 
   private void handleNickChange(Packet p) {
@@ -203,10 +202,10 @@ public class ClientHandler implements Runnable {
     // Alten Namen aus der Registry löschen
     if (oldName != null && !oldName.equals(assignedNick)) {
       registry.releaseName(oldName, this);
-    }
+      sendMessage(Packet.of(Command.CLEARED, "NICK", this.name));
+      LOGGER.info("Nick changed from {} to {}", oldName, newNick);
 
-    sendMessage(Packet.of(Command.CLEARED, "NICK", this.name));
-    LOGGER.info("Nick changed from {} to {}", oldName, newNick);
+    }
 
     if (!assignedNick.equals(newNick)) {
       LOGGER.warn("Nick forcefully changed due to duplicate from {} to {}", oldName, newNick);
@@ -240,7 +239,7 @@ public class ClientHandler implements Runnable {
     // synchronising fixes the thread issue of the thread-per-client server that this here is
     // is used to send messages to people conneected to the server with then the according logic
     if (p == null){
-      LOGGER.info("Wollte leeres packet schicken");
+      LOGGER.error("Server tried sending an empty packet");
       return;
     }
     String str = Protocol.encode(p);

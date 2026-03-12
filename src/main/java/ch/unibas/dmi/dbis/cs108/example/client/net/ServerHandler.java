@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.xml.namespace.QName;
+
 /**
  * Manages the client's active network connection to the server.
  * This class runs in its own thread, constantly listens for incoming
@@ -121,7 +123,7 @@ public class ServerHandler implements Runnable {
      */
     public void sendMessage(Packet p) {
         if (p == null){
-            LOGGER.info("Wollte leeres packet schicken");
+            LOGGER.error("User tried sending an empty packet");
             return;
         }
         try {

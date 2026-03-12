@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * The main server class that listens for incoming client connections.
@@ -15,19 +16,27 @@ public class TcpServer {
 
   private static final Logger LOGGER = LogManager.getLogger(TcpServer.class);
   private final int port;
+  private CountDownLatch readyLatch;
+
+  public TcpServer(int port){this.port = port;} //should be deleted soon left it for serverApp
 
   /**
    * Creates a new TCP server.
    * @param port The port the server will listen.
+   * @param readyLatch Timer to see if server is started
    */
-  public TcpServer(int port) {
+  public TcpServer(int port, CountDownLatch readyLatch) {
     this.port = port;
+    this.readyLatch = readyLatch;
   }
 
   // this starts the server
   public void start() {
     try (ServerSocket serverSocket = new ServerSocket(port)) {
       LOGGER.info("Server listening on port: {}", port);
+      if (readyLatch != null) {
+        readyLatch.countDown();
+      }
 
       Registry registry = new Registry();
 

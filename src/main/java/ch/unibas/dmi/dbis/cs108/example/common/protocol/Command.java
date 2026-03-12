@@ -18,5 +18,5 @@ public enum Command {
   UNICOM, // UNICOM <text...>
   WHISPER, // WHISPER <recipient> <text...>
   LOGOUT,
-  NICK
+  NICK,
 }
