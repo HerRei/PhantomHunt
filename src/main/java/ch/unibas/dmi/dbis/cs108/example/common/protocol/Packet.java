@@ -46,9 +46,10 @@ public final class Packet {
 
   // useful error if package was empty, also idk when this would be the case anyway
   public String text() {
-
-    if (args == null) throw new UnsupportedOperationException();
-    LOGGER.error("Failed to retrieve text: args is null for command {}", cmd);
+    if (args == null || args.isEmpty()) {
+      LOGGER.warn("No text found for command {}", cmd);
+      throw new IllegalStateException("Packet contains no text");
+    }
     return args.get(0);
   }
 

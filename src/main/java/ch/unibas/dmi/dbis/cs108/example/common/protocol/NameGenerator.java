@@ -33,17 +33,9 @@ public class NameGenerator {
     if (RANDOM.nextBoolean()) {
       String first = CONNECTORS[RANDOM.nextInt(CONNECTORS.length)];
       con = RANDOM.nextBoolean() ? first + CONNECTORS[RANDOM.nextInt(CONNECTORS.length)] : first;
-      LOGGER.debug("Connector chosen: {}", con);
     } else {
       con = "";
-      LOGGER.debug("No connector chosen");
     }
-    LOGGER.info(
-        "Generated name: {}{}{}",
-        pre,
-        con,
-        suf); // all the logging in here was just for testing and serves no purpose at all, this
-              // whole class is never used really
     return pre + con + suf;
   }
 }

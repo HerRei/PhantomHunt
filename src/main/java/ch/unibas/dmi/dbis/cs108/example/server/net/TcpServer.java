@@ -24,11 +24,8 @@ public class TcpServer {
     this.port = port;
   }
 
-  /**
-   * Starts the server and waits for new Clients.
-   * @throws IOException If server can't be started.
-   */
-  public void start() throws IOException {
+  // this starts the server
+  public void start() {
     try (ServerSocket serverSocket = new ServerSocket(port)) {
       LOGGER.info("Server listening on port: {}", port);
 
@@ -49,7 +46,7 @@ public class TcpServer {
         Thread t = new Thread(clientHandler);
         t.start();
       }
-    } catch (Exception e) {
+    } catch (IOException e) {
       LOGGER.error("Error starting server", e);
       throw new RuntimeException(e); // fatal error of the server, should not happen
     }

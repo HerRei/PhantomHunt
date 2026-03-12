@@ -75,7 +75,7 @@ public class ClientHandler implements Runnable {
           p = Protocol.decode(line);
           LOGGER.trace("Received packet: {} with:", p, line);
         } catch (IllegalArgumentException e) {
-          LOGGER.error("Invalid packet: {}", line); // i cannot add p in here, idk why
+          LOGGER.error("Invalid packet: {}", line, e);
           sendMessage((Packet.of(Command.REJECT, e.getMessage())));
           continue;
         }
@@ -111,8 +111,7 @@ public class ClientHandler implements Runnable {
       }
 
     } catch (IOException e) { // this is for the try with resources to be memorysafe
-      // do nothing
-      LOGGER.error("IOException in ClientHandler for {}: {}", getName(), e.getMessage());
+      LOGGER.error("IOException in ClientHandler for {}", getName(), e);
     } finally {
       disconnect();
     }
@@ -227,7 +226,7 @@ public class ClientHandler implements Runnable {
       registry.unregister(this);
       socket.close();
     } catch (IOException e) {
-      // do nothing
+      LOGGER.error("Error while disconnecting client {}", getName(), e);
     }
   }
 
@@ -247,7 +246,7 @@ public class ClientHandler implements Runnable {
         this.out.newLine();
         this.out.flush();
       } catch (IOException e) {
-        e.getMessage();
+        LOGGER.error("Error sending message to {}", getName(), e);
       }
     }
   }

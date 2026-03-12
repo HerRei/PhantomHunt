@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Manages the client's active network connection to the server.
@@ -18,6 +20,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class ServerHandler implements Runnable {
 
+    private static final Logger LOGGER = LogManager.getLogger(ServerHandler.class);
     private final Socket socket;
     private BufferedWriter out;
 
@@ -51,7 +54,7 @@ public class ServerHandler implements Runnable {
                 managePacket(packet);
             }
         } catch (IOException e) {
-            System.err.println("Connection to server lost.");
+            LOGGER.error("Connection to server lost.", e);
         } finally {
             closeSocket();
         }
@@ -87,23 +90,23 @@ public class ServerHandler implements Runnable {
     }
 
     private void handleUnicom(Packet packet) {
-        System.out.println("Chat: " + packet.text());
+        LOGGER.info("Chat: {}", packet.text());
     }
 
     private void handleWhisper(Packet packet) {
-        System.out.println(packet.text());
+        LOGGER.info(packet.text());
     }
 
     private void handleCleared(Packet packet) {
-        System.out.println("System: " + packet.text());
+        LOGGER.info("System: {}", packet.text());
     }
 
     private void handleReject(Packet packet) {
-        System.err.println("Error: " + packet.text());
+        LOGGER.error("Error: {}", packet.text());
     }
 
     private void handleUnknown(Packet packet) {
-        System.out.println("Received unknown command: " + packet.cmd());
+        LOGGER.info("Received unknown command: {}", packet.cmd());
     }
 
 
@@ -119,7 +122,7 @@ public class ServerHandler implements Runnable {
                 out.flush();
             }
         } catch (IOException e) {
-            // Failed to send packet, likely due to a closed connection
+            LOGGER.error("Failed to send packet", e);
         }
     }
 
@@ -130,7 +133,7 @@ public class ServerHandler implements Runnable {
                 socket.close();
             }
         } catch (IOException e) {
-            // Error while closing the socket
+            LOGGER.error("Error while closing the socket", e);
         }
     }
 }
