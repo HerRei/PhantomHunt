@@ -85,16 +85,22 @@ public class ServerHandler implements Runnable {
             case REJECT:
                 handleReject(packet);
                 break;
+            case CHECKIN:
+                handleCheckin(packet);
+                break;
             default:
                 handleUnknown(packet);
                 break;
         }
     }
 
+
     // helper functions
     private void handlePing() {
         sendMessage(Packet.of(Command.PONG));
     }
+
+    private void handleCheckin(Packet packet) {LOGGER.info("Welcome on the Server: {}", packet.text());}
 
     private void handleUnicom(Packet packet) {
         LOGGER.info("Chat: {}", packet.text());

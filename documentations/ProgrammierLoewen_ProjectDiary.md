@@ -99,3 +99,17 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Image: Die Pipeline läuft in einem Container mit Java 25 auf einem kleinen Alpine-Linux.
 
 
+## 2026-03-09 - Silas ## 
+**Dauer:** ~5h
+**Ziel:** Ping Pong, sowie Client-Seite implementieren.
+**Was gemacht:**
+- Client-Seite: ClientTcp.java und ServerHandler.java hinzugefügt welches ermöglicht zu Server verbinden, Packete zu empfangen, sie zu handhaben und Packete zu verschicken.
+- Ping Pong: Server pingt clients jede 15 Sekunden an und kickt sie falls sie kein Pong zurücksenden.
+
+## 2026-03-12 - Silas ## 
+**Dauer:** ~4h
+**Ziel:** Main Methode implementieren.
+**Was gemacht:**
+- Infos sammeln: Ich habe geschaut wie man am besten eine Main Methode strukturiert, da ich es zuerst falsch gemacht habe.
+- Main: Main.java startet den Server oder erstellt Client, wie in den Anforderungen beschrieben.
+

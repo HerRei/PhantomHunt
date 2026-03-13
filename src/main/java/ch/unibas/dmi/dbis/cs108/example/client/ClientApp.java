@@ -1,9 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.example.client;
 
 import ch.unibas.dmi.dbis.cs108.example.client.net.TcpClient;
-import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
-import ch.unibas.dmi.dbis.cs108.example.common.protocol.NameGenerator;
-import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
