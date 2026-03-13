@@ -115,6 +115,12 @@ public class ClientHandler implements Runnable {
     }
   }
 
+  //========================================
+
+  //helper functions
+
+  //========================================
+
   private void handlePong() {
     lastSeen = System.currentTimeMillis();
     LOGGER.trace("Received pong: {} from {}", lastSeen, name);
