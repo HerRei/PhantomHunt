@@ -7,6 +7,7 @@ import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -17,15 +18,13 @@ public final class Registry {
 
   // hash map that is thread safe as we dont want a O(n) lookup with e.g. vector that is also
   // threadsafe.
-  // ArrayList doesnt(?) have a threadsafe version?!, also the thing is that there is no concurrent
-  // hashset so we need to use boolean.TRUE
-  // as a dummy key value pair, this is definently not the optimal solution so if anyone has a
+
   // better idea - please do indulge me.
 
   private static final Logger log =
       LogManager.getLogger(
           Registry.class); // somehow here i called it log, i dont wanna change it...
-  private final ConcurrentHashMap<ClientHandler, Boolean> sessions = new ConcurrentHashMap<>();
+  private final Vector<ClientHandler> sessions = new Vector<>(); //zwar O(n) for get but easier to work with than the hashMap with a dummy.
   private final ConcurrentHashMap<String, ClientHandler> byName =
       new ConcurrentHashMap<>(); // Nickname handling
 
@@ -74,7 +73,7 @@ public final class Registry {
    * @param h Client handler to add.
    */
   public void register(ClientHandler h) {
-    sessions.put(h, true); // autoboxing of Boolean.TRUE - might bring issues idk
+    sessions.add(h);
     log.info("New client registered. size is: {}", sessions.size());
   }
 
@@ -97,8 +96,8 @@ public final class Registry {
   public void broadcast(ClientHandler sender, Packet p) {
     log.debug("registry brioadcat packet from {}: {}", sender.getName(), p.cmd());
     String str = Protocol.encode(p);
-    for (ClientHandler h : sessions.keySet()) {
-      if (h == sender) continue;
+    for (ClientHandler h : sessions) {
+      if (h == sender) continue; //this will lead to errors later as the sender doesnt get its own packages again...!
 
       h.sendMessage(p);
     }
