@@ -16,17 +16,17 @@ public class Main {
     private static final int DEFAULT_PORT = 2222; // Port which we also use in ServerApp
 
     public static void main(String[] args) {
-        // [0] = join/host [1] = host [2] = port
+        // [0] = server/client [1] = host [2] = port
         if (args.length >= 3) {
             String host = args[1];
             int port = Integer.parseInt(args[2]);
             switch (args[0]) {
-                case "join" -> {
+                case "client" -> {
                     connect(host, port);
                 }
 
-                case "host" -> {
-                    connectAsHost(host, port);
+                case "server" -> {
+                    startServer(port);
                 }
 
                 default -> {
@@ -37,12 +37,12 @@ public class Main {
 
         else if(args.length >= 1){
             switch (args[0]) {
-                case "join" -> {
+                case "client" -> {
                     connect(DEFAULT_HOST, DEFAULT_PORT);
                 }
 
-                case "host" -> {
-                    connectAsHost(DEFAULT_HOST, DEFAULT_PORT);
+                case "server" -> {
+                    startServer(DEFAULT_PORT);
                 }
 
                 default -> {
@@ -57,12 +57,11 @@ public class Main {
     }
 
     /**
-     * @param host ip-adress for socket
      * @param port port for socket
-     * User is host and client
+     * User is host
      */
-    public static void connectAsHost(String host, int port){
-        LOGGER.info("Starting as HOST...");
+    public static void startServer(int port){
+        LOGGER.info("Starting Server...");
         CountDownLatch serverReadySignal = new CountDownLatch(1); //used to know when server ready
 
         // Start Server via thread
@@ -71,22 +70,6 @@ public class Main {
             server.start();
         });
         serverThread.start();
-
-        // Check max. 5 seconds if server ready
-        try{
-            LOGGER.info("Waiting for server to initialize...");
-            boolean success = serverReadySignal.await(5, TimeUnit.SECONDS);
-            if (!success) {
-                LOGGER.error("Server took too long to start!");
-            }
-        }
-        catch (InterruptedException e){
-            LOGGER.error("Wait interrupted: {}", e.getMessage());
-            Thread.currentThread().interrupt();
-        }
-
-        // Connect as a client
-        connect(host, port);
     }
 
     /**
