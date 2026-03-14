@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx;
 
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene.LoadingScene;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene.HomeScene;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -36,7 +37,16 @@ public class GUI extends Application {
    */
   public void showLoadingScene() {
     LoadingScene loadingScene = new LoadingScene();
-    Scene scene = loadingScene.createScene();
+    Scene scene = loadingScene.createScene(this::showHomeScene);
+    stage.setScene(scene);
+  }
+
+  /**
+   * Shows the home scene.
+   */
+  public void showHomeScene() {
+    HomeScene homeScene = new HomeScene();
+    Scene scene = homeScene.createScene(); //hier nächste action in this:: something, für nächse action
     stage.setScene(scene);
   }
 }
