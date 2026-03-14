@@ -26,7 +26,7 @@ public class LoadingScene {
     Label subtitleLabel = new Label("Loading client...");
     subtitleLabel.setStyle("-fx-font-size: 16px;");
 
-    continueButton = new Button("Continue");
+    continueButton = new Button("Continue to Homemenu");
 
     VBox layout = new VBox();
     layout.setAlignment(Pos.CENTER);
@@ -35,7 +35,7 @@ public class LoadingScene {
     layout.getChildren().add(subtitleLabel);
     layout.getChildren().add(continueButton);
 
-    return new Scene(layout, 640, 480);
+    return new Scene(layout, 1280, 960);
   }
 
   /**
