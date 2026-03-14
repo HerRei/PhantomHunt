@@ -61,6 +61,7 @@ public class ClientHandler implements Runnable {
       registry.register(this); // hand the client to the register
       LOGGER.info("New client connected. {}", name);
       String line;
+
       pinging();
 
       // input loop, as soon as a commamd is entered this will run.
@@ -113,6 +114,12 @@ public class ClientHandler implements Runnable {
       disconnect();
     }
   }
+
+  //========================================
+
+  //helper functions
+
+  //========================================
 
   private void handlePong() {
     lastSeen = System.currentTimeMillis();
@@ -183,6 +190,7 @@ public class ClientHandler implements Runnable {
       LOGGER.debug("No system username found, generated random name: {}", systemName);
     }
     handleNickChange(Packet.of(Command.NICK, systemName));
+    sendMessage(Packet.of(Command.CHECKIN,getName()));
   }
 
   private void handleNickChange(Packet p) {
