@@ -19,7 +19,7 @@ public class LoadingScene {
    *
    * @return the loading scene
    */
-  public Scene createScene() {
+  public Scene createScene(Runnable onContinue) {
     Label titleLabel = new Label("Phantom Hunt");
     titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -27,6 +27,7 @@ public class LoadingScene {
     subtitleLabel.setStyle("-fx-font-size: 16px;");
 
     continueButton = new Button("Continue to Homemenu");
+    continueButton.setOnAction(event -> onContinue.run()); //sets action to clicking of button
 
     VBox layout = new VBox();
     layout.setAlignment(Pos.CENTER);
