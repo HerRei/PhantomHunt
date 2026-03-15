@@ -97,8 +97,8 @@ public final class Registry {
     log.debug("registry brioadcat packet from {}: {}", sender.getName(), p.cmd());
     String str = Protocol.encode(p);
     for (ClientHandler h : sessions) {
-      if (h == sender) continue; //this will lead to errors later as the sender doesnt get its own packages again...!
-
+      //if (h == sender) continue; //this will lead to errors later as the sender doesnt get its own packages again...!
+      //section should be unnecessary, the sender will always receve his own messages as well
       h.sendMessage(p);
     }
   }

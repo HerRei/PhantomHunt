@@ -12,7 +12,7 @@ public class EnterNicknameScene {
   private Button enterNicknameButton;
   private TextField nicknameField;
 
-  public Scene createScene(java.util.function.Consumer<String> onNicknameEntered) {
+  public Scene createScene(java.util.function.Consumer<String> onNicknameEntered, String currentNickname) {
     Label titleLabel = new Label("Phantom Hunt - Nickname Selection");
     titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -25,6 +25,7 @@ public class EnterNicknameScene {
     nicknameField = new TextField();
     nicknameField.setPromptText("Enter nickname here");
     nicknameField.setMaxWidth(250);
+    nicknameField.setText(currentNickname);
 
     enterNicknameButton = new Button("Enter Nickname");
     enterNicknameButton.setOnAction(event -> {

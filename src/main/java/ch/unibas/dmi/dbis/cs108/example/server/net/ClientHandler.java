@@ -128,7 +128,7 @@ public class ClientHandler implements Runnable {
 
   private void handleUnicom(Packet p) {
     String msg = (p.argc() >= 1) ? p.args().get(0) : "";
-    LOGGER.trace("Received unicom: {} from {}", msg, name);
+    LOGGER.info("Received unicom: {} from {}", msg, name);
     registry.broadcast(this, (Packet.of(Command.UNICOM, getName() + ": " + msg)));
   }
 

@@ -26,7 +26,7 @@ public class LoadingScene {
     Label subtitleLabel = new Label("Loading client...");
     subtitleLabel.setStyle("-fx-font-size: 16px;");
 
-    continueButton = new Button("Continue to Homemenu");
+    continueButton = new Button("Proceed");
     continueButton.setOnAction(event -> onContinue.run()); //sets action to clicking of button
 
     VBox layout = new VBox();

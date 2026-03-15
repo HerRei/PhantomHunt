@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.function.Consumer;
 
 /**
  * The main class of the client.
@@ -19,9 +20,14 @@ public class ClientApp {
   private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
 
   public final TcpClient tcpClient;
+  //for thread safety
+  public static volatile String confirmedNickname;
+  private static volatile Consumer<String> globalMessageListener;
+  private static volatile Consumer<String> whisperMessageListener;
 
   public ClientApp() {
     this(DEFAULT_HOST, DEFAULT_PORT);
+
   }
 
   public ClientApp(String host, int port) {
@@ -29,14 +35,28 @@ public class ClientApp {
     this.tcpClient = new TcpClient(host, port);
   }
 
-  public void setNickname(String nickname) {
+  public boolean setNickname(String nickname) { //changed to make robust against nullpointer
     if (nickname == null || nickname.isBlank()) {
       LOGGER.warn("Nickname was blank --> not sent to server");
-      return;
+      return false;
+    }
+    if (tcpClient == null || nickname.isBlank()) {
+      LOGGER.warn("NIckname was blank --> wont send to server");
+      return false;
     }
 
     tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, nickname.trim()));
+    return true;
   }
+
+  public static void setConfirmedNickname(String confirmedNickname){ //setter
+    ClientApp.confirmedNickname = confirmedNickname;
+  }
+
+  public static String getConfirmedNickname() { //getter
+    return confirmedNickname;
+  }
+
 
   public void sendGlobalMessage(String message) {
     if (message == null || message.isBlank()) {
@@ -44,7 +64,29 @@ public class ClientApp {
       return;
     }
 
+    LOGGER.info("ClientApp sends UNICOM: {}", message); //Debugging
     tcpClient.getServerHandler().sendMessage(Packet.of(Command.UNICOM, message.trim()));
+  }
+
+  public static void setGlobalMessageListener(Consumer<String> listener) {
+    globalMessageListener = listener;
+  }
+
+  public static void notifyGlobalMessageReceived(String message) {
+    if (globalMessageListener != null && message != null && !message.isBlank()) {
+      globalMessageListener.accept(message);
+    }
+  }
+
+  //does the same with wisper as with global, Wisper from server -> client app -> GUI
+  public static void setWhisperMessageListener(Consumer<String> listener) {
+    whisperMessageListener = listener;
+  }
+
+  public static void notifyWhisperReceived(String message) {
+    if (whisperMessageListener != null && message != null && !message.isBlank()) {
+      whisperMessageListener.accept(message);
+    }
   }
 
   public void sendWhisper(String targetUser, String message) {
