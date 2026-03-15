@@ -52,7 +52,6 @@ public class HomeScene {
         lobbyChatButton,
         whisperButton
     );
-
     return new Scene(layout, 1280, 960);
   }
 }
