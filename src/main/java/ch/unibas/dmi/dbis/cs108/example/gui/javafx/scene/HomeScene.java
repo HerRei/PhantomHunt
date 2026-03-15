@@ -1,7 +1,5 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene;
 
-
-import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,6 +9,7 @@ import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
+import java.util.function.BiConsumer;
 
 /**
  * Builds the home screen of the client.
@@ -18,13 +17,19 @@ import javafx.scene.control.TextArea;
 public class HomeScene {
 
   private TextArea globalChatArea;
+  private TextArea wisperChatArea;
 
   /**
    * Creates the home scene.
    *
    * @return the home scene
    */
-  public Scene createScene(String nickname, Runnable onChangeNickname, Consumer<String> onSendGlobalMessage) {
+  public Scene createScene(
+      String nickname,
+      Runnable onChangeNickname,
+      Consumer<String> onSendGlobalMessage,
+      BiConsumer<String, String> onSendWisper //1. Reciver name, 2. wisper message
+  ) {
     Label titleLabel = new Label("Phantom Hunt - Home");
     titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -47,6 +52,10 @@ public class HomeScene {
     globalChatField.setVisible(false);
     globalChatField.setManaged(false);
 
+    /**
+     * Starts Layout for Global Chat button
+     */
+
     Button sendGlobalButton = new Button("Send Global Message");
     sendGlobalButton.setMaxWidth(Double.MAX_VALUE);
     sendGlobalButton.setVisible(false);
@@ -57,8 +66,39 @@ public class HomeScene {
     globalChatArea.setPrefRowCount(10);
     globalChatArea.setVisible(false);
     globalChatArea.setManaged(false);
+
+
     Button lobbyChatButton = new Button("Lobby Chat");
+
+    /**
+     * Starts Layout for Wisper function
+     */
     Button whisperButton = new Button("Whisper");
+    TextField whisperTargetField = new TextField();
+    whisperTargetField.setPromptText("Enter target nickname");
+    whisperTargetField.setMaxWidth(Double.MAX_VALUE);
+    whisperTargetField.setVisible(false);
+    whisperTargetField.setManaged(false);
+
+    TextField whisperMessageField = new TextField();
+    whisperMessageField.setPromptText("Enter whisper message here");
+    whisperMessageField.setMaxWidth(Double.MAX_VALUE);
+    whisperMessageField.setVisible(false);
+    whisperMessageField.setManaged(false);
+
+    Button sendWhisperButton = new Button("Send Whisper");
+    sendWhisperButton.setMaxWidth(Double.MAX_VALUE);
+    sendWhisperButton.setVisible(false);
+    sendWhisperButton.setManaged(false);
+
+    whisperArea = new TextArea();
+    whisperArea.setEditable(false);
+    whisperArea.setWrapText(true);
+    whisperArea.setPrefRowCount(8);
+    whisperArea.setVisible(false);
+    whisperArea.setManaged(false);
+
+    //Effect for click on globalchat button
     globalChatButton.setOnAction(event -> { //buttons erst sichtbar bei cklick
       globalChatField.setVisible(true);
       globalChatField.setManaged(true);
@@ -69,6 +109,20 @@ public class HomeScene {
       globalChatField.requestFocus();
     });
 
+    //Effect for cklick on wisper Button
+    whisperButton.setOnAction(event -> {
+      whisperTargetField.setVisible(true);
+      whisperTargetField.setManaged(true);
+      whisperMessageField.setVisible(true);
+      whisperMessageField.setManaged(true);
+      sendWhisperButton.setVisible(true);
+      sendWhisperButton.setManaged(true);
+      whisperArea.setVisible(true);
+      whisperArea.setManaged(true);
+      whisperTargetField.requestFocus();
+    });
+
+    // kontrolle und sernder und nachricht lesen
     sendGlobalButton.setOnAction(event -> { //After click, contorlling not empty, andd trimming
       String message = globalChatField.getText().trim();
       if (!message.isEmpty()) {
@@ -77,6 +131,19 @@ public class HomeScene {
         globalChatField.clear();
       }
     });
+
+
+    //Kontrolle, und sender und nachricht lesen
+    sendWhisperButton.setOnAction(event -> {
+      String target = whisperTargetField.getText().trim();
+      String message = whisperMessageField.getText().trim();
+
+      if (!target.isEmpty() && !message.isEmpty()) {
+        onSendWhisper.accept(target, message);
+        whisperMessageField.clear();
+      }
+    });
+
 
     nicknameButton.setMaxWidth(Double.MAX_VALUE);
     createLobbyButton.setMaxWidth(Double.MAX_VALUE);
@@ -101,7 +168,11 @@ public class HomeScene {
         sendGlobalButton,
         globalChatArea,
         lobbyChatButton,
-        whisperButton
+        whisperButton,
+        whisperTargetField,
+        whisperMessageField,
+        sendWhisperButton,
+        whisperArea
     );
     return new Scene(layout, 1280, 960);
   }
