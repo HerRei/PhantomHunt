@@ -53,10 +53,12 @@ public class GUI extends Application {
     stage.setScene(scene);
   }
 
-  public void handleNicknameEntered(String nickname) {
-    this.nickname = nickname;
-    clientApp.setNickname(nickname);
-    showHomeScene();
+  public void handleNicknameEntered(String nickname) { //changed to reduce nullpointer risk
+    boolean success = clientApp.setNickname(nickname);
+
+    if (success) {
+      showHomeScene();
+    }
   }
 
   /**

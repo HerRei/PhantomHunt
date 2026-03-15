@@ -29,13 +29,18 @@ public class ClientApp {
     this.tcpClient = new TcpClient(host, port);
   }
 
-  public void setNickname(String nickname) {
+  public boolean setNickname(String nickname) { //changed to make robust against nullpointer
     if (nickname == null || nickname.isBlank()) {
       LOGGER.warn("Nickname was blank --> not sent to server");
-      return;
+      return false;
+    }
+    if (tcpClient == null || nickname.isBlank()) {
+      LOGGER.warn("NIckname was blank --> wont send to server");
+      return false;
     }
 
     tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, nickname.trim()));
+    return true;
   }
 
   public void sendGlobalMessage(String message) {
