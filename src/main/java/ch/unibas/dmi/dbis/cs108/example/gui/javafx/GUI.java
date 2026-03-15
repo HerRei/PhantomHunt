@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.cs108.example.gui.javafx;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene.LoadingScene;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene.EnterNicknameScene;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene.HomeScene;
+import ch.unibas.dmi.dbis.cs108.example.client.ClientApp;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -15,6 +16,8 @@ import javafx.stage.Stage;
  */
 public class GUI extends Application {
   private Stage stage;
+  private ClientApp clientApp;
+  private String nickname;
 
   public static void main(String[] args) {
     launch(args);
@@ -29,8 +32,10 @@ public class GUI extends Application {
   public void start(Stage stage) {
     this.stage = stage;
     this.stage.setTitle("Phantom Hunt");
+    this.clientApp = new ClientApp();
     showLoadingScene();
     this.stage.show();
+
   }
 
   /**
@@ -44,8 +49,14 @@ public class GUI extends Application {
 
   public void showEnterNicknameScene() {
     EnterNicknameScene enterNicknameScene = new EnterNicknameScene();
-    Scene scene = enterNicknameScene.createScene(this::showHomeScene); //hier nächste action in this:: something, für nächse action
+    Scene scene = enterNicknameScene.createScene(this::handleNicknameEntered); //hier nächste action in this:: something, für nächse action
     stage.setScene(scene);
+  }
+
+  public void handleNicknameEntered(String nickname) {
+    this.nickname = nickname;
+    clientApp.setNickname(nickname);
+    showHomeScene();
   }
 
   /**
