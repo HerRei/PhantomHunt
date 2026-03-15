@@ -50,11 +50,13 @@ public class GUI extends Application {
 
   public void showEnterNicknameScene() {
     EnterNicknameScene enterNicknameScene = new EnterNicknameScene();
-    Scene scene = enterNicknameScene.createScene(this::handleNicknameEntered); //hier nächste action in this:: something, für nächse action
+    String currentNickname = ClientApp.getConfirmedNickname();
+    Scene scene = enterNicknameScene.createScene(this::handleNicknameEntered, currentNickname); //hier nächste action in this:: something, für nächse action
     stage.setScene(scene);
   }
 
   public void handleNicknameEntered(String nickname) { //ersatzt
+    ClientApp.setConfirmedNickname(null); //takes old name out of cache
     boolean success = clientApp.setNickname(nickname);
 
     if (!success) {
@@ -84,7 +86,7 @@ public class GUI extends Application {
    */
   public void showHomeScene(String nickname) {
     HomeScene homeScene = new HomeScene();
-    Scene scene = homeScene.createScene(nickname); //hier nächste action in this:: something, für nächse action
+    Scene scene = homeScene.createScene(nickname, this::showEnterNicknameScene); //hier nächste action in this:: something, für nächse action
     stage.setScene(scene);
   }
 }

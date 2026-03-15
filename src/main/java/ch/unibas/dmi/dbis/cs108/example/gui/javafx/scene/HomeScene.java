@@ -19,7 +19,7 @@ public class HomeScene {
    *
    * @return the home scene
    */
-  public Scene createScene(String nickname) {
+  public Scene createScene(String nickname, Runnable onChangeNickname) {
     Label titleLabel = new Label("Phantom Hunt - Home");
     titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -32,6 +32,7 @@ public class HomeScene {
 
 
     Button nicknameButton = new Button("Change Nickname");
+    nicknameButton.setOnAction(event -> onChangeNickname.run());
     Button createLobbyButton = new Button("Create Lobby");
     Button joinLobbyButton = new Button("Join Lobby");
     Button globalChatButton = new Button("Global Chat");
