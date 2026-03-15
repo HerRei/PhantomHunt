@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.function.Consumer;
 
 /**
  * The main class of the client.
@@ -20,6 +21,7 @@ public class ClientApp {
 
   public final TcpClient tcpClient;
   public static volatile String confirmedNickname;
+  private static volatile Consumer<String> globalMessageListener;
 
   public ClientApp() {
     this(DEFAULT_HOST, DEFAULT_PORT);
@@ -60,7 +62,18 @@ public class ClientApp {
       return;
     }
 
+    LOGGER.info("ClientApp sends UNICOM: {}", message); //Debugging
     tcpClient.getServerHandler().sendMessage(Packet.of(Command.UNICOM, message.trim()));
+  }
+
+  public static void setGlobalMessageListener(Consumer<String> listener) {
+    globalMessageListener = listener;
+  }
+
+  public static void notifyGlobalMessageReceived(String message) {
+    if (globalMessageListener != null && message != null && !message.isBlank()) {
+      globalMessageListener.accept(message);
+    }
   }
 
   public void sendWhisper(String targetUser, String message) {

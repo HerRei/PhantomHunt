@@ -18,7 +18,8 @@ import javafx.application.Platform;
 public class GUI extends Application {
   private Stage stage;
   private ClientApp clientApp;
-  private String nickname;
+  //private String nickname;
+  private HomeScene currentHomeScene;
 
   public static void main(String[] args) {
     launch(args);
@@ -49,6 +50,7 @@ public class GUI extends Application {
   }
 
   public void showEnterNicknameScene() {
+    ClientApp.setGlobalMessageListener(null); //nicht mehr zu message listerner wenn bei change nickname
     EnterNicknameScene enterNicknameScene = new EnterNicknameScene();
     String currentNickname = ClientApp.getConfirmedNickname();
     Scene scene = enterNicknameScene.createScene(this::handleNicknameEntered, currentNickname); //hier nächste action in this:: something, für nächse action
@@ -85,13 +87,20 @@ public class GUI extends Application {
    * Shows the home scene.
    */
   public void showHomeScene(String nickname) {
-    HomeScene homeScene = new HomeScene();
+    //aktuelle home sc
+    currentHomeScene = new HomeScene();
     //hier nächste action in this:: something, für nächse action
-    Scene scene = homeScene.createScene(
+    //aktuelle homescene wird gespeichert
+    Scene scene = currentHomeScene.createScene(
         nickname,
         this::showEnterNicknameScene,
         clientApp::sendGlobalMessage
     );
+
+    ClientApp.setGlobalMessageListener(message ->
+        Platform.runLater(() -> currentHomeScene.appendGlobalMessage(message))
+    );
+
     stage.setScene(scene);
   }
 }

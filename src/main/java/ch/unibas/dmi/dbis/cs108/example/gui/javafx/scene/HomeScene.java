@@ -10,11 +10,14 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 
 /**
  * Builds the home screen of the client.
  */
 public class HomeScene {
+
+  private TextArea globalChatArea;
 
   /**
    * Creates the home scene.
@@ -48,6 +51,12 @@ public class HomeScene {
     sendGlobalButton.setMaxWidth(Double.MAX_VALUE);
     sendGlobalButton.setVisible(false);
     sendGlobalButton.setManaged(false);
+    globalChatArea = new TextArea();
+    globalChatArea.setEditable(false);
+    globalChatArea.setWrapText(true);
+    globalChatArea.setPrefRowCount(10);
+    globalChatArea.setVisible(false);
+    globalChatArea.setManaged(false);
     Button lobbyChatButton = new Button("Lobby Chat");
     Button whisperButton = new Button("Whisper");
     globalChatButton.setOnAction(event -> { //buttons erst sichtbar bei cklick
@@ -55,12 +64,15 @@ public class HomeScene {
       globalChatField.setManaged(true);
       sendGlobalButton.setVisible(true);
       sendGlobalButton.setManaged(true);
+      globalChatArea.setVisible(true);
+      globalChatArea.setManaged(true);
       globalChatField.requestFocus();
     });
 
     sendGlobalButton.setOnAction(event -> { //After click, contorlling not empty, andd trimming
       String message = globalChatField.getText().trim();
       if (!message.isEmpty()) {
+        System.out.println("Homescreen: sending gloobal Message: "+message); //Debugging
         onSendGlobalMessage.accept(message);
         globalChatField.clear();
       }
@@ -87,9 +99,22 @@ public class HomeScene {
         globalChatButton,
         globalChatField,
         sendGlobalButton,
+        globalChatArea,
         lobbyChatButton,
         whisperButton
     );
     return new Scene(layout, 1280, 960);
+  }
+
+  public void appendGlobalMessage(String message) { //for formating and displaying of chat
+    if (globalChatArea == null || message == null || message.isBlank()) {
+      return;
+    }
+
+    if (!globalChatArea.getText().isEmpty()) {
+      globalChatArea.appendText("\n");
+    }
+
+    globalChatArea.appendText(message);
   }
 }

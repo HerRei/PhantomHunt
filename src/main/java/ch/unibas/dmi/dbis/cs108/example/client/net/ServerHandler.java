@@ -109,6 +109,7 @@ public class ServerHandler implements Runnable {
   }
 
   private void handleUnicom(Packet packet) {
+    ClientApp.notifyGlobalMessageReceived(packet.text()); //nachricht kommt vom server wird an client app weitergeleitet, und GUI kommt sie dort abhohlen
     LOGGER.info("Chat: {}", packet.text());
   }
 
@@ -148,6 +149,9 @@ public class ServerHandler implements Runnable {
       LOGGER.error("User tried sending an invalid packet");
       return;
     }
+    //Debugging
+    LOGGER.info("Client side sends packet : {}", p);
+
     try {
       if (out != null) {
         out.write(Protocol.encode(p));
