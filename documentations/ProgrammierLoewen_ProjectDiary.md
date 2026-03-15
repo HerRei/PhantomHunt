@@ -113,3 +113,10 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Infos sammeln: Ich habe geschaut wie man am besten eine Main Methode strukturiert, da ich es zuerst falsch gemacht habe.
 - Main: Main.java startet den Server oder erstellt Client, wie in den Anforderungen beschrieben.
 
+## 2026-03-15 — Ismail ##
+**Dauer:** ~2.5h
+**Ziel:** Dokumentation des Netzwerkprotokolls
+**Was gemacht:**
+- Dokumentation des Protokolls.
+- Befehle strukturiert aufgelistet und ihre Funktion erklärt.
+- Beispiele zu den Befehlen hinzugefügt.
