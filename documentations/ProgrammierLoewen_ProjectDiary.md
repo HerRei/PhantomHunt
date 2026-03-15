@@ -113,10 +113,19 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Infos sammeln: Ich habe geschaut wie man am besten eine Main Methode strukturiert, da ich es zuerst falsch gemacht habe.
 - Main: Main.java startet den Server oder erstellt Client, wie in den Anforderungen beschrieben.
 
-## 2026-03-15 — Ismail ##
+## 2026-03-13 — Ismail ##
 **Dauer:** ~2.5h
 **Ziel:** Dokumentation des Netzwerkprotokolls
 **Was gemacht:**
 - Dokumentation des Protokolls.
 - Befehle strukturiert aufgelistet und ihre Funktion erklärt.
 - Beispiele zu den Befehlen hinzugefügt.
+
+## 2026-03-09 & 2026-03-13 — Team-Sitzung ##
+**Dauer:** ~2h
+**Ziel:** Vorbereitung und Kontrolle für die Abgabe von Meilenstein 2
+**Was gemacht:**
+- Gemeinsame Besprechung des aktuellen Entwicklungsstands im Hinblick auf die MS2-Abgabe.
+- Check-up aller Projektanforderungen für Meilenstein 2
+- Identifikation noch fehlender oder unvollständig umgesetzter Punkte.
+- Die verbleibenden Aufgaben wurden auf die Teammitglieder aufgeteilt, um die Deadline einzuhalten.
