@@ -7,6 +7,7 @@ import ch.unibas.dmi.dbis.cs108.example.client.ClientApp;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 
 
 
@@ -53,12 +54,29 @@ public class GUI extends Application {
     stage.setScene(scene);
   }
 
-  public void handleNicknameEntered(String nickname) { //changed to reduce nullpointer risk
+  public void handleNicknameEntered(String nickname) { //ersatzt
     boolean success = clientApp.setNickname(nickname);
 
-    if (success) {
-      showHomeScene(nickname);
+    if (!success) {
+      return;
     }
+
+    new Thread(() -> {
+      for (int i = 0; i < 20; i++) {
+        String confirmedNickname = ClientApp.getConfirmedNickname();
+        if (confirmedNickname != null && !confirmedNickname.isBlank()) {
+          Platform.runLater(() -> showHomeScene(confirmedNickname));
+          return;
+        }
+        try {
+          Thread.sleep(50);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          break;
+        }
+      }
+      Platform.runLater(() -> showHomeScene(nickname));
+    }).start();
   }
 
   /**
