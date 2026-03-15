@@ -20,8 +20,10 @@ public class ClientApp {
   private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
 
   public final TcpClient tcpClient;
+  //for thread safety
   public static volatile String confirmedNickname;
   private static volatile Consumer<String> globalMessageListener;
+  private static volatile Consumer<String> whisperMessageListener;
 
   public ClientApp() {
     this(DEFAULT_HOST, DEFAULT_PORT);
@@ -73,6 +75,17 @@ public class ClientApp {
   public static void notifyGlobalMessageReceived(String message) {
     if (globalMessageListener != null && message != null && !message.isBlank()) {
       globalMessageListener.accept(message);
+    }
+  }
+
+  //does the same with wisper as with global, Wisper from server -> client app -> GUI
+  public static void setWhisperMessageListener(Consumer<String> listener) {
+    whisperMessageListener = listener;
+  }
+
+  public static void notifyWhisperReceived(String message) {
+    if (whisperMessageListener != null && message != null && !message.isBlank()) {
+      whisperMessageListener.accept(message);
     }
   }
 

@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
 public class HomeScene {
 
   private TextArea globalChatArea;
-  private TextArea wisperChatArea;
+  private TextArea whisperArea;
 
   /**
    * Creates the home scene.
@@ -139,7 +139,7 @@ public class HomeScene {
       String message = whisperMessageField.getText().trim();
 
       if (!target.isEmpty() && !message.isEmpty()) {
-        onSendWhisper.accept(target, message);
+        onSendWisper.accept(target, message);
         whisperMessageField.clear();
       }
     });
@@ -187,5 +187,17 @@ public class HomeScene {
     }
 
     globalChatArea.appendText(message);
+  }
+
+  public void appendWhisperMessage(String message) {
+    if (whisperArea == null || message == null || message.isBlank()) {
+      return;
+    }
+
+    if (!whisperArea.getText().isEmpty()) {
+      whisperArea.appendText("\n");
+    }
+
+    whisperArea.appendText(message);
   }
 }

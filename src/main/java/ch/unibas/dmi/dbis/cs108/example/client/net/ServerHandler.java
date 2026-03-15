@@ -113,8 +113,10 @@ public class ServerHandler implements Runnable {
     LOGGER.info("Chat: {}", packet.text());
   }
 
+  // ins terminal wisper geloggt, dann weitergegeben zu GUI
   private void handleWhisper(Packet packet) {
-    LOGGER.info(packet.text());
+    ClientApp.notifyWhisperReceived(packet.text());
+    LOGGER.info("Wisper: {}", packet.text());
   }
 
   private void handleCleared(Packet packet) {

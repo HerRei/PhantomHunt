@@ -8,7 +8,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.application.Platform;
-
+import java.util.function.BiConsumer; //für funnktionen mit zwei eingaben
 
 
 
@@ -51,6 +51,7 @@ public class GUI extends Application {
 
   public void showEnterNicknameScene() {
     ClientApp.setGlobalMessageListener(null); //nicht mehr zu message listerner wenn bei change nickname
+    ClientApp.setWhisperMessageListener(null); //gilt auch für wisper
     EnterNicknameScene enterNicknameScene = new EnterNicknameScene();
     String currentNickname = ClientApp.getConfirmedNickname();
     Scene scene = enterNicknameScene.createScene(this::handleNicknameEntered, currentNickname); //hier nächste action in this:: something, für nächse action
@@ -94,11 +95,16 @@ public class GUI extends Application {
     Scene scene = currentHomeScene.createScene(
         nickname,
         this::showEnterNicknameScene,
-        clientApp::sendGlobalMessage
+        clientApp::sendGlobalMessage,
+        clientApp::sendWhisper
     );
 
     ClientApp.setGlobalMessageListener(message ->
         Platform.runLater(() -> currentHomeScene.appendGlobalMessage(message))
+    );
+
+    ClientApp.setWhisperMessageListener(message ->
+    Platform.runLater(() -> currentHomeScene.appendWhisperMessage(message))
     );
 
     stage.setScene(scene);
