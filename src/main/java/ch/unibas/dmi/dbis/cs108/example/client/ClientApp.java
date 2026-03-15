@@ -19,9 +19,11 @@ public class ClientApp {
   private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
 
   public final TcpClient tcpClient;
+  public static volatile String confirmedNickname;
 
   public ClientApp() {
     this(DEFAULT_HOST, DEFAULT_PORT);
+
   }
 
   public ClientApp(String host, int port) {
@@ -42,6 +44,15 @@ public class ClientApp {
     tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, nickname.trim()));
     return true;
   }
+
+  public static void setConfirmedNickname(String confirmedNickname){ //setter
+    ClientApp.confirmedNickname = confirmedNickname;
+  }
+
+  public static String getConfirmedNickname() { //getter
+    return confirmedNickname;
+  }
+
 
   public void sendGlobalMessage(String message) {
     if (message == null || message.isBlank()) {
