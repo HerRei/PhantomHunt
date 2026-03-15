@@ -13,8 +13,10 @@ java {
     }
 }
 
-application {
-    mainClass = 'ch.unibas.dmi.dbis.cs108.example.Main'
+ext { // von application zu ext geändert
+    clientMainClass = 'ch.unibas.dmi.dbis.cs108.example.gui.javafx.ClientGuiMain'
+    serverMainClass = 'ch.unibas.dmi.dbis.cs108.example.server.ServerApp'
+
 }
 
 repositories {
@@ -38,22 +40,38 @@ test {
     useJUnitPlatform()
 }
 
-tasks.named('jar', Jar) {
-    manifest {
-        attributes('Main-Class': application.mainClass.get())
-    }
-}
-
-
-tasks.register('fatJar', Jar) {
+tasks.register('clientFatJar', Jar) {
     group = 'build'
-    description = 'Assembles a runnable fat JAR including runtime dependencies.'
+    description = 'Assembles a runnable fat JAR for the client application.'
 
-    archiveClassifier = 'all'
+    archiveClassifier = 'client'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
-        attributes('Main-Class': application.mainClass.get())
+        attributes('Main-Class': clientMainClass)
+    }
+
+    // include your compiled classes/resources
+    from(sourceSets.main.output)
+
+    // make sure runtimeClasspath is resolved before we try to zipTree it
+    dependsOn(configurations.runtimeClasspath)
+
+    // unpack runtime deps into the jar
+    from({
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    })
+}
+
+tasks.register('serverFatJar', Jar) {
+    group = 'build'
+    description = 'Assembles a runnable fat JAR for the server application.'
+
+    archiveClassifier = 'server'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes('Main-Class': serverMainClass)
     }
 
     // include your compiled classes/resources
