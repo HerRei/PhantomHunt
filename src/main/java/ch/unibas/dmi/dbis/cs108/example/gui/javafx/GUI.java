@@ -86,7 +86,12 @@ public class GUI extends Application {
    */
   public void showHomeScene(String nickname) {
     HomeScene homeScene = new HomeScene();
-    Scene scene = homeScene.createScene(nickname, this::showEnterNicknameScene); //hier nächste action in this:: something, für nächse action
+    //hier nächste action in this:: something, für nächse action
+    Scene scene = homeScene.createScene(
+        nickname,
+        this::showEnterNicknameScene,
+        clientApp::sendGlobalMessage
+    );
     stage.setScene(scene);
   }
 }
