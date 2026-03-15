@@ -17,12 +17,16 @@ public class HomeScene {
    *
    * @return the home scene
    */
-  public Scene createScene() {
+  public Scene createScene(String nickname) {
     Label titleLabel = new Label("Phantom Hunt - Home");
     titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
     Label infoLabel = new Label("Choose an action:");
     infoLabel.setStyle("-fx-font-size: 16px;");
+
+    Label nameLabel = new Label("Hello player "+nickname);
+    nameLabel.setStyle("-fx-font-size: 16px;");
+
 
     Button nicknameButton = new Button("Change Nickname");
     Button createLobbyButton = new Button("Create Lobby");
@@ -45,6 +49,7 @@ public class HomeScene {
     layout.getChildren().addAll(
         titleLabel,
         infoLabel,
+        nameLabel,
         nicknameButton,
         createLobbyButton,
         joinLobbyButton,

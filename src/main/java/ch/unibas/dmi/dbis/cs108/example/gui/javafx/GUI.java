@@ -57,16 +57,16 @@ public class GUI extends Application {
     boolean success = clientApp.setNickname(nickname);
 
     if (success) {
-      showHomeScene();
+      showHomeScene(nickname);
     }
   }
 
   /**
    * Shows the home scene.
    */
-  public void showHomeScene() {
+  public void showHomeScene(String nickname) {
     HomeScene homeScene = new HomeScene();
-    Scene scene = homeScene.createScene(); //hier nächste action in this:: something, für nächse action
+    Scene scene = homeScene.createScene(nickname); //hier nächste action in this:: something, für nächse action
     stage.setScene(scene);
   }
 }
