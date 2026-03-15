@@ -25,6 +25,8 @@ public class EnterNicknameScene {
     nicknameField = new TextField();
     nicknameField.setPromptText("Enter nickname here");
     nicknameField.setMaxWidth(250);
+    nicknameField.setText(System.getProperty("user.name"));
+    //nicknameField.setText("Player");
 
     enterNicknameButton = new Button("Enter Nickname");
     enterNicknameButton.setOnAction(event -> {

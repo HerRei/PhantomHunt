@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene;
 
+
+import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,7 +26,8 @@ public class HomeScene {
     Label infoLabel = new Label("Choose an action:");
     infoLabel.setStyle("-fx-font-size: 16px;");
 
-    Label nameLabel = new Label("Hello player "+nickname);
+
+    Label nameLabel = new Label("Hello player "+ nickname);
     nameLabel.setStyle("-fx-font-size: 16px;");
 
 
