@@ -9,9 +9,9 @@ import org.apache.logging.log4j.Logger;
 import java.util.function.Consumer;
 
 /**
- * The main class of the client.
- * It connects to the game server, sets the player's name,
- * and reads input from the console to send it to the server.
+ * Client-side application wrapper used by the GUI.
+ * It manages the TCP client connection and exposes helper methods for nickname changes,
+ * global chat, whispers and logout.
  */
 public class ClientApp {
 
@@ -25,16 +25,31 @@ public class ClientApp {
   private static volatile Consumer<String> globalMessageListener;
   private static volatile Consumer<String> whisperMessageListener;
 
+  /**
+   * Creates a client app that connects to the default host and port.
+   */
   public ClientApp() {
     this(DEFAULT_HOST, DEFAULT_PORT);
 
   }
 
+  /**
+   * Creates a client app that connects to the given server address.
+   *
+   * @param host server host name or IP address
+   * @param port server port
+   */
   public ClientApp(String host, int port) {
     LOGGER.info("Connecting to {}:{}", host, port);
     this.tcpClient = new TcpClient(host, port);
   }
 
+  /**
+   * Sends a nickname change request to the server.
+   *
+   * @param nickname requested nickname
+   * @return {@code true} if the nickname request was sent, otherwise {@code false}
+   */
   public boolean setNickname(String nickname) { //changed to make robust against nullpointer
     if (nickname == null || nickname.isBlank()) {
       LOGGER.warn("Nickname was blank --> not sent to server");
@@ -49,15 +64,30 @@ public class ClientApp {
     return true;
   }
 
+  /**
+   * Stores the nickname that was confirmed by the server.
+   *
+   * @param confirmedNickname nickname accepted by the server
+   */
   public static void setConfirmedNickname(String confirmedNickname){ //setter
     ClientApp.confirmedNickname = confirmedNickname;
   }
 
+  /**
+   * Returns the most recently confirmed nickname.
+   *
+   * @return confirmed nickname, or {@code null} if no nickname was confirmed yet
+   */
   public static String getConfirmedNickname() { //getter
     return confirmedNickname;
   }
 
 
+  /**
+   * Sends a global chat message to the server.
+   *
+   * @param message global chat message
+   */
   public void sendGlobalMessage(String message) {
     if (message == null || message.isBlank()) {
       LOGGER.warn("Message is blank --> Not sent");
@@ -68,27 +98,52 @@ public class ClientApp {
     tcpClient.getServerHandler().sendMessage(Packet.of(Command.UNICOM, message.trim()));
   }
 
+  /**
+   * Registers the listener that receives global chat messages for the GUI.
+   *
+   * @param listener callback for received global chat messages
+   */
   public static void setGlobalMessageListener(Consumer<String> listener) {
     globalMessageListener = listener;
   }
 
+  /**
+   * Forwards a received global chat message to the registered listener.
+   *
+   * @param message global chat message received from the server
+   */
   public static void notifyGlobalMessageReceived(String message) {
     if (globalMessageListener != null && message != null && !message.isBlank()) {
       globalMessageListener.accept(message);
     }
   }
 
-  //does the same with wisper as with global, Wisper from server -> client app -> GUI
+  /**
+   * Registers the listener that receives whisper messages for the GUI.
+   *
+   * @param listener callback for received whisper messages
+   */
   public static void setWhisperMessageListener(Consumer<String> listener) {
     whisperMessageListener = listener;
   }
 
+  /**
+   * Forwards a received whisper to the registered listener.
+   *
+   * @param message whisper text received from the server
+   */
   public static void notifyWhisperReceived(String message) {
     if (whisperMessageListener != null && message != null && !message.isBlank()) {
       whisperMessageListener.accept(message);
     }
   }
 
+  /**
+   * Sends a private whisper message to another user.
+   *
+   * @param targetUser nickname of the whisper recipient
+   * @param message whisper text
+   */
   public void sendWhisper(String targetUser, String message) {
     if (targetUser == null || targetUser.isBlank() || message == null || message.isBlank()) {
       LOGGER.warn("Message or target is blank --> Not sent");
@@ -99,6 +154,9 @@ public class ClientApp {
         .sendMessage(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
   }
 
+  /**
+   * Sends a logout request to the server.
+   */
   public void logout() {
     tcpClient.getServerHandler().sendMessage(Packet.of(Command.LOGOUT));
   }
