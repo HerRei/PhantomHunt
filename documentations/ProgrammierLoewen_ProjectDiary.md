@@ -129,3 +129,15 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Check-up aller Projektanforderungen für Meilenstein 2
 - Identifikation noch fehlender oder unvollständig umgesetzter Punkte.
 - Die verbleibenden Aufgaben wurden auf die Teammitglieder aufgeteilt, um die Deadline einzuhalten.
+
+## 2026-03-11 - 2026-03-14 - Implementierung GUI ##
+**Dauer:** ~12h
+**Ziel:** Erstellen einer ersten UI, Verbindung aufbauen zwischen UI und Server/ Frontend&Backend, UI - Nickname Eingaben, UI - GlobalChat, UI - Wisper Function, UI Change Nickname, UI Nickname vorschlag und korrekte verwendung der Nicknames.
+**Was gemacht:**
+- Erstellung unteschiedlicher Scens
+- Erstellen der Logic und handhabung hinter den Eingaben
+- Sicherstellen und Aufbau, der kommunikation zwischen CLient, server und UI
+- Einfügen eines Global Chats
+- Einfügen eines Wisper Chats
+- Akutallisieren der Frontend Java Docs
+
