@@ -26,9 +26,13 @@ public class ClientHandler implements Runnable {
   private long lastSeen = System.currentTimeMillis(); // used for PingPong
   private ScheduledExecutorService scheduler;
 
-  // getter for the name as to keep access private
+  /**
+   * Returns the current nickname of this client.
+   *
+   * @return the client nickname, or {@code "UKNW"} if no nickname is set yet
+   */
   public String getName() {
-    if (name == null) return "UKNW";
+    if (name == null) return "UKNW =(";
     return name;
   }
 
@@ -121,22 +125,38 @@ public class ClientHandler implements Runnable {
 
   //========================================
 
+  /**
+   * Updates the last-seen timestamp after a pong response from the client.
+   */
   private void handlePong() {
     lastSeen = System.currentTimeMillis();
     LOGGER.trace("Received pong: {} from {}", lastSeen, name);
   }
 
+  /**
+   * Broadcasts a global chat message from this client to all connected sessions.
+   *
+   * @param p packet containing the chat text
+   */
   private void handleUnicom(Packet p) {
     String msg = (p.argc() >= 1) ? p.args().get(0) : "";
-    LOGGER.info("Received unicom: {} from {}", msg, name);
+    LOGGER.info("Received unicom: {} from {}", msg, name); //Debugging, changed to .info
     registry.broadcast(this, (Packet.of(Command.UNICOM, getName() + ": " + msg)));
   }
 
+  /**
+   * Sends a goodbye message and disconnects the client.
+   */
   private void handleLogout() {
     sendMessage(Packet.of(Command.UNICOM, "Okay, Bye"));
     disconnect();
   }
 
+  /**
+   * Extracts the whisper target and message text and forwards both to the registry.
+   *
+   * @param p packet containing whisper target and message text
+   */
   private void handleWhisper(Packet p) {
     String payload = p.argc() >= 1 ? p.args().get(0) : "";
     int space = payload.indexOf(' ');
@@ -151,13 +171,18 @@ public class ClientHandler implements Runnable {
     }
   }
 
+  /**
+   * Handles unsupported commands by informing the client that the command is rejected.
+   *
+   * @param p unsupported packet
+   */
   private void handleDefault(Packet p) {
     LOGGER.warn("Received default: {} from {}", p.argc(), name);
     sendMessage((Packet.of(Command.REJECT, "Unsupported command: " + p.cmd())));
   }
 
   /**
-   * pings the player all 15 seconds and handles if he left
+   * Starts periodic ping checks and disconnects the client if no pong arrives in time.
    */
   public void pinging() {
     LOGGER.trace("Pinging... {}", name);
@@ -183,6 +208,10 @@ public class ClientHandler implements Runnable {
         TimeUnit.SECONDS);
   }
 
+  /**
+   * Initializes the client nickname from the local system user name or a generated fallback.
+   * The final nickname is then sent back to the client as a check-in packet.
+   */
   private void getSystemUserName() {
     String systemName = System.getProperty("user.name");
     if (systemName == null || systemName.isBlank()) {
@@ -193,6 +222,11 @@ public class ClientHandler implements Runnable {
     sendMessage(Packet.of(Command.CHECKIN,getName()));
   }
 
+  /**
+   * Applies a nickname change request and ensures the assigned nickname is unique.
+   *
+   * @param p packet containing the requested nickname
+   */
   private void handleNickChange(Packet p) {
     String newNick = (p.argc() >= 1) ? p.args().get(0) : "";
 
@@ -226,7 +260,7 @@ public class ClientHandler implements Runnable {
 
 
   /**
-   * this is just resetting the buffered writer and clearing the register and sockets
+   * Unregisters the client and closes the underlying socket connection. In a clean manner
    */
   public void disconnect() {
 
@@ -244,6 +278,7 @@ public class ClientHandler implements Runnable {
    * Sends a packet to this client.
    * This method is synchronized to safely allow other threads
    * to send messages to this client.
+   *
    * @param p The packet to send.
    */
   public void sendMessage(Packet p) {

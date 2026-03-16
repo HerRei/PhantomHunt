@@ -20,8 +20,12 @@ public class HomeScene {
   private TextArea whisperArea;
 
   /**
-   * Creates the home scene.
+   * Creates the home scene and connects all UI controls to the callbacks provided by the GUI.
    *
+   * @param nickname nickname shown in the welcome text
+   * @param onChangeNickname action that opens the nickname scene
+   * @param onSendGlobalMessage action that sends a global chat message
+   * @param onSendWisper action that sends a whisper with target and message text
    * @return the home scene
    */
   public Scene createScene(
@@ -177,6 +181,11 @@ public class HomeScene {
     return new Scene(layout, 1280, 960);
   }
 
+  /**
+   * Appends a received global chat message to the global chat text area.
+   *
+   * @param message formatted global chat message
+   */
   public void appendGlobalMessage(String message) { //for formating and displaying of chat
     if (globalChatArea == null || message == null || message.isBlank()) {
       return;
@@ -189,6 +198,11 @@ public class HomeScene {
     globalChatArea.appendText(message);
   }
 
+  /**
+   * Appends a received whisper message to the whisper text area.
+   *
+   * @param message formatted whisper message
+   */
   public void appendWhisperMessage(String message) {
     if (whisperArea == null || message == null || message.isBlank()) {
       return;

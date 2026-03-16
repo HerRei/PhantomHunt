@@ -43,7 +43,8 @@ public class ServerHandler implements Runnable {
 
 
   /**
-   * Receives Packets from server and sends Packets back
+   * Starts the read loop for the server connection.
+   * Incoming lines are decoded into packets and forwarded to the packet dispatcher.
    */
   @Override
   public void run() {
@@ -70,7 +71,11 @@ public class ServerHandler implements Runnable {
     }
   }
 
-  //Manages the Packets received from server
+  /**
+   * Dispatches an incoming packet to the matching handler method.
+   *
+   * @param packet packet received from the server
+   */
   private void managePacket(Packet packet) {
     switch (packet.cmd()) {
       case PING:
@@ -98,31 +103,57 @@ public class ServerHandler implements Runnable {
   }
 
 
-  // helper functions
+  /**
+   * Responds to a server ping with a pong packet.
+   */
   private void handlePing() {
     sendMessage(Packet.of(Command.PONG));
   }
 
+  /**
+   * Stores the nickname confirmed by the server.
+   *
+   * @param packet packet containing the confirmed nickname
+   */
   private void handleCheckin(Packet packet) {
     ClientApp.setConfirmedNickname(packet.text());
     LOGGER.info("Welcome on the Server: {}", packet.text());
   }
 
+  /**
+   * Forwards a global chat message from the server to the client UI layer.
+   *
+   * @param packet packet containing the global chat text
+   */
   private void handleUnicom(Packet packet) {
     ClientApp.notifyGlobalMessageReceived(packet.text()); //nachricht kommt vom server wird an client app weitergeleitet, und GUI kommt sie dort abhohlen
     LOGGER.info("Chat: {}", packet.text());
   }
 
-  // ins terminal wisper geloggt, dann weitergegeben zu GUI
+  /**
+   * Forwards a whisper message from the server to the client UI layer.
+   *
+   * @param packet packet containing the whisper text
+   */
   private void handleWhisper(Packet packet) {
     ClientApp.notifyWhisperReceived(packet.text());
     LOGGER.info("Wisper: {}", packet.text());
   }
 
+  /**
+   * Logs a successful server-side action such as a nickname change confirmation.
+   *
+   * @param packet packet describing the completed action
+   */
   private void handleCleared(Packet packet) {
     LOGGER.info("System: {}", packet.text());
   }
 
+  /**
+   * Processes a rejection sent by the server and updates the confirmed nickname if needed.
+   *
+   * @param packet packet containing the rejection text
+   */
   private void handleReject(Packet packet) {
     String text = packet.text();
     String marker = "You are now: ";
@@ -136,13 +167,18 @@ public class ServerHandler implements Runnable {
     LOGGER.error("Error: {}", packet.text());
   }
 
+  /**
+   * Logs packets that are currently not handled explicitly by the client.
+   *
+   * @param packet packet with an unsupported or unexpected command
+   */
   private void handleUnknown(Packet packet) {
     LOGGER.info("Received unknown command: {}", packet.cmd());
   }
 
 
   /**
-   * Sends Packet to server
+   * Sends a packet to the server over the active socket connection.
    *
    * @param p
    */
@@ -165,7 +201,9 @@ public class ServerHandler implements Runnable {
     }
   }
 
-  //Closes Socket
+  /**
+   * Closes the client socket if it is still open.
+   */
   private void closeSocket() {
     try {
       if (!socket.isClosed()) {

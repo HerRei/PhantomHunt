@@ -13,7 +13,8 @@ import java.util.function.BiConsumer; //für funnktionen mit zwei eingaben
 
 
 /**
- * This is a first JavaFX-Application, for the first Scene: LoadingScene
+ * Main JavaFX application class.
+ * It owns the main stage and switches between the different client scenes.
  */
 public class GUI extends Application {
   private Stage stage;
@@ -21,14 +22,19 @@ public class GUI extends Application {
   //private String nickname;
   private HomeScene currentHomeScene;
 
+  /**
+   * Starts the JavaFX application from a regular main method.
+   *
+   * @param args command line arguments
+   */
   public static void main(String[] args) {
     launch(args);
   }
 
   /**
-   * Sets up and opens the main game vidow
+   * Initializes the primary stage, creates the client connection and shows the first scene.
    *
-   * @param stage
+   * @param stage the primary JavaFX stage
    */
   @Override
   public void start(Stage stage) {
@@ -41,7 +47,7 @@ public class GUI extends Application {
   }
 
   /**
-   * Shows the loading scene.
+   * Creates and displays the loading scene.
    */
   public void showLoadingScene() {
     LoadingScene loadingScene = new LoadingScene();
@@ -49,6 +55,10 @@ public class GUI extends Application {
     stage.setScene(scene);
   }
 
+  /**
+   * Creates and displays the nickname entry scene.
+   * Existing chat listeners are removed before switching away from the home scene.
+   */
   public void showEnterNicknameScene() {
     ClientApp.setGlobalMessageListener(null); //nicht mehr zu message listerner wenn bei change nickname
     ClientApp.setWhisperMessageListener(null); //gilt auch für wisper
@@ -58,6 +68,12 @@ public class GUI extends Application {
     stage.setScene(scene);
   }
 
+  /**
+   * Sends the entered nickname to the client logic and waits briefly for confirmation.
+   * Once a nickname is available, the home scene is shown.
+   *
+   * @param nickname the nickname entered by the user
+   */
   public void handleNicknameEntered(String nickname) { //ersatzt
     ClientApp.setConfirmedNickname(null); //takes old name out of cache
     boolean success = clientApp.setNickname(nickname);
@@ -85,7 +101,9 @@ public class GUI extends Application {
   }
 
   /**
-   * Shows the home scene.
+   * Creates and displays the home scene and installs the message listeners used by the UI.
+   *
+   * @param nickname the nickname currently shown in the home scene
    */
   public void showHomeScene(String nickname) {
     //aktuelle home sc

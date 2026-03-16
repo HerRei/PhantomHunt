@@ -8,10 +8,21 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
+/**
+ * Builds the scene in which the player enters or changes a nickname.
+ */
 public class EnterNicknameScene {
   private Button enterNicknameButton;
   private TextField nicknameField;
 
+  /**
+   * Creates the nickname scene and wires the submit button to the provided callback.
+   *
+   * @param onNicknameEntered action that receives the entered nickname
+   * @param currentNickname nickname that should be pre-filled in the input field, actual Nickname,
+   * changes if standart is already taken.
+   * @return the nickname scene
+   */
   public Scene createScene(java.util.function.Consumer<String> onNicknameEntered, String currentNickname) {
     Label titleLabel = new Label("Phantom Hunt - Nickname Selection");
     titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
@@ -56,10 +67,20 @@ public class EnterNicknameScene {
 
     return new Scene(layout, 1280, 960);
   }
-
+  /**
+   * Returns the nickname that is currently entered in the text field.
+   *
+   * @return the trimmed nickname text
+   */
   public String getNickname() {
     return nicknameField.getText().trim();
   }
 
+  /**
+   * Returns the button that confirms the nickname entry.
+   * From Old uscases, when results hardcoded
+   *
+   * @return the nickname submit button
+   */
   public Button getContinueButton() { return enterNicknameButton; }
 }

@@ -8,15 +8,16 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 /**
- * Builds a simple loading scene for the JavaFX client.
+ * Builds the initial loading scene of the JavaFX client.
  */
 public class LoadingScene {
 
   private Button continueButton;
 
   /**
-   * Creates the JavaFX scene.
+   * Creates the loading scene and connects the continue button to the next action.
    *
+   * @param onContinue action that is executed when the user presses the continue button
    * @return the loading scene
    */
   public Scene createScene(Runnable onContinue) {
@@ -40,7 +41,7 @@ public class LoadingScene {
   }
 
   /**
-   * Returns the continue button so other classes can attach actions if needed.
+   * Returns the continue button of this scene.
    *
    * @return the continue button
    */
