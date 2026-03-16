@@ -130,7 +130,7 @@ public class ClientHandler implements Runnable {
    */
   private void handlePong() {
     lastSeen = System.currentTimeMillis();
-    LOGGER.trace("Received pong: {} from {}", lastSeen, name);
+    LOGGER.info("Received pong: {} from {}", lastSeen, name);
   }
 
   /**
