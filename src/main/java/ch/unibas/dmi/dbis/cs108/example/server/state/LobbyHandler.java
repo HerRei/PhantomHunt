@@ -19,7 +19,7 @@ public class LobbyHandler {
       new AtomicInteger(1); // atmoic integer is thread safe!!
 
   public String getLobbies() {
-    return lobbies.keySet();
+    return lobbies.keySet().toString();
   }
 
   public void createLobby(String name, ClientHandler host) {
@@ -29,11 +29,15 @@ public class LobbyHandler {
     LOGGER.info("Lobby {} ({}) created by {}", name, id, host.getName());
 
     host.setCurrentLobby(lobby);
-    host.sendMessage(Packet.of(Command.CLEARED, "Lobby created: " + name + "Id: " + id));
+    host.sendMessage(Packet.of(Command.CLEARED, "Lobby created: " + name + " Id: " + id));
   }
 
-  public void joinLobby(String id, ClientHandler player) { // NPE? idk if its ever cought like
+  public void joinLobby(String id, ClientHandler player) {
     Lobby lobby = lobbies.get(id);
+    if (lobby == null) {
+      player.sendMessage(Packet.of(Command.REJECT, "Lobby not found: " + id));
+      return;
+    }
     if (lobby.addPlayer(player)) {
       player.setCurrentLobby(lobby);
     }
@@ -45,6 +49,7 @@ public class LobbyHandler {
           player) { // thrad saftey is not here, we have a race condition but whatevs oh and NPE's
                     // :)
     Lobby lobby = lobbies.get(id);
+    if (lobby == null) return;
     if (lobby.removePlayer(player)) {
       player.setCurrentLobby(null);
       if (lobby.getPlayers().isEmpty()) {

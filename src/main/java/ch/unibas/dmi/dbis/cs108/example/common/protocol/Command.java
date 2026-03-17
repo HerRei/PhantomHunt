@@ -18,7 +18,7 @@ public enum Command {
   // chat
   UNICOM, // UNICOM <text...>
   WHISPER, // WHISPER <recipient> <text...>
-  YAP, // YAP <Lobby_id> <text>
-  LOGOUT,
-  NICK,
+  YAP, // YAP <text>
+  LOGOUT, // LOGOUT
+  NICK, // NICK <name>
 }

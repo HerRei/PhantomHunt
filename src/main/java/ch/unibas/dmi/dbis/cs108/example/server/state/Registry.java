@@ -105,16 +105,18 @@ public final class Registry {
 
   public void yapping(ClientHandler sender, Packet p) {
     log.debug("registry yapping packet from {}: {}", sender.getName(), p.cmd());
-    String str = Protocol.encode(p);
-    var x = sender.getCurrentLobby();
-    if(x == null) sender.sendMessage(Packet.of(Command.REJECT, "You are not in a lobby, what are you \" yapping \""));
+    Lobby senderLobby = sender.getCurrentLobby();
+    if(senderLobby == null) {
+        sender.sendMessage(Packet.of(Command.REJECT, "You are not in a lobby, what are you \" yapping \""));
+        return;
+    }
 
     for (ClientHandler h : sessions) {
-      var y = h.getCurrentLobby();
-      if(!(h.isInLobby(x))) continue;
-      h.sendMessage(p);
+      if(h.isInLobby(senderLobby)) {
+          h.sendMessage(p);
+      }
     }
-    }
+  }
 
   /**
    * Private message from client to client.
