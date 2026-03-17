@@ -12,9 +12,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,8 +28,6 @@ public class ServerHandler implements Runnable {
   private static final Logger LOGGER = LogManager.getLogger(ServerHandler.class);
   private final Socket socket;
   private BufferedWriter out;
-  private long lastSeen = System.currentTimeMillis(); // used for PingPong
-  private ScheduledExecutorService scheduler;
 
   /**
    * Creates a new handler for the server connection and starts immediately
@@ -61,7 +56,6 @@ public class ServerHandler implements Runnable {
     ) {
       this.out = out;
       String line;
-      ponging();
       while ((line = in.readLine()) != null) {
         try {
           Packet packet = Protocol.decode(line);
@@ -113,8 +107,8 @@ public class ServerHandler implements Runnable {
    * Responds to a server ping with a pong packet.
    */
   private void handlePing() {
-    lastSeen = System.currentTimeMillis();
-    LOGGER.info("Received ping from server.");
+    sendMessage(Packet.of(Command.PONG));
+    LOGGER.info("Recieved Ping {}", System.currentTimeMillis());
   }
 
   /**
@@ -183,28 +177,6 @@ public class ServerHandler implements Runnable {
     LOGGER.info("Received unknown command: {}", packet.cmd());
   }
 
-  private void ponging(){
-    LOGGER.trace("Pong the server...");
-    sendMessage(Packet.of(Command.PONG));
-    this.scheduler = Executors.newSingleThreadScheduledExecutor();
-    scheduler.scheduleAtFixedRate(
-            () -> {
-              long now = System.currentTimeMillis();
-              if (now - lastSeen > 16000) // checks if lastping > 16 seconds
-              {
-                LOGGER.warn("Ponging took {}, client kicked.", now - lastSeen);
-                closeSocket();
-              }
-              else {
-                // Send the Ping again
-                LOGGER.debug("Ponging took {}, trying again", now - lastSeen);
-                sendMessage(Packet.of(Command.PONG));
-              }
-            },
-            15,
-            15,
-            TimeUnit.SECONDS);
-  }
 
   /**
    * Sends a packet to the server over the active socket connection.

@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.example.server.net;
 
+import ch.unibas.dmi.dbis.cs108.example.server.state.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.example.server.state.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +40,7 @@ public class TcpServer {
       }
 
       Registry registry = new Registry();
+      LobbyHandler lobbyHandler = new LobbyHandler();
 
       while (true) {
         Socket socket =

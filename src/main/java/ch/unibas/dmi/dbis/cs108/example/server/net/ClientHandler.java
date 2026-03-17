@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.server.net;
 
+import ch.unibas.dmi.dbis.cs108.example.server.state.Lobby;
+import ch.unibas.dmi.dbis.cs108.example.server.state.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.example.server.state.Registry;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.*;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +24,8 @@ public class ClientHandler implements Runnable {
   private final Socket socket;
   private BufferedWriter out; // used for the chat function
   private final Registry registry; // keeps all of the users
+  private final LobbyHandler lobbyHandler;
+  private Lobby currentLobby;
   private String name; // nickname
   private long lastSeen = System.currentTimeMillis(); // used for PingPong
   private ScheduledExecutorService scheduler;
@@ -36,14 +40,27 @@ public class ClientHandler implements Runnable {
     return name;
   }
 
+  public Lobby getCurrentLobby() {
+    return currentLobby;
+  }
+
+  public boolean isInLobby(Lobby lobby){
+    return lobby == currentLobby;
+  }
+
+  public void setCurrentLobby(Lobby lobby) {
+    this.currentLobby = lobby;
+  }
+
   /**
    * Creates a new handler for a connected client.
    * @param socket   The socket connection to the client.
    * @param registry The server registry that manages all connected players.
    */
-  public ClientHandler(Socket socket, Registry registry) {
+  public ClientHandler(Socket socket, Registry registry, LobbyHandler lobbyHandler) {
     this.socket = socket;
     this.registry = registry;
+    this.lobbyHandler = lobbyHandler;
   }
 
   /**
@@ -105,6 +122,14 @@ public class ClientHandler implements Runnable {
           case WHISPER -> {
             handleWhisper(p);
           }
+          
+          case CHECKIN ->  {
+            handleCheckin(p);
+          }
+
+          case YAP -> {
+            handleYAP(p);
+          }
 
           default -> {
             handleDefault(p);
@@ -144,12 +169,26 @@ public class ClientHandler implements Runnable {
     registry.broadcast(this, (Packet.of(Command.UNICOM, getName() + ": " + msg)));
   }
 
+  private void handleYAP(Packet p){
+    String msg = (p.argc() >= 1) ? p.args().get(0) : "";
+    LOGGER.info("Received YAP: {} from {}", msg, name);
+    registry.yapping(this, (Packet.of(Command.YAP, getName() + ": " + msg)));
+
+  }
+
   /**
    * Sends a goodbye message and disconnects the client.
    */
   private void handleLogout() {
     sendMessage(Packet.of(Command.UNICOM, "Okay, Bye"));
     disconnect();
+  }
+  
+  private void handleCheckin(Packet p){
+    String msg = (p.argc() >= 1) ? p.args().get(0) : "";
+    LOGGER.info("Received checkin: {} from {}", msg, name);
+    sendMessage(Packet.of(Command.CHECKIN, getName()));
+    lobbyHandler.joinLobby(msg, this); //error handling?? idk if this gets cought anywhere down the line? or if he already is in a lobby...
   }
 
   /**
@@ -164,7 +203,7 @@ public class ClientHandler implements Runnable {
     String target = payload.substring(0, space);
     String message = payload.substring(space + 1);
 
-    if (registry.whisper(this, target, message)) {
+    if (registry.whisper(this, target, message)) { // why does this not work?
       // this used to be here for debugging , might need this later when registry has errors
     } else {
       sendMessage(Packet.of(Command.REJECT, "User not found: " + target));
@@ -263,9 +302,16 @@ public class ClientHandler implements Runnable {
    * Unregisters the client and closes the underlying socket connection. In a clean manner
    */
   public void disconnect() {
+    
+    
 
     try {
-      scheduler.shutdown();
+      if (currentLobby != null) {
+        lobbyHandler.leaveLobby(currentLobby.getId(), this); //only god knows if this will throw NPE's around...
+      }
+      if (scheduler != null) {
+        scheduler.shutdown();
+      }
       this.out = null;
       registry.unregister(this);
       socket.close();
