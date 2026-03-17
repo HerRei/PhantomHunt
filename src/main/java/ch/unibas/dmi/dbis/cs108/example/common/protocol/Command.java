@@ -10,6 +10,7 @@ public enum Command {
   PONG, // pong
 
   // identity
+  MKL, // MKL <name> (Make Lobby)
   CHECKIN, // CHECKIN <name>
   CLEARED, // login ok
   REJECT, // REJECT <text...>

@@ -53,7 +53,7 @@ public class TcpServer {
 
         ClientHandler clientHandler =
             new ClientHandler(
-                socket, registry); // thread-per-client. everyone gets a handler trough this here.
+                socket, registry, lobbyHandler); // thread-per-client. everyone gets a handler trough this here.
         Thread t = new Thread(clientHandler);
         t.start();
       }

@@ -131,6 +131,10 @@ public class ClientHandler implements Runnable {
             handleYAP(p);
           }
 
+          case MKL -> {
+            makeLobby(p);
+          }
+
           default -> {
             handleDefault(p);
           }
@@ -167,6 +171,12 @@ public class ClientHandler implements Runnable {
     String msg = (p.argc() >= 1) ? p.args().get(0) : "";
     LOGGER.info("Received unicom: {} from {}", msg, name); //Debugging, changed to .info
     registry.broadcast(this, (Packet.of(Command.UNICOM, getName() + ": " + msg)));
+  }
+
+  private void makeLobby(Packet p){
+    String msg = (p.argc() >= 1) ? p.args().get(0) : "";
+    LOGGER.info("Received MKL: {} from {}", msg, name);
+    lobbyHandler.createLobby(msg, this);
   }
 
   private void handleYAP(Packet p){
