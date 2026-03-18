@@ -47,8 +47,12 @@ public class Lobby {
             player.sendMessage(Packet.of(Command.REJECT, "Game is already running."));
             return false;
         }
-        if (players.contains(player)) {
+        else if (players.contains(player)) {
             LOGGER.warn("Player {} is already in lobby {}", player.getName(), this.id);
+            return false;
+        }
+        else if(players.size()>= 4){
+            LOGGER.warn("This lobby is already full");
             return false;
         }
 
