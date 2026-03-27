@@ -6,55 +6,92 @@ import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LobbyHandler {
 
-  private static final Logger LOGGER = LogManager.getLogger(LobbyHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(LobbyHandler.class);
 
-  private final ConcurrentHashMap<String, Lobby> lobbies =
-      new ConcurrentHashMap<>(); // is a thread safe map
-  private final AtomicInteger lobbyCounter =
-      new AtomicInteger(1); // atmoic integer is thread safe!!
+    private final Vector<Lobby> waitingLobbies = new Vector<>();
+    private final Vector<Lobby> playingLobbies = new Vector<>();
+    private final Vector<Lobby> finishedLobbies = new Vector<>();
+    private final AtomicInteger lobbyCounter = new AtomicInteger(1);
 
-  public String getLobbies() {
-    return lobbies.keySet().toString();
-  }
-
-  public void createLobby(String name, ClientHandler host) {
-    String id = "lobby" + lobbyCounter.getAndIncrement();
-    Lobby lobby = new Lobby(id, name, host);
-    lobbies.put(id, lobby);
-    LOGGER.info("Lobby {} ({}) created by {}", name, id, host.getName());
-
-    host.setCurrentLobby(lobby);
-    host.sendMessage(Packet.of(Command.CLEARED, "Lobby created: " + name + " Id: " + id));
-  }
-
-  public void joinLobby(String id, ClientHandler player) {
-    Lobby lobby = lobbies.get(id);
-    if (lobby == null) {
-      player.sendMessage(Packet.of(Command.REJECT, "Lobby not found: " + id));
-      return;
+    public Optional<Vector<Lobby>> getWaitingLobbies() {
+        return Optional.ofNullable(waitingLobbies);
     }
-    if (lobby.addPlayer(player)) {
-      player.setCurrentLobby(lobby);
-    }
-  }
 
-  public void leaveLobby(
-      String id,
-      ClientHandler
-          player) { // thrad saftey is not here, we have a race condition but whatevs oh and NPE's
-                    // :)
-    Lobby lobby = lobbies.get(id);
-    if (lobby == null) return;
-    if (lobby.removePlayer(player)) {
-      player.setCurrentLobby(null);
-      if (lobby.getPlayers().isEmpty()) {
-        lobbies.remove(id);
-      }
+    public Optional<Vector<Lobby>> getPlayingLobbies() {
+        return Optional.ofNullable(playingLobbies);
     }
-  }
+
+    public Optional<Vector<Lobby>> getFinishedLobbies() {
+        return Optional.ofNullable(finishedLobbies);
+    }
+
+    public String getLobbies() {
+        StringBuilder sb = new StringBuilder();
+        for (Lobby lobby : waitingLobbies) {
+            sb.append(lobby.getId()).append(", ");
+        }
+        for (Lobby lobby : playingLobbies) {
+            sb.append(lobby.getId()).append(", ");
+        }
+        for (Lobby lobby : finishedLobbies) {
+            sb.append(lobby.getId()).append(", ");
+        }
+        // Remove the trailing comma and space if the list is not empty
+        if (sb.length() > 0) {
+            sb.setLength(sb.length() - 2);
+        }
+        return sb.toString();
+    }
+
+    public void createLobby(String name, ClientHandler host) {
+        String id = "lobby" + lobbyCounter.getAndIncrement();
+        Lobby lobby = new Lobby(id, name, host);
+        waitingLobbies.add(lobby);
+        LOGGER.info("Lobby {} ({}) created by {}", name, id, host.getName());
+
+        host.setCurrentLobby(lobby);
+        host.sendMessage(Packet.of(Command.CLEARED, "Lobby created: " + name + " Id: " + id));
+    }
+
+    public void joinLobby(String id, ClientHandler player) {
+        Optional<Lobby> lobbyOpt = findLobbyById(id, waitingLobbies);
+        if (lobbyOpt.isEmpty()) {
+            player.sendMessage(Packet.of(Command.REJECT, "Lobby not found or has already started: " + id));
+            return;
+        }
+
+        Lobby lobby = lobbyOpt.get();
+        if (lobby.addPlayer(player)) {
+            player.setCurrentLobby(lobby);
+        }
+    }
+
+    public void leaveLobby(String id, ClientHandler player) {
+        Optional<Lobby> lobbyOpt = findLobbyById(id, waitingLobbies);
+        if (lobbyOpt.isEmpty()) return;
+
+        Lobby lobby = lobbyOpt.get();
+        if (lobby.removePlayer(player)) {
+            player.setCurrentLobby(null);
+            if (lobby.getPlayers().isPresent() && lobby.getPlayers().get().isEmpty()) {
+                waitingLobbies.remove(lobby);
+                LOGGER.info("Empty lobby {} removed.", id);
+            }
+        }
+    }
+
+    private Optional<Lobby> findLobbyById(String id, Vector<Lobby> lobbyList) {
+        for (Lobby lobby : lobbyList) {
+            if (lobby.getId().equals(id)) {
+                return Optional.of(lobby);
+            }
+        }
+        return Optional.empty();
+    }
 }

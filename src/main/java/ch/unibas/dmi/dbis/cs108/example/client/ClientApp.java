@@ -46,24 +46,21 @@ public class ClientApp {
 
   /**
    * Sends a nickname change request to the server.
-   * If the nickname contains whitespace, it is removed and a warning is logged.
    *
    * @param nickname requested nickname
    * @return {@code true} if the nickname request was sent, otherwise {@code false}
    */
-  public boolean setNickname(String nickname) {
+  public boolean setNickname(String nickname) { //changed to make robust against nullpointer
     if (nickname == null || nickname.isBlank()) {
       LOGGER.warn("Nickname was blank --> not sent to server");
       return false;
     }
-
-    String finalNickname = nickname;
-    if (nickname.contains(" ")) {
-      finalNickname = nickname.replaceAll("\\s", "");
-      LOGGER.warn("Username contained whitespace and was changed from '{}' to '{}'", nickname, finalNickname);
+    if (tcpClient == null || nickname.isBlank()) {
+      LOGGER.warn("NIckname was blank --> wont send to server");
+      return false;
     }
 
-    tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, finalNickname.trim()));
+    tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, nickname.trim()));
     return true;
   }
 
