@@ -50,13 +50,9 @@ public class ClientApp {
    * @param nickname requested nickname
    * @return {@code true} if the nickname request was sent, otherwise {@code false}
    */
-  public boolean setNickname(String nickname) { //changed to make robust against nullpointer
+  public boolean setNickname(String nickname) {
     if (nickname == null || nickname.isBlank()) {
       LOGGER.warn("Nickname was blank --> not sent to server");
-      return false;
-    }
-    if (tcpClient == null || nickname.isBlank()) {
-      LOGGER.warn("NIckname was blank --> wont send to server");
       return false;
     }
 

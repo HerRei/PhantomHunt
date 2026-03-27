@@ -168,15 +168,15 @@ public class ClientHandler implements Runnable {
    * @param p packet containing the chat text
    */
   private void handleUnicom(Packet p) {
-    String msg = (p.argc() >= 1) ? p.args().get(0) : "";
+    String msg = (p.argc() >= 1) ? String.join(" ", p.args()) : "";
     LOGGER.info("Received unicom: {} from {}", msg, name); //Debugging, changed to .info
     registry.broadcast(this, (Packet.of(Command.UNICOM, getName() + ": " + msg)));
   }
 
   private void makeLobby(Packet p){
-    String msg = (p.argc() >= 1) ? p.args().get(0) : "";
-    LOGGER.info("Received MKL: {} from {}", msg, name);
-    lobbyHandler.createLobby(msg, this);
+    String lobbyName = (p.argc() >= 1) ? String.join(" ", p.args()) : "";
+    LOGGER.info("Received MKL: {} from {}", lobbyName, name);
+    lobbyHandler.createLobby(lobbyName, this);
   }
 
   private void handleYAP(Packet p){
@@ -207,14 +207,16 @@ public class ClientHandler implements Runnable {
    * @param p packet containing whisper target and message text
    */
   private void handleWhisper(Packet p) {
-    String payload = p.argc() >= 1 ? p.args().get(0) : "";
-    int space = payload.indexOf(' ');
+    if (p.argc() < 2) {
+        sendMessage(Packet.of(Command.REJECT, "Invalid whisper format. Use: WHISPER <user> <message>"));
+        return;
+    }
+    
+    String target = p.args().get(0);
+    String message = String.join(" ", p.args().subList(1, p.args().size()));
 
-    String target = payload.substring(0, space);
-    String message = payload.substring(space + 1);
-
-    if (registry.whisper(this, target, message)) { // why does this not work?
-      // this used to be here for debugging , might need this later when registry has errors
+    if (registry.whisper(this, target, message)) {
+      // Whisper sent successfully
     } else {
       sendMessage(Packet.of(Command.REJECT, "User not found: " + target));
     }
@@ -277,7 +279,7 @@ public class ClientHandler implements Runnable {
    * @param p packet containing the requested nickname
    */
   private void handleNickChange(Packet p) {
-    String newNick = (p.argc() >= 1) ? p.args().get(0) : "";
+    String newNick = (p.argc() >= 1) ? String.join(" ", p.args()) : "";
 
     if (newNick.isBlank()) {
       LOGGER.warn("Nick name is blank :(");
