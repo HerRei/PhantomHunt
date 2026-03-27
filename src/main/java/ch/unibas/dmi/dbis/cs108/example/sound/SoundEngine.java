@@ -2,115 +2,188 @@ package ch.unibas.dmi.dbis.cs108.example.sound;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.stb.STBVorbis;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
+import static org.lwjgl.openal.AL10.*;
+import static org.lwjgl.openal.ALC10.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
- * A simple sound engine for loading and playing audio clips.
- * This class provides an API to start, stop, and play sounds for a specified duration.
- * Sound files are cached to avoid redundant loading.
+ * A sound engine powered by LWJGL and OpenAL for playing audio.
+ * This engine must be initialized before use and shut down on application exit.
+ * It is designed to load and play .ogg audio files.
  */
 public final class SoundEngine {
 
     private static final Logger LOGGER = LogManager.getLogger(SoundEngine.class);
 
-    // A cache to store loaded sound files
-    private final Map<String, URL> soundCache = new HashMap<>();
+    private long device;
+    private long context;
 
-    // A scheduler to handle time-based tasks
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final Map<String, Integer> soundBufferMap = new HashMap<>();
+    private final List<Integer> activeSources = new ArrayList<>();
 
     /**
-     * Loads a sound file from the given path and caches it with a specified name.
-     * The path should be absolute.
+     * Initializes the OpenAL sound engine. This must be called before any other methods.
+     * It sets up the audio device and context needed for sound playback.
+     */
+    public void init() {
+        // Open the default audio device.
+        device = alcOpenDevice((ByteBuffer) null);
+        if (device == NULL) {
+            throw new IllegalStateException("Failed to open the default OpenAL device.");
+        }
+
+        // Create the OpenAL context.
+        ALCCapabilities alcCapabilities = ALC.createCapabilities(device);
+        context = alcCreateContext(device, (IntBuffer) null);
+        if (context == NULL) {
+            throw new IllegalStateException("Failed to create an OpenAL context.");
+        }
+
+        // Make the context current and create capabilities.
+        alcMakeContextCurrent(context);
+        AL.createCapabilities(alcCapabilities);
+
+        LOGGER.info("OpenAL sound engine initialized successfully.");
+    }
+
+    /**
+     * Loads a sound from a resource path and prepares it for playback.
+     * This implementation uses STB to decode .ogg Vorbis files.
      *
-     * @param name A name to identify the sound.
-     * @param path The resource path to the sound file.
+     * @param name The friendly name to associate with the sound (e.g., "jump").
+     * @param path The resource path to the sound file (e.g., "/sounds/jump.ogg").
      */
     public void loadSound(String name, String path) {
-        URL soundURL = getClass().getResource(path);
-        if (soundURL != null) {
-            soundCache.put(name, soundURL);
-            LOGGER.info("Sound loaded and cached: '{}' at path '{}'", name, path);
-        } else {
-            LOGGER.error("Could not find sound file at path: {}", path);
-        }
-    }
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Read the entire audio file into a byte buffer.
+            ByteBuffer resourceBuffer = resourceToByteBuffer(path);
 
-    /**
-     * Starts playing a cached sound.
-     *
-     * @param name The name of the sound to play.
-     * @param loop If true, the sound will loop while.
-     * @return object that can be used to control the sound.
-     */
-    public Clip startSound(String name, boolean loop) {
-        URL soundURL = soundCache.get(name);
-        if (soundURL == null) {
-            LOGGER.warn("Attempted to play a sound that was not loaded: '{}'", name);
-            return null;
-        }
+            IntBuffer channels = stack.mallocInt(1);
+            IntBuffer sampleRate = stack.mallocInt(1);
 
-        try {
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundURL);
-            Clip clip = AudioSystem.getClip();
-            clip.open(audioStream);
-
-            if (loop) {
-                clip.loop(Clip.LOOP_CONTINUOUSLY);
-            } else {
-                clip.start();
+            // Decode the .ogg file into raw audio data (PCM).
+            ShortBuffer rawAudioBuffer = STBVorbis.stb_vorbis_decode_memory(resourceBuffer, channels, sampleRate);
+            if (rawAudioBuffer == null) {
+                LOGGER.error("Failed to decode Vorbis audio from: {}", path);
+                return;
             }
 
-            LOGGER.info("Playing sound: '{}' (Loop: {})", name, loop);
-            return clip;
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            LOGGER.error("An error occurred while trying to play sound: '{}'", name, e);
-            return null;
+            // Determine the OpenAL format based on the number of channels.
+            int format = (channels.get(0) == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+
+            // Create an OpenAL buffer and upload the audio data.
+            int bufferPointer = alGenBuffers();
+            alBufferData(bufferPointer, format, rawAudioBuffer, sampleRate.get(0));
+
+            // Free the decoded audio buffer, as it's now on the audio device.
+            MemoryUtil.memFree(rawAudioBuffer);
+
+            // Cache the buffer ID using the friendly name.
+            soundBufferMap.put(name, bufferPointer);
+            LOGGER.info("Loaded sound '{}' from path '{}'", name, path);
+
+        } catch (IOException e) {
+            LOGGER.error("Could not find or read sound file at path: {}", path, e);
         }
     }
 
     /**
-     * Stops a currently playing sound clip.
+     * Plays a loaded sound.
+     *
+     * @param name The friendly name of the sound to play.
+     * @return The OpenAL source ID for the playing sound, which can be used to stop it. Returns -1 on failure.
      */
-    public void stopSound(Clip clip) {
-        if (clip != null && clip.isOpen()) {
-            clip.stop();
-            clip.close();
-            LOGGER.info("Sound clip stopped and closed.");
+    public int playSound(String name) {
+        Integer bufferId = soundBufferMap.get(name);
+        if (bufferId == null) {
+            LOGGER.warn("Attempted to play a sound that was not loaded: '{}'", name);
+            return -1;
         }
+
+        // Create a new audio source (a playback channel).
+        int sourcePointer = alGenSources();
+        // Attach the sound buffer to the source.
+        alSourcei(sourcePointer, AL_BUFFER, bufferId);
+        // Play the sound.
+        alSourcePlay(sourcePointer);
+
+        // Keep track of the source so it can be cleaned up later.
+        activeSources.add(sourcePointer);
+        LOGGER.info("Playing sound '{}' on source ID {}", name, sourcePointer);
+        return sourcePointer;
     }
 
     /**
-     * Plays a sound for a specific duration and then automatically stops it.
+     * Stops a playing sound and releases its source.
+     *
+     * @param sourcePointer The source ID of the sound to stop (returned by playSound).
      */
-    public void playSoundForDuration(String name, long durationMillis) {
-        // Start the sound without looping.
-        Clip clip = startSound(name, false);
-
-        // If the clip started successfully, schedule it to stop after the specified duration.
-        if (clip != null) {
-            scheduler.schedule(() -> stopSound(clip), durationMillis, TimeUnit.MILLISECONDS);
-            LOGGER.info("Sound '{}' is scheduled to stop in {} milliseconds.", name, durationMillis);
+    public void stopSound(int sourcePointer) {
+        if (activeSources.contains(sourcePointer)) {
+            alSourceStop(sourcePointer);
+            alDeleteSources(sourcePointer);
+            activeSources.remove(Integer.valueOf(sourcePointer));
+            LOGGER.info("Stopped and deleted audio source ID {}", sourcePointer);
         }
     }
 
     /**
-     * Shuts down the sound engine and releases its resources.
+     * Shuts down the sound engine and cleans up all resources.
+     * This must be called when the application is closing to prevent memory leaks.
      */
     public void shutdown() {
-        scheduler.shutdownNow(); //
-        LOGGER.info("Sound engine has been shut down.");
+        // Stop and delete all currently active sources.
+        for (int source : activeSources) {
+            alSourceStop(source);
+            alDeleteSources(source);
+        }
+        activeSources.clear();
+
+        // Delete all sound buffers that were loaded.
+        for (int buffer : soundBufferMap.values()) {
+            alDeleteBuffers(buffer);
+        }
+        soundBufferMap.clear();
+
+        // Destroy the OpenAL context and close the audio device.
+        if (context != NULL) {
+            alcDestroyContext(context);
+        }
+        if (device != NULL) {
+            alcCloseDevice(device);
+        }
+
+        LOGGER.info("OpenAL sound engine has been shut down.");
+    }
+
+    /**
+     * Helper method to read a resource file into a direct ByteBuffer.
+     */
+    private ByteBuffer resourceToByteBuffer(String resource) throws IOException {
+        InputStream source = SoundEngine.class.getResourceAsStream(resource);
+        if (source == null) {
+            throw new IOException("Resource not found: " + resource);
+        }
+        byte[] bytes = source.readAllBytes();
+        ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
+        buffer.put(bytes).flip();
+        return buffer;
     }
 }
