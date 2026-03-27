@@ -141,3 +141,13 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Einfügen eines Wisper Chats
 - Akutallisieren der Frontend Java Docs
 
+## 2026-03-27 - Einführung von Vera in Team
+**Dauer:** ~1h
+**Ziele:** Einführen Vera in YouTrack, Code, Aufgabenverteilung
+**Was gemacht:**
+- Vera als neues Mitglied in die YouTrack Umgebung eingeführt
+    In YouTrack:
+    - Einführung in Agileboard
+    - Einführung in Gantt
+- Kurzes Brefing über Code/Repo Struktur gegeben
+- Erneute Besprechung der momentanen Aufgabenverteilung und neuverteilung der Aufgaben
