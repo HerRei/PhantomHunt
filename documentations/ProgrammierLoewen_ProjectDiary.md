@@ -151,3 +151,16 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
     - Einführung in Gantt
 - Kurzes Brefing über Code/Repo Struktur gegeben
 - Erneute Besprechung der momentanen Aufgabenverteilung und neuverteilung der Aufgaben
+
+## 2026-05-15 — Hermes ##
+**Dauer:** ~6h
+**Ziel:** Erweiterung der Server-Lobby-Funktionalität.
+**Was gemacht:**
+- **Sound-Engine:** Das Implementieren einer SoundEngine mit hilfe eines Youtube Tutorials, bei dem mit JLWGL und OpenAL gearbeitet wird.
+- **Whitespace in Usernames:** Die Logik zur Verarbeitung von Username um Mehrdeutikeiten in Whisper und MKL zu beheben.
+- **Lobby-Management:** Es wurden bei Lobbies ab jetzt festgehalten, in welchem Zustand sie sind und man kann diese Jeweils abfragen. Dass sollte vorallem die Arbeit im frontend später erleichtern.
+- **Zuschauer-Modus implementiert:** Mit spec kann man einer Lobby als Spectator beitreten. Die spectators werden ausserhalb der Spieler getrackt und auch schön in die Lobbys aufgenommen und dann wieder Rausgenommen umd die Datenstruktur konsisten zu halten.
+    
+**Nächstes:**
+- Die GUI and diese Funktionen anbinden.
+- Weitere Tests die danne erggeben, ob die Mehrdeutigkeit wirklich behoben wurde. evt. erstellen von Unit-tests und Äquivalenzklassenf um all das auf nicht Ambiguative Art zu testen. 
