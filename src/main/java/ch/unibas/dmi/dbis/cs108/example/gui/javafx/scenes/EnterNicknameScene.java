@@ -1,5 +1,6 @@
-package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene;
+package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 
+import ch.unibas.dmi.dbis.cs108.example.client.ClientApp;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -7,11 +8,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Builds the scene in which the player enters or changes a nickname.
  */
-public class EnterNicknameScene {
+public class EnterNicknameScene implements SceneInterface{
+  private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
+  private Scene localScene;
   private Button enterNicknameButton;
   private TextField nicknameField;
 
@@ -23,7 +28,7 @@ public class EnterNicknameScene {
    * changes if standart is already taken.
    * @return the nickname scene
    */
-  public Scene createScene(java.util.function.Consumer<String> onNicknameEntered, String currentNickname) {
+  public void createScene(java.util.function.Consumer<String> onNicknameEntered, String currentNickname) {
     Label titleLabel = new Label("Phantom Hunt - Nickname Selection");
     titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -64,9 +69,14 @@ public class EnterNicknameScene {
         enterNicknameButton
         );
 
-
-    return new Scene(layout, 1280, 960);
+    localScene = new Scene(layout, 1280, 960);
   }
+
+  @Override
+  public Scene getScene() {
+    return localScene;
+  }
+
   /**
    * Returns the nickname that is currently entered in the text field.
    *
@@ -83,4 +93,6 @@ public class EnterNicknameScene {
    * @return the nickname submit button
    */
   public Button getContinueButton() { return enterNicknameButton; }
+
+
 }

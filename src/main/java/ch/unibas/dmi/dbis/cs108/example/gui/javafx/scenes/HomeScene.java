@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene;
+package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,10 +14,11 @@ import java.util.function.BiConsumer;
 /**
  * Builds the home screen of the client.
  */
-public class HomeScene {
+public class HomeScene implements  SceneInterface{
 
   private TextArea globalChatArea;
   private TextArea whisperArea;
+  private Scene localScene;
 
   /**
    * Creates the home scene and connects all UI controls to the callbacks provided by the GUI.
@@ -28,7 +29,7 @@ public class HomeScene {
    * @param onSendWisper action that sends a whisper with target and message text
    * @return the home scene
    */
-  public Scene createScene(
+  public void createScene(
       String nickname,
       Runnable onChangeNickname,
       Consumer<String> onSendGlobalMessage,
@@ -178,8 +179,12 @@ public class HomeScene {
         sendWhisperButton,
         whisperArea
     );
-    return new Scene(layout, 1280, 960);
+    localScene = new Scene(layout, 1280, 960);
   }
+
+  public Scene getScene(){
+    return localScene;
+  };
 
   /**
    * Appends a received global chat message to the global chat text area.
