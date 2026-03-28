@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scene;
+package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 
 
 import javafx.geometry.Pos;
@@ -10,9 +10,10 @@ import javafx.scene.layout.VBox;
 /**
  * Builds the initial loading scene of the JavaFX client.
  */
-public class LoadingScene {
+public class LoadingScene implements SceneInterface{
 
   private Button continueButton;
+  private Scene localScene;
 
   /**
    * Creates the loading scene and connects the continue button to the next action.
@@ -20,7 +21,7 @@ public class LoadingScene {
    * @param onContinue action that is executed when the user presses the continue button
    * @return the loading scene
    */
-  public Scene createScene(Runnable onContinue) {
+  public void createScene(Runnable onContinue) {
     Label titleLabel = new Label("Phantom Hunt");
     titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
 
@@ -37,7 +38,12 @@ public class LoadingScene {
     layout.getChildren().add(subtitleLabel);
     layout.getChildren().add(continueButton);
 
-    return new Scene(layout, 1280, 960);
+    localScene = new Scene(layout, 1280, 960);
+  }
+
+  @Override
+  public Scene getScene(){
+    return localScene;
   }
 
   /**
