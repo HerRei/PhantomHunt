@@ -21,4 +21,7 @@ public enum Command {
   YAP, // YAP <text>
   LOGOUT, // LOGOUT
   NICK, // NICK <name>
+
+  // lobby
+  SPEC // SPEC <lobbyId>
 }

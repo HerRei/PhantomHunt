@@ -72,18 +72,45 @@ public class LobbyHandler {
         }
     }
 
+    public void spectateLobby(String id, ClientHandler player) {
+        Optional<Lobby> lobbyOpt = findLobbyById(id);
+        if (lobbyOpt.isEmpty()) {
+            player.sendMessage(Packet.of(Command.REJECT, "Lobby not found: " + id));
+            return;
+        }
+
+        Lobby lobby = lobbyOpt.get();
+        if (lobby.addSpectator(player)) {
+            player.setCurrentLobby(lobby);
+        }
+    }
+
     public void leaveLobby(String id, ClientHandler player) {
-        Optional<Lobby> lobbyOpt = findLobbyById(id, waitingLobbies);
+        Optional<Lobby> lobbyOpt = findLobbyById(id);
         if (lobbyOpt.isEmpty()) return;
 
         Lobby lobby = lobbyOpt.get();
-        if (lobby.removePlayer(player)) {
+        if (lobby.removePlayer(player) || lobby.removeSpectator(player)) {
             player.setCurrentLobby(null);
-            if (lobby.getPlayers().isPresent() && lobby.getPlayers().get().isEmpty()) {
+            if (lobby.getPlayers().isPresent() && lobby.getPlayers().get().isEmpty() && lobby.getSpectators().isPresent() && lobby.getSpectators().get().isEmpty()) {
                 waitingLobbies.remove(lobby);
+                playingLobbies.remove(lobby);
+                finishedLobbies.remove(lobby);
                 LOGGER.info("Empty lobby {} removed.", id);
             }
         }
+    }
+
+    private Optional<Lobby> findLobbyById(String id) {
+        Optional<Lobby> lobby = findLobbyById(id, waitingLobbies);
+        if (lobby.isPresent()) {
+            return lobby;
+        }
+        lobby = findLobbyById(id, playingLobbies);
+        if (lobby.isPresent()) {
+            return lobby;
+        }
+        return findLobbyById(id, finishedLobbies);
     }
 
     private Optional<Lobby> findLobbyById(String id, Vector<Lobby> lobbyList) {

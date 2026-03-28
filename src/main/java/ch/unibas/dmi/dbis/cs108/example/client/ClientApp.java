@@ -151,6 +151,19 @@ public class ClientApp {
   }
 
   /**
+   * Sends a request to spectate a lobby.
+   *
+   * @param lobbyId The ID of the lobby to spectate.
+   */
+  public void spectateLobby(String lobbyId) {
+      if (lobbyId == null || lobbyId.isBlank()) {
+          LOGGER.warn("Lobby ID is blank --> Not sent");
+          return;
+      }
+      tcpClient.getServerHandler().sendMessage(Packet.of(Command.SPEC, lobbyId));
+  }
+
+  /**
    * Sends a logout request to the server.
    */
   public void logout() {

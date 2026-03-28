@@ -135,6 +135,10 @@ public class ClientHandler implements Runnable {
             makeLobby(p);
           }
 
+          case SPEC -> {
+            handleSpectate(p);
+          }
+
           default -> {
             handleDefault(p);
           }
@@ -184,6 +188,12 @@ public class ClientHandler implements Runnable {
     LOGGER.info("Received YAP: {} from {}", msg, name);
     registry.yapping(this, (Packet.of(Command.YAP, getName() + ": " + msg)));
 
+  }
+
+  private void handleSpectate(Packet p) {
+      String lobbyId = (p.argc() >= 1) ? p.args().get(0) : "";
+      LOGGER.info("Received SPEC: {} from {}", lobbyId, name);
+      lobbyHandler.spectateLobby(lobbyId, this);
   }
 
   /**
