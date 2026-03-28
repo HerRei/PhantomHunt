@@ -114,7 +114,7 @@ public class HomeScene implements  SceneInterface{
       globalChatField.requestFocus();
     });
 
-    //Effect for cklick on wisper Button
+    //Effect for click on whisper Button
     whisperButton.setOnAction(event -> {
       whisperTargetField.setVisible(true);
       whisperTargetField.setManaged(true);
@@ -127,7 +127,7 @@ public class HomeScene implements  SceneInterface{
       whisperTargetField.requestFocus();
     });
 
-    // kontrolle und sernder und nachricht lesen
+    // kontrolle und sender und nachricht lesen
     sendGlobalButton.setOnAction(event -> { //After click, contorlling not empty, andd trimming
       String message = globalChatField.getText().trim();
       if (!message.isEmpty()) {

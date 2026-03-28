@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.cs108.example.client.net;
 
 import java.io.IOException;
 import java.net.Socket;
+
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +29,7 @@ public class TcpClient {
         this.port = port;
         try {
             this.serverHandler = connect(host, port);
+            EventHandlers.getInstance().setSH(this.serverHandler);
         } catch (IOException e) {
             LOGGER.error("Failed to connect to server", e);
         }

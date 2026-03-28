@@ -1,7 +1,9 @@
 package ch.unibas.dmi.dbis.cs108.example;
 
 import ch.unibas.dmi.dbis.cs108.example.client.net.TcpClient;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.GUI;
 import ch.unibas.dmi.dbis.cs108.example.server.net.TcpServer;
+import javafx.application.Application;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,7 +23,7 @@ public class Main {
             String[] socketInput = args[1].split(":");
             String host = socketInput[0];
             int port = Integer.parseInt(socketInput[1]);
-            connect(host, port);
+            connect(host, port, args);
 
           } catch (Exception e) {
             LOGGER.error("invalid input format has to be <host>:<port>, not: {}", args[1]);
@@ -68,9 +70,9 @@ public class Main {
    * @param port port for socket
    *             User is client
    */
-  public static void connect(String host, int port) {
+  public static void connect(String host, int port, String[] args) {
     LOGGER.info("Connecting to {}:{}...", host, port);
     new TcpClient(host, port);
-    //#todo open ui and game loop...
+    Application.launch(GUI.class, args);
   }
 }

@@ -3,10 +3,10 @@ package ch.unibas.dmi.dbis.cs108.example.server.net;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
-import ch.unibas.dmi.dbis.cs108.example.server.game.Lobby;
-import ch.unibas.dmi.dbis.cs108.example.server.handler.LobbyHandler;
+import ch.unibas.dmi.dbis.cs108.example.server.state.Lobby;
+import ch.unibas.dmi.dbis.cs108.example.server.state.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.example.server.state.Registry;
-import ch.unibas.dmi.dbis.cs108.example.server.util.NameGenerator;
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.NameGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -155,19 +155,6 @@ public class ClientHandler implements Runnable {
   }
 
   /**
-   * Initializes the client nickname from the local system user name or a generated fallback.
-   */
-  private void initializeUser() {
-    String systemName = System.getProperty("user.name");
-    if (systemName == null || systemName.isBlank()) {
-      systemName = NameGenerator.randomName();
-      LOGGER.debug("No system username found, generated random name: {}", systemName);
-    }
-    handleNickChange(Packet.of(Command.NICK, systemName));
-    sendMessage(Packet.of(Command.CHECKIN, getName()));
-  }
-
-  /**
    * Updates the last-seen timestamp after a pong response from the client.
    */
   private void handlePong() {
@@ -206,7 +193,7 @@ public class ClientHandler implements Runnable {
     String msg = String.join(" ", p.args());
     LOGGER.info("YAP from {}: {}", name, msg);
     if (currentLobby != null) {
-      currentLobby.broadcastMessage(Packet.of(Command.YAP, getName() + ": " + msg));
+      //currentLobby.broadcastMessage(Packet.of(Command.YAP, getName() + ": " + msg));
     } else {
       sendMessage(Packet.of(Command.REJECT, "You are not in a lobby."));
     }
@@ -292,6 +279,7 @@ public class ClientHandler implements Runnable {
     if (!assignedNick.equals(newNick)) {
       sendMessage(Packet.of(Command.REJECT, "Name was taken. You are now: " + this.name));
     }
+    sendMessage(Packet.of(Command.WELCOME, this.name));
   }
 
   /**
@@ -317,8 +305,6 @@ public class ClientHandler implements Runnable {
     try (var in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
         var out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
       this.out = out;
-
-      initializeUser();
       registry.register(this);
       LOGGER.info("New client connected: {}", name);
       startPinging();

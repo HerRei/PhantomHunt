@@ -25,14 +25,12 @@ public class GUI extends Application {
     manager.setStage(primaryStage);
 
     // Register Scenes (Scenes fetch Singletons internally)
-    manager.addScene(SceneProtocol.NICKNAME, new EnterNicknameScene());
+    manager.addScene(SceneProtocol.HOME, new HubScene());
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
-    manager.showScene(SceneProtocol.NICKNAME);
+    manager.showScene(SceneProtocol.HOME);
   }
-
-  /* Standard main method to launch the JavaFX thread */
   public static void main(String[] args) {
     launch(args);
   }

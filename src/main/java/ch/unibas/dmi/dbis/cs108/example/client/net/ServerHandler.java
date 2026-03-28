@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.client.net;
 
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.NameGenerator;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.example.client.ClientApp;
@@ -13,6 +14,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.HubScene;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.SceneProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +33,7 @@ public class ServerHandler implements Runnable {
   private static final Logger LOGGER = LogManager.getLogger(ServerHandler.class);
   private final Socket socket;
   private BufferedWriter out;
+  private String name;
 
   /**
    * Creates a new handler for the server connection and starts immediately
@@ -56,6 +62,7 @@ public class ServerHandler implements Runnable {
     ) {
       this.out = out;
       String line;
+      initializeUser();
       while ((line = in.readLine()) != null) {
         try {
           Packet packet = Protocol.decode(line);
@@ -78,6 +85,9 @@ public class ServerHandler implements Runnable {
    */
   private void managePacket(Packet packet) {
     switch (packet.cmd()) {
+      case WELCOME:
+        handleWelcome(packet);
+        break;
       case PING:
         handlePing();
         break;
@@ -100,6 +110,15 @@ public class ServerHandler implements Runnable {
         handleUnknown(packet);
         break;
     }
+  }
+
+
+  /**
+   * Updates the name.
+   */
+  private void handleWelcome(Packet packet) {
+    this.name = packet.text();
+    GameModel.getInstance().playerName.set(packet.text());
   }
 
 
@@ -127,8 +146,8 @@ public class ServerHandler implements Runnable {
    * @param packet packet containing the global chat text
    */
   private void handleUnicom(Packet packet) {
-    ClientApp.notifyGlobalMessageReceived(packet.text()); //nachricht kommt vom server wird an client app weitergeleitet, und GUI kommt sie dort abhohlen
     LOGGER.info("Chat: {}", packet.text());
+    SceneManager.getInstance().scenes.get(SceneProtocol.HOME).as(HubScene.class).addToChat(packet.text());
   }
 
   /**
@@ -175,6 +194,18 @@ public class ServerHandler implements Runnable {
    */
   private void handleUnknown(Packet packet) {
     LOGGER.info("Received unknown command: {}", packet.cmd());
+  }
+
+  /**
+   * Initializes the client nickname from the local system user name or a generated fallback.
+   */
+  private void initializeUser() {
+    String systemName = System.getProperty("user.name");
+    if (systemName == null || systemName.isBlank()) {
+      systemName = NameGenerator.randomName();
+      LOGGER.debug("No system username found, generated random name: {}", systemName);
+    }
+    sendMessage(Packet.of(Command.NICK, systemName));
   }
 
 

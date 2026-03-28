@@ -14,7 +14,7 @@ public class SceneManager {
     private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
     private static SceneManager instance;
     private Stage stageRef;
-    private final Map<SceneProtocol, SceneInterface> scenes = new HashMap<>();
+    public final Map<SceneProtocol, SceneInterface> scenes = new HashMap<>();
 
     private SceneManager() {} // Private constructor
 

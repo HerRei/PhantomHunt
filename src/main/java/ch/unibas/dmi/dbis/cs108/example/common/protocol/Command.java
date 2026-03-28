@@ -14,6 +14,7 @@ public enum Command {
   CHECKIN, // CHECKIN <name>
   CLEARED, // login ok
   REJECT, // REJECT <text...>
+  WELCOME, //Welcome <name>
 
   // chat
   UNICOM, // UNICOM <text...>
