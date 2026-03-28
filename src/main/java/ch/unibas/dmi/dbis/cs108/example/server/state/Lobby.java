@@ -10,6 +10,8 @@ import java.util.Vector;
 
 public class Lobby {
 
+    private static final Logger LOGGER = LogManager.getLogger(Lobby.class);
+
     private boolean isTheGameRunning = false;
     private final Vector<ClientHandler> players = new Vector<>();
     private final Vector<ClientHandler> spectators = new Vector<>();
@@ -17,7 +19,9 @@ public class Lobby {
     private final String name;
     private final ClientHandler host;
 
-    private static final Logger LOGGER = LogManager.getLogger(Lobby.class);
+    // ---------------------------------------------------------------------------------------------
+    // Constructor
+    // ---------------------------------------------------------------------------------------------
 
     public Lobby(String id, String name, ClientHandler host) {
         this.id = id;
@@ -26,6 +30,10 @@ public class Lobby {
         this.players.add(host);
         LOGGER.info("Lobby {} ({}) created by {}", name, id, host.getName());
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Getters & Setters
+    // ---------------------------------------------------------------------------------------------
 
     public boolean isTheGameRunning() {
         return isTheGameRunning;
@@ -41,6 +49,10 @@ public class Lobby {
     public Optional<Vector<ClientHandler>> getSpectators() {
         return Optional.of(spectators);
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Player Management
+    // ---------------------------------------------------------------------------------------------
 
     public boolean addPlayer(ClientHandler player) {
         if (isTheGameRunning) {
@@ -95,6 +107,10 @@ public class Lobby {
         LOGGER.info("Spectator {} left lobby {}", spectator.getName(), this.id);
         return true;
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Game Logic
+    // ---------------------------------------------------------------------------------------------
 
     public void startGame(ClientHandler requester) {
         if (requester != host) return;

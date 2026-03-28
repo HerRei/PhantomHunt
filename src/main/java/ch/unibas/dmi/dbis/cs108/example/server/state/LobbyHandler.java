@@ -19,6 +19,10 @@ public class LobbyHandler {
     private final Vector<Lobby> finishedLobbies = new Vector<>();
     private final AtomicInteger lobbyCounter = new AtomicInteger(1);
 
+    // ---------------------------------------------------------------------------------------------
+    // Getters & Setters
+    // ---------------------------------------------------------------------------------------------
+
     public Optional<Vector<Lobby>> getWaitingLobbies() {
         return Optional.ofNullable(waitingLobbies);
     }
@@ -48,6 +52,10 @@ public class LobbyHandler {
         }
         return sb.toString();
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Lobby Management & Methods
+    // ---------------------------------------------------------------------------------------------
 
     public void createLobby(String name, ClientHandler host) {
         String id = "lobby" + lobbyCounter.getAndIncrement();
@@ -100,6 +108,10 @@ public class LobbyHandler {
             }
         }
     }
+
+    // ---------------------------------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------------------------------
 
     private Optional<Lobby> findLobbyById(String id) {
         Optional<Lobby> lobby = findLobbyById(id, waitingLobbies);
