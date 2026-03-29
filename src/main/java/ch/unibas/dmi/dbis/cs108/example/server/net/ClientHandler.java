@@ -21,6 +21,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+ //---------------------------------------------------------------------------------------------
+ //Attention - 29.3.26
+ // Please refrain form putting anymore GameLogic into this Class
+ // Should mainly do: Socket reading, Packet sending, and sending
+ //---------------------------------------------------------------------------------------------
+
+
 /**
  * Handles the connection to a single client on the server. Listens for incoming packets, processes
  * them, and can send packets back.
