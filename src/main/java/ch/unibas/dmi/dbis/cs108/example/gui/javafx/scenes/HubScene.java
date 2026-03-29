@@ -2,7 +2,9 @@ package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel; // Angenommen, das Model liegt hier
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -37,23 +39,20 @@ public class HubScene implements SceneInterface {
 
         // Initialer Name aus dem Model
         nicknameLabel = new Label();
+        nicknameLabel.textProperty().bind(Bindings.concat("Your name: ", GameModel.getInstance().getName()));
         nicknameLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        Button btnChangeName = new Button("Change Nickname");
-        btnChangeName.setMaxWidth(150);
-        btnChangeName.setOnAction(e -> handleChangeNickname());
-
-        profileBox.getChildren().addAll(headLabel, nicknameLabel, btnChangeName);
+        profileBox.getChildren().addAll(headLabel, nicknameLabel);
 
         // Action Buttons
+        Button btnNickname = new Button("Change Nickname");
         Button btnJoin = new Button("Join Lobby");
         Button btnCreate = new Button("Create Lobby");
-        Button btnSettings = new Button("Settings");
 
         // Make buttons larger and fill width
         btnJoin.setMaxWidth(Double.MAX_VALUE);
+        btnNickname.setMaxWidth(Double.MAX_VALUE);
         btnCreate.setMaxWidth(Double.MAX_VALUE);
-        btnSettings.setMaxWidth(Double.MAX_VALUE);
         btnJoin.setPrefHeight(40);
         btnCreate.setPrefHeight(40);
 
@@ -61,9 +60,9 @@ public class HubScene implements SceneInterface {
         volumeSlider = new Slider(0, 100, 50);
         volumeSlider.setShowTickLabels(true);
 
-        leftMenu.getChildren().addAll(profileBox, new Separator(), btnJoin, btnCreate, btnSettings, new Separator(), volLabel, volumeSlider);
+        leftMenu.getChildren().addAll(profileBox, btnNickname,new Separator(), btnJoin, btnCreate, new Separator(), volLabel, volumeSlider);
 
-        // --- RIGHT SIDE: Chat System (Relatively smaller) ---
+        // --- RIGHT SIDE: Chat System ---
         VBox chatBox = new VBox(10);
         chatBox.setPadding(new Insets(15));
         HBox.setHgrow(chatBox, Priority.ALWAYS);
@@ -85,9 +84,14 @@ public class HubScene implements SceneInterface {
 
         Button btnSend = new Button("Send");
         btnSend.setPrefWidth(80);
-        btnSend.setOnAction(e -> handleSendMessage());
 
+        //--- ButtonAction ---
+        btnSend.setOnAction(e -> handleSendMessage());
+        btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
+        btnJoin.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.JOINLOBBY));
+        btnCreate.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.CREATELOBBY));
         chatInput.setOnAction(e -> handleSendMessage());
+
 
         inputArea.getChildren().addAll(chatMode, chatInput, btnSend);
         chatBox.getChildren().addAll(new Label("Server Chat"), chatDisplay, inputArea);
@@ -97,25 +101,6 @@ public class HubScene implements SceneInterface {
         mainLayout.getChildren().addAll(leftMenu, new Separator(javafx.geometry.Orientation.VERTICAL), chatBox);
 
         localScene = new Scene(mainLayout, 800, 450);
-    }
-
-    /**
-     * Dialog to change Nickname
-     */
-    private void handleChangeNickname() {
-        TextInputDialog dialog = new TextInputDialog(nicknameLabel.getText());
-        dialog.setTitle("Change Nickname");
-        dialog.setHeaderText("New Nickname:");
-        dialog.setContentText("Please enter your name:");
-
-        dialog.showAndWait().ifPresent(newName -> {
-            if (!newName.trim().isEmpty()) {
-                // Sende Befehl an Server via Handler
-                EventHandlers.getInstance().handleNicknameUpdate(newName.trim());
-                // Update das Label (wird später idealerweise übers Model/Binding gemacht)
-                nicknameLabel.setText(newName.trim());
-            }
-        });
     }
 
     public void addToChat(String msg) {

@@ -33,6 +33,7 @@ public class EventHandlers {
     }
 
     public void setSH(ServerHandler sh) {
+        GameModel.getInstance().setName(sh.getName());
         serverHandler = sh;
     }
 
@@ -52,6 +53,12 @@ public class EventHandlers {
     }
 
     public void handleNicknameUpdate(String name) {
-        serverHandler.sendMessage(Packet.of(Command.NICK, name));
+        name = name.trim();
+        if (!name.isEmpty()) {
+            serverHandler.sendMessage(Packet.of(Command.NICK, name));
+        }
+        else{
+            LOGGER.info("Nickname is empty.");
+        }
     }
 }

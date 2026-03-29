@@ -11,7 +11,7 @@ public class GameModel {
     private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
     private static GameModel instance;
     private final ObservableList<Player> players = FXCollections.observableArrayList();
-    public final StringProperty playerName = new SimpleStringProperty();
+    private final StringProperty playerName = new SimpleStringProperty();
 
     private GameModel() {} // Private constructor
 
@@ -27,7 +27,13 @@ public class GameModel {
     }
 
 
-    public String getName() {
-        return playerName.get();
+    // ---GETTERS---
+    public StringProperty getName() {
+        return playerName;
+    }
+
+    // ---SETTERS---
+    public void setName(String name){
+        playerName.set(name);
     }
 }

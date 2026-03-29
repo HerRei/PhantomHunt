@@ -7,5 +7,7 @@ public enum SceneProtocol {
     LOADING,
     HOME,
     GAME,
-    NICKNAME;
+    NICKNAME,
+    JOINLOBBY,
+    CREATELOBBY;
 }

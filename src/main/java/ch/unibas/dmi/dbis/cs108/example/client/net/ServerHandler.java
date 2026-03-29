@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import javafx.application.Platform;
 
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
@@ -21,7 +22,6 @@ import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.SceneProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.xml.namespace.QName;
 
 /**
  * Manages the client's active network connection to the server.
@@ -118,7 +118,14 @@ public class ServerHandler implements Runnable {
    */
   private void handleWelcome(Packet packet) {
     this.name = packet.text();
-    GameModel.getInstance().playerName.set(packet.text());
+    try{
+      Platform.runLater(() -> {
+        GameModel.getInstance().setName(this.name);
+      });
+    } catch (Exception e) {
+      LOGGER.info("JavaFX nicht vorhanden");
+    }
+
   }
 
 
@@ -245,4 +252,7 @@ public class ServerHandler implements Runnable {
       LOGGER.error("Error while closing the socket", e);
     }
   }
+
+  //---getters---
+  public String getName(){return this.name;}
 }

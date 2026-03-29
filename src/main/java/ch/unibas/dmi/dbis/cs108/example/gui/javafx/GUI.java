@@ -26,10 +26,13 @@ public class GUI extends Application {
 
     // Register Scenes (Scenes fetch Singletons internally)
     manager.addScene(SceneProtocol.HOME, new HubScene());
+    manager.addScene(SceneProtocol.NICKNAME, new NicknameScene());
+    manager.addScene(SceneProtocol.CREATELOBBY, new CreateLobbyScene());
+    manager.addScene(SceneProtocol.JOINLOBBY, new JoinLobbyScene());
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
-    manager.showScene(SceneProtocol.HOME);
+    manager.showScene(SceneProtocol.NICKNAME);
   }
   public static void main(String[] args) {
     launch(args);
