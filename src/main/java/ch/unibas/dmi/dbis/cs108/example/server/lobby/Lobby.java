@@ -91,6 +91,10 @@ public class Lobby {
     }
 
     public boolean removePlayer(ClientHandler player) {
+        if (hasActiveGame()) {
+            player.sendMessage(Packet.of(Command.REJECT, "Game is already running."));
+            return false;
+        }
         if (!players.contains(player)) {
             LOGGER.warn("Player {} is not in lobby {}", player.getName(), this.id);
             return false;
