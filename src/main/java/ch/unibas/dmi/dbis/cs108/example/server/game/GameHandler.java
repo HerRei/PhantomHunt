@@ -9,6 +9,7 @@ import ch.unibas.dmi.dbis.cs108.example.server.game.state.Position;
 import ch.unibas.dmi.dbis.cs108.example.server.game.state.RoundOutcome;
 import ch.unibas.dmi.dbis.cs108.example.server.game.state.RoundOutcomeType;
 import ch.unibas.dmi.dbis.cs108.example.server.game.state.RoundState;
+import ch.unibas.dmi.dbis.cs108.example.server.lobby.LobbyHandler;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,9 +21,11 @@ import java.util.Optional;
 public class GameHandler {
 
   private final GameState gameState;
+  private final LobbyHandler lobbyHandler;
 
-  public GameHandler(GameState gameState) {
+  public GameHandler(GameState gameState, LobbyHandler lobbyHandler) {
     this.gameState = Objects.requireNonNull(gameState, "gameState must not be null");
+    this.lobbyHandler = Objects.requireNonNull(lobbyHandler, "lobbyHandler must not be null");
   }
 
   public synchronized void startMatch(long nowMillis) {
@@ -89,6 +92,7 @@ public class GameHandler {
             Optional.empty(),
             System.currentTimeMillis(),
             reason));
+    lobbyHandler.finishLobby(gameState.getMatchId());
   }
 
   public synchronized void advanceToNextRound(long nowMillis) {
@@ -96,6 +100,7 @@ public class GameHandler {
 
     if (!hasNextRound()) {
       gameState.setPhase(GamePhase.MATCH_ENDED);
+      lobbyHandler.finishLobby(gameState.getMatchId());
       return;
     }
 
