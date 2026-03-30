@@ -92,7 +92,7 @@ public class LobbyHandler {
 
         TileType[][] map = null; //here the map has to be added
         GameState gameState = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map );
-        GameHandler gameHandler = new GameHandler(gameState);
+        GameHandler gameHandler = new GameHandler(gameState, this);
 
         lobby.attachGame(gameHandler);
         waitingLobbies.remove(lobby);
@@ -152,6 +152,18 @@ public class LobbyHandler {
                 LOGGER.info("Empty lobby {} removed.", id);
             }
         }
+    }
+
+    public void finishLobby(String id) {
+        Optional<Lobby> lobbyOpt = findLobbyById(id, playingLobbies);
+        if (lobbyOpt.isEmpty()) {
+            LOGGER.warn("Could not find lobby to finish: {}", id);
+            return;
+        }
+        Lobby lobby = lobbyOpt.get();
+        playingLobbies.remove(lobby);
+        finishedLobbies.add(lobby);
+        LOGGER.info("Lobby {} finished.", id);
     }
 
     // ---------------------------------------------------------------------------------------------
