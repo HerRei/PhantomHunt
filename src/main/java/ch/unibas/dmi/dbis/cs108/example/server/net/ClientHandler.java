@@ -3,10 +3,9 @@ package ch.unibas.dmi.dbis.cs108.example.server.net;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
-import ch.unibas.dmi.dbis.cs108.example.server.state.Lobby;
-import ch.unibas.dmi.dbis.cs108.example.server.state.LobbyHandler;
-import ch.unibas.dmi.dbis.cs108.example.server.state.Registry;
-import ch.unibas.dmi.dbis.cs108.example.common.protocol.NameGenerator;
+import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
+import ch.unibas.dmi.dbis.cs108.example.server.lobby.LobbyHandler;
+import ch.unibas.dmi.dbis.cs108.example.server.session.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -186,6 +185,10 @@ public class ClientHandler implements Runnable {
    * @param p The packet containing the lobby name.
    */
   private void handleMkl(Packet p) {
+    if (currentLobby != null) {
+      sendMessage(Packet.of(Command.REJECT, "You are already in a lobby."));
+      return;
+    }
     String lobbyName = String.join(" ", p.args());
     LOGGER.info("MKL from {}: {}", name, lobbyName);
     lobbyHandler.createLobby(lobbyName, this);
@@ -199,11 +202,7 @@ public class ClientHandler implements Runnable {
   private void handleYap(Packet p) {
     String msg = String.join(" ", p.args());
     LOGGER.info("YAP from {}: {}", name, msg);
-    if (currentLobby != null) {
-      //currentLobby.broadcastMessage(Packet.of(Command.YAP, getName() + ": " + msg));
-    } else {
-      sendMessage(Packet.of(Command.REJECT, "You are not in a lobby."));
-    }
+    registry.yapping(this, Packet.of(Command.YAP, getName() + ": " + msg));
   }
 
   /**
@@ -212,6 +211,10 @@ public class ClientHandler implements Runnable {
    * @param p The packet containing the lobby ID.
    */
   private void handleSpec(Packet p) {
+    if (currentLobby != null) {
+      sendMessage(Packet.of(Command.REJECT, "You are already in a lobby."));
+      return;
+    }
     if (p.argc() < 1) {
       sendMessage(Packet.of(Command.REJECT, "Lobby ID is required."));
       return;
@@ -236,6 +239,10 @@ public class ClientHandler implements Runnable {
    * @param p The packet containing the lobby ID.
    */
   private void handleCheckin(Packet p) {
+    if (currentLobby != null) {
+      sendMessage(Packet.of(Command.REJECT, "You are already in a lobby."));
+      return;
+    }
     if (p.argc() < 1) {
       sendMessage(Packet.of(Command.REJECT, "Lobby ID is required."));
       return;
@@ -289,6 +296,14 @@ public class ClientHandler implements Runnable {
     sendMessage(Packet.of(Command.WELCOME, this.name));
   }
 
+  private void handleStart(Packet p) {
+    if (currentLobby == null) {
+      sendMessage(Packet.of(Command.REJECT, "You are not in a lobby."));
+      return;
+    }
+    lobbyHandler.startGame(currentLobby.getId(), this);
+  }
+
   /**
    * Handles unsupported commands by informing the client that the command is rejected.
    *
@@ -334,6 +349,7 @@ public class ClientHandler implements Runnable {
             case YAP -> handleYap(p);
             case MKL -> handleMkl(p);
             case SPEC -> handleSpec(p);
+            case START -> handleStart(p);
             default -> handleDefault(p);
           }
         } catch (IllegalArgumentException e) {

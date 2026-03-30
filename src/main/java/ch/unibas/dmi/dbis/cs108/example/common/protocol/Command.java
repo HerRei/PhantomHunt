@@ -24,5 +24,6 @@ public enum Command {
   NICK, // NICK <name>
 
   // lobby
-  SPEC // SPEC <lobbyId>
+  SPEC, // SPEC <lobbyId>
+  START // START
 }

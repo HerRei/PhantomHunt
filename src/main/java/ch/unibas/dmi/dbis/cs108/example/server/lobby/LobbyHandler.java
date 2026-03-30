@@ -1,13 +1,16 @@
-package ch.unibas.dmi.dbis.cs108.example.server.state;
+package ch.unibas.dmi.dbis.cs108.example.server.lobby;
 
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
+import ch.unibas.dmi.dbis.cs108.example.server.game.GameFactory;
+import ch.unibas.dmi.dbis.cs108.example.server.game.GameHandler;
+import ch.unibas.dmi.dbis.cs108.example.server.game.state.GameState;
+import ch.unibas.dmi.dbis.cs108.example.server.game.state.TileType;
 import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Optional;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LobbyHandler {
@@ -18,6 +21,7 @@ public class LobbyHandler {
     private final Vector<Lobby> playingLobbies = new Vector<>();
     private final Vector<Lobby> finishedLobbies = new Vector<>();
     private final AtomicInteger lobbyCounter = new AtomicInteger(1);
+    private final GameFactory gameFactory = new GameFactory();
 
     // ---------------------------------------------------------------------------------------------
     // Getters & Setters
@@ -56,15 +60,55 @@ public class LobbyHandler {
     // ---------------------------------------------------------------------------------------------
     // Lobby Management & Methods
     // ---------------------------------------------------------------------------------------------
+    public void startGame(String id, ClientHandler requester){
+        Optional<Lobby> lobbyOpt = findLobbyById(id);
+        if (lobbyOpt.isEmpty()) {
+            requester.sendMessage(Packet.of(Command.REJECT, "Lobby not found: " + id));
+            return;
+        }
 
-    public void createLobby(String name, ClientHandler host) {
+        Lobby lobby = lobbyOpt.get();
+        if (lobby.getHost() != requester) {
+            requester.sendMessage(Packet.of(Command.REJECT, "You are not the host of this lobby"));
+            return;
+        }
+
+        Vector<ClientHandler> players = lobby.getPlayers().orElseThrow();
+        if(players.size() != GameState.REQUIRED_PLAYER_COUNT) {
+            requester.sendMessage(
+                Packet.of(
+                    Command.REJECT,
+                    "Not the right amount of players"
+                        + players.size()
+                        + "is not: "
+                        + GameState.REQUIRED_PLAYER_COUNT));
+        }
+
+        List<GameState.PlayerSeed> seeds = new LinkedList<>();
+        for (ClientHandler player : players) {
+            seeds.add(new GameState.PlayerSeed(player.getName(), player.getName()));
+        }
+
+        TileType[][] map = null; //here the map has to be added
+        GameState gameState = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map );
+        GameHandler gameHandler = new GameHandler(gameState);
+
+        lobby.attachGame(gameHandler);
+        waitingLobbies.remove(lobby);
+        playingLobbies.add(lobby);
+
+        gameHandler.startMatch(System.currentTimeMillis());
+    }
+
+    public Lobby createLobby(String name, ClientHandler host) {
         String id = "lobby" + lobbyCounter.getAndIncrement();
+
         Lobby lobby = new Lobby(id, name, host);
         waitingLobbies.add(lobby);
-        LOGGER.info("Lobby {} ({}) created by {}", name, id, host.getName());
-
         host.setCurrentLobby(lobby);
-        host.sendMessage(Packet.of(Command.CLEARED, "Lobby created: " + name + " Id: " + id));
+
+        LOGGER.info("Lobby {} ({}) created by {}", name, id, host.getName());
+        return lobby;
     }
 
     public void joinLobby(String id, ClientHandler player) {

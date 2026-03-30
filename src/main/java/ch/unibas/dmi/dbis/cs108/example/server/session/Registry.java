@@ -1,9 +1,10 @@
-package ch.unibas.dmi.dbis.cs108.example.server.state;
+package ch.unibas.dmi.dbis.cs108.example.server.session;
 
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
+import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
