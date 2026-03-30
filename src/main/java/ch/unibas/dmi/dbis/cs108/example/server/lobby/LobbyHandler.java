@@ -61,9 +61,9 @@ public class LobbyHandler {
     // Lobby Management & Methods
     // ---------------------------------------------------------------------------------------------
     public void startGame(String id, ClientHandler requester){
-        Optional<Lobby> lobbyOpt = findLobbyById(id);
+        Optional<Lobby> lobbyOpt = findLobbyById(id, waitingLobbies);
         if (lobbyOpt.isEmpty()) {
-            requester.sendMessage(Packet.of(Command.REJECT, "Lobby not found: " + id));
+            requester.sendMessage(Packet.of(Command.REJECT, "Lobby not found or has already started: " + id));
             return;
         }
 
@@ -78,10 +78,11 @@ public class LobbyHandler {
             requester.sendMessage(
                 Packet.of(
                     Command.REJECT,
-                    "Not the right amount of players"
+                    "Not the right amount of players. Is: "
                         + players.size()
-                        + "is not: "
+                        + ", required: "
                         + GameState.REQUIRED_PLAYER_COUNT));
+            return;
         }
 
         List<GameState.PlayerSeed> seeds = new LinkedList<>();
