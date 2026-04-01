@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel; // Angenommen, das Model liegt hier
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,6 +16,7 @@ public class HubScene implements SceneInterface {
 
     private TextArea chatDisplay;
     private TextField chatInput;
+    private TextField whisperTargetInput; // textfield for name of receiver
     private ComboBox<String> chatMode;
     private Slider volumeSlider;
     private Label nicknameLabel; // Anzeige für den aktuellen Namen
@@ -82,6 +84,15 @@ public class HubScene implements SceneInterface {
         chatMode.setValue("Global");
         chatMode.setPrefWidth(100);
 
+        // Initializing the receiver-field
+        whisperTargetInput = new TextField();
+        whisperTargetInput.setPromptText("To whom?");
+        whisperTargetInput.setPrefWidth(100);
+
+        // Field is now visible but only takes away place, when "Whisper" is chosen
+        whisperTargetInput.visibleProperty().bind(Bindings.equal("Whisper", chatMode.valueProperty()));
+        whisperTargetInput.managedProperty().bind(whisperTargetInput.visibleProperty());
+
         Button btnSend = new Button("Send");
         btnSend.setPrefWidth(80);
 
@@ -92,8 +103,8 @@ public class HubScene implements SceneInterface {
         btnCreate.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.CREATELOBBY));
         chatInput.setOnAction(e -> handleSendMessage());
 
-
-        inputArea.getChildren().addAll(chatMode, chatInput, btnSend);
+        // whisperTargetInput added to HBox (between chatMode and chatInput)
+        inputArea.getChildren().addAll(chatMode, whisperTargetInput, chatInput, btnSend);
         chatBox.getChildren().addAll(new Label("Server Chat"), chatDisplay, inputArea);
 
         // --- MAIN LAYOUT ---
@@ -104,7 +115,10 @@ public class HubScene implements SceneInterface {
     }
 
     public void addToChat(String msg) {
-        chatDisplay.appendText(msg + "\n");
+        // UI-Update shifted to JavaFX-Thread, to minimize crashes
+        Platform.runLater(() -> {
+            chatDisplay.appendText(msg + "\n");
+        });
     }
 
     private void handleSendMessage() {
@@ -115,10 +129,22 @@ public class HubScene implements SceneInterface {
             // Wichtig: Strings vergleicht man in Java mit .equals()!
             if ("Global".equals(mode)) {
                 EventHandlers.getInstance().sendMessage(Command.UNICOM, message);
+                chatInput.clear();
             } else {
-                EventHandlers.getInstance().sendMessage(Command.WHISPER, message);
+                // Logic adapted to Whisper
+                String target = whisperTargetInput.getText().trim();
+
+                // We check, if user actually put in receiver
+                if (target.isEmpty()) {
+                    addToChat("You need to enter a target");
+                    return;
+                }
+                // we put goal and message with space together
+                // EventHandlers.java divides this with split(" ", 2).
+                EventHandlers.getInstance().sendMessage(Command.WHISPER, target + " " + message);
+                chatInput.clear();
+                // Optional: whisperTargetInput.clear(); // If we want to delete the name after sending
             }
-            chatInput.clear();
         }
     }
 

@@ -32,7 +32,7 @@ public class GUI extends Application {
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
-    manager.showScene(SceneProtocol.NICKNAME);
+    manager.showScene(SceneProtocol.HOME);
   }
   public static void main(String[] args) {
     launch(args);

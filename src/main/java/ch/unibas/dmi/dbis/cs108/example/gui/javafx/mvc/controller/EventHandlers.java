@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class EventHandlers {
-    private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
+    private static final Logger LOGGER = LogManager.getLogger(EventHandlers.class);
     private static EventHandlers instance;
     private GameModel model;
     private ServerHandler serverHandler;
@@ -33,6 +33,7 @@ public class EventHandlers {
     }
 
     public void setSH(ServerHandler sh) {
+        // sh.getName() could be null here. idk if this would create a crash
         GameModel.getInstance().setName(sh.getName());
         serverHandler = sh;
     }
@@ -42,7 +43,14 @@ public class EventHandlers {
     public void handleStartGame() {
         SceneManager.getInstance().showScene(SceneProtocol.GAME);
     }
+
     public void sendMessage(Command cmd, String msg){
+        // Null-Check
+        if (serverHandler == null) {
+            LOGGER.warn("Cannot send message: Not connected to server.");
+            return;
+        }
+
         //Sendet Nachricht an Server
         if (cmd == Command.WHISPER){
             serverHandler.sendMessage(Packet.of(cmd, msg.split(" ", 2)));
@@ -55,7 +63,12 @@ public class EventHandlers {
     public void handleNicknameUpdate(String name) {
         name = name.trim();
         if (!name.isEmpty()) {
-            serverHandler.sendMessage(Packet.of(Command.NICK, name));
+            // Null-Check
+            if (serverHandler != null) {
+                serverHandler.sendMessage(Packet.of(Command.NICK, name));
+            } else {
+                LOGGER.warn("Cannot send nickname: Not connected to server.");
+            }
         }
         else{
             LOGGER.info("Nickname is empty.");

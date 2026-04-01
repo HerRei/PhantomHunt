@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class GameModel {
-    private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
+    private static final Logger LOGGER = LogManager.getLogger(GameModel.class);
     private static GameModel instance;
     private final ObservableList<Player> players = FXCollections.observableArrayList();
     private final StringProperty playerName = new SimpleStringProperty();
