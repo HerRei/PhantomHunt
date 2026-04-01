@@ -1,8 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.common.protocol;
 
 /**
- * These are the first few basic tokens, there will definietly be more to add, esp with the chat
- * which needs to be up and running as soon as Milestone two.
+ * These are the first few basic tokens, there will definitely be more to add.
  */
 public enum Command {
   // health / connection

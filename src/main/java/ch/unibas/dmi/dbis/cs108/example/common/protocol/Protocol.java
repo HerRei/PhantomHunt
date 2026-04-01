@@ -21,9 +21,10 @@ public class Protocol {
    * @throws IllegalArgumentException If the line is empty or the command is unknown.
    */
   public static Packet decode(String line) {
+    // Throw exception as mentioned in JavaDoc
     if (line == null || line.isBlank()) {
       LOGGER.error("Decoding failed: input line is null or blank");
-      return null;
+      throw new IllegalArgumentException("Input line cannot be null or blank");
     }
 
     line = line.trim();
@@ -31,27 +32,31 @@ public class Protocol {
     // Split by first whitespace
     String[] parts = line.split("\\s+", 2);
 
-    String cmdToken;
-    String rest;
+    String cmdToken = parts[0];
+    String rest = (parts.length > 1) ? parts[1] : "";
 
     // Determine command (workaround for no message)
-    if (parts.length >= 2) {
+    /*if (parts.length >= 2) {
       cmdToken = parts[0];
       rest = parts[1];
     } else {
       cmdToken = line;
       rest = "";
-    }
+    } */
 
     try {
       Command cmd = Command.valueOf(cmdToken); // tests if the command is in the enum
       LOGGER.debug("Command identified: {}", cmd);
 
-      if (rest.isEmpty()) return new Packet(cmd, List.of()); //
+      if (rest.isEmpty()) {
+        return new Packet(cmd, List.of()); //
+      }
       return Packet.of(cmd, rest); // keep tail as one arg
+
     } catch (IllegalArgumentException e) {
       LOGGER.error("Unknown command token received: {}", cmdToken);
-      return null;
+      // Throw exception as mentioned in JavaDoc
+      throw new IllegalArgumentException("Unknown command: " + cmdToken, e);
     }
   }
 
@@ -62,24 +67,26 @@ public class Protocol {
    * @throws IllegalArgumentException If the packet or its command is null.
    */
   public static String encode(Packet p) {
+    // Throw exception as mentioned in JavaDoc
     if (p == null || p.cmd() == null) {
       LOGGER.error("Encoding failed: Packet or Command is null");
-      return null;
+      throw new IllegalArgumentException("Packet and its Command must not be null");
     }
 
     StringBuilder sb = new StringBuilder();
     sb.append(p.cmd().name());
 
     List<String> args = p.args();
-    if (args == null || args.isEmpty()) {
-      LOGGER.debug("Encoded packet to string: {}", sb.toString());
-      return sb.toString();
+
+    // since args is never null (Packet-Class), we can keep it simple
+    if (!args.isEmpty()) {
+      for (String s : args) {
+        sb.append(' ').append(s);
+      }
     }
 
-    for (String s : args) {
-      sb.append(' ').append(s);
-    }
-    LOGGER.debug("Encoded packet to string: {}", sb.toString());
-    return sb.toString();
+    String result = sb.toString();
+    LOGGER.debug("Encoded packet to string: {}", result);
+    return result;
   }
 }
