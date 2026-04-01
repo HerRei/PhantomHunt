@@ -164,3 +164,27 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 **Nächstes:**
 - Die GUI and diese Funktionen anbinden.
 - Weitere Tests die danne erggeben, ob die Mehrdeutigkeit wirklich behoben wurde. evt. erstellen von Unit-tests und Äquivalenzklassenf um all das auf nicht Ambiguative Art zu testen. 
+
+## 2026-03-29 — Vera ##
+**Dauer:** ~6h
+**Ziel:** Einarbeitung in die bestehende Code-Basis.
+**Was gemacht:**
+- **Code-Review:** Den Ablauf zwischen Netzwerk-Logik und der Benutzeroberfläche Schritt für Schritt nachvollzogen.
+- **Protokoll-Check:** Verstanden, wie die Packet-Klasse Daten in Strings umwandelt und wie die Command-Enums für die Kommunikation genutzt werden.
+- **Projekt-Setup:** Die lokale Entwicklungsumgebung eingerichtet. 
+
+**Nächstes:**
+- Konkrete Schwachstellen in der Fehlerbehandlung und beim Threadin gim Client beheben.
+
+## 2026-04-01 — Vera ##
+**Dauer:** ~4h
+**Ziel:** Refactoring der Core-Klassen und Stabilisierung der GUI.
+**Was gemacht:**
+- **Sichere Datenstrukturen:** Die Packet-Klasse so umgebaut, dass sie bei fehlenden Argumenten eine leere Liste statt null speichert. Das verhindert spätere Abstürze beim Zugriff auf Daten.
+- **Thread-Fixes:** Den ServerHandler und die HubScene so angepasst, dass Netzwerk-Updates die GUI nicht mehr zum Abstürzen bringen (Platform.runLater). Den Schreibzugriff auf den Socket durch synchronized abgesichert.
+- **Logik-Korrekturen:** Einen kritischen Fehler beim Decodieren von Nachrichten behoben (richtiges Exception-Handling). Ausserdem die Start-Szene korrigiert, damit man im Hub landet.
+- **Chat-Erweiterung:** Das Flüstern-System in der GUI gefixt, indem ich ein dynamisches Eingabefeld für den Empfänger eingebaut habe
+
+**Nächstes:**
+- Die neuen Funktionen für den Zuschauer-Modus (Spectator) an die GUI anbinden.
+- Prüfen, ob die Logik für Leerzeichen in Usernamen bei allen Befehlen (Whisper, MKL) einwandfrei funktioniert.
