@@ -134,7 +134,7 @@ public class ServerHandler implements Runnable {
    */
   private void handlePing() {
     sendMessage(Packet.of(Command.PONG));
-    LOGGER.info("Recieved Ping {}", System.currentTimeMillis());
+    LOGGER.info("Received Ping {}", System.currentTimeMillis());
   }
 
   /**
@@ -221,7 +221,7 @@ public class ServerHandler implements Runnable {
    *
    * @param p
    */
-  public void sendMessage(Packet p) {
+  public synchronized void sendMessage(Packet p) {
     if (p == null) {
       LOGGER.error("User tried sending an invalid packet");
       return;

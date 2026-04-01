@@ -20,7 +20,7 @@ public class ClientApp {
 
   public final TcpClient tcpClient;
   //for thread safety
-  public static volatile String confirmedNickname;
+  private static volatile String confirmedNickname; // private since data encapsulation
   private static volatile Consumer<String> globalMessageListener;
   private static volatile Consumer<String> whisperMessageListener;
 
@@ -54,9 +54,13 @@ public class ClientApp {
       LOGGER.warn("Nickname was blank --> not sent to server");
       return false;
     }
-
-    tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, nickname.trim()));
-    return true;
+    // Null-Check
+    if (tcpClient.getServerHandler() != null) {
+      tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, nickname.trim()));
+      return true;
+    }
+    LOGGER.error("Not connected to server. Nickname request failed.");
+    return false;
   }
 
   /**
@@ -89,8 +93,11 @@ public class ClientApp {
       return;
     }
 
-    LOGGER.info("ClientApp sends UNICOM: {}", message); //Debugging
-    tcpClient.getServerHandler().sendMessage(Packet.of(Command.UNICOM, message.trim()));
+    // Null-Check
+    if (tcpClient.getServerHandler() != null) {
+      LOGGER.info("ClientApp sends UNICOM: {}", message); //Debugging
+      tcpClient.getServerHandler().sendMessage(Packet.of(Command.UNICOM, message.trim()));
+    }
   }
 
   /**
@@ -145,8 +152,11 @@ public class ClientApp {
       return;
     }
 
-    tcpClient.getServerHandler()
-        .sendMessage(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
+    // Null-Check added
+    if (tcpClient.getServerHandler() !=null) {
+      tcpClient.getServerHandler()
+              .sendMessage(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
+    }
   }
 
   /**
@@ -155,40 +165,24 @@ public class ClientApp {
    * @param lobbyId The ID of the lobby to spectate.
    */
   public void spectateLobby(String lobbyId) {
-      if (lobbyId == null || lobbyId.isBlank()) {
-          LOGGER.warn("Lobby ID is blank --> Not sent");
-          return;
-      }
+    if (lobbyId == null || lobbyId.isBlank()) {
+      LOGGER.warn("Lobby ID is blank --> Not sent");
+      return;
+    }
+
+    // Null-Check added
+    if (tcpClient.getServerHandler() != null) {
       tcpClient.getServerHandler().sendMessage(Packet.of(Command.SPEC, lobbyId));
+    }
   }
 
   /**
    * Sends a logout request to the server.
    */
   public void logout() {
-    tcpClient.getServerHandler().sendMessage(Packet.of(Command.LOGOUT));
-  }
-
-  /**
-   * Old Version of sending username
-   * Starts the client.
-   * It connects to the server, sends the username, and waits for
-   * user input in a loop.
-   * @param args
-   *
-  public static void main(String[] args) {
-    String host = DEFAULT_HOST;
-    int port = DEFAULT_PORT;
-
-    System.out.println("Connecting to " + host + ":" + port);
-    TcpClient client = new TcpClient(host, port);
-
-    try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
-      while (scanner.hasNextLine()) {
-        String input = scanner.nextLine();
-        client.getServerHandler().sendMessage(Protocol.decode(input));
-      }
+    // Null-Check added
+    if (tcpClient.getServerHandler() != null) {
+      tcpClient.getServerHandler().sendMessage(Packet.of(Command.LOGOUT));
     }
   }
-  */
 }
