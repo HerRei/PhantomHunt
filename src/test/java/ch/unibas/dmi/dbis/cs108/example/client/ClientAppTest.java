@@ -1,6 +1,5 @@
-package ch.unibas.dmi.dbis.cs108.example;
+package ch.unibas.dmi.dbis.cs108.example.client;
 
-import ch.unibas.dmi.dbis.cs108.example.client.ClientApp;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
