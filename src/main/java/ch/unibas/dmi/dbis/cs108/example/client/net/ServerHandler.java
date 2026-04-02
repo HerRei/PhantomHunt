@@ -4,7 +4,6 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.NameGenerator;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
-import ch.unibas.dmi.dbis.cs108.example.client.ClientApp;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,10 +14,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import javafx.application.Platform;
 
-import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
-import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.HubScene;
-import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.SceneProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -106,6 +102,9 @@ public class ServerHandler implements Runnable {
       case CHECKIN:
         handleCheckin(packet);
         break;
+      case INFO:
+        handleInfo(packet);
+        break;
       default:
         handleUnknown(packet);
         break;
@@ -143,8 +142,17 @@ public class ServerHandler implements Runnable {
    * @param packet packet containing the confirmed nickname
    */
   private void handleCheckin(Packet packet) {
-    ClientApp.setConfirmedNickname(packet.text());
     LOGGER.info("Welcome on the Server: {}", packet.text());
+  }
+
+  /**
+   * adds Infos such as Nickname Change or left player to chat
+   *
+   * @param packet
+   */
+  private void handleInfo(Packet packet) {
+    LOGGER.info("Info: {}", packet.text());
+    GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
   }
 
   /**
@@ -154,7 +162,7 @@ public class ServerHandler implements Runnable {
    */
   private void handleUnicom(Packet packet) {
     LOGGER.info("Chat: {}", packet.text());
-    SceneManager.getInstance().scenes.get(SceneProtocol.HOME).as(HubScene.class).addToChat(packet.text());
+    GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
   }
 
   /**
@@ -163,8 +171,8 @@ public class ServerHandler implements Runnable {
    * @param packet packet containing the whisper text
    */
   private void handleWhisper(Packet packet) {
-    ClientApp.notifyWhisperReceived(packet.text());
-    LOGGER.info("Wisper: {}", packet.text());
+    LOGGER.info("Whisper: {}", packet.text());
+    GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
   }
 
   /**
@@ -184,13 +192,6 @@ public class ServerHandler implements Runnable {
   private void handleReject(Packet packet) {
     String text = packet.text();
     String marker = "You are now: ";
-    int markerIndex = text.indexOf(marker);
-    if (markerIndex >= 0) {
-      String confirmedNickname = text.substring(markerIndex + marker.length()).trim();
-      if (!confirmedNickname.isEmpty()) {
-        ClientApp.setConfirmedNickname(confirmedNickname);
-      }
-    }
     LOGGER.error("Error: {}", packet.text());
   }
 

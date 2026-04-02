@@ -3,9 +3,10 @@ package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
-import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel; // Angenommen, das Model liegt hier
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,12 +15,13 @@ import javafx.scene.layout.*;
 
 public class HubScene implements SceneInterface {
 
-    private TextArea chatDisplay;
+    // GEÄNDERT: Von TextArea zu ListView für Property-Binding
+    private ListView<String> chatDisplay;
     private TextField chatInput;
-    private TextField whisperTargetInput; // textfield for name of receiver
+    private TextField whisperTargetInput;
     private ComboBox<String> chatMode;
     private Slider volumeSlider;
-    private Label nicknameLabel; // Anzeige für den aktuellen Namen
+    private Label nicknameLabel;
     private Scene localScene;
 
     public HubScene(){
@@ -27,31 +29,28 @@ public class HubScene implements SceneInterface {
     }
 
     public void createScene() {
-        // --- LEFT SIDE: Navigation & Profile (Wider side) ---
+        // --- LEFT SIDE: Navigation & Profile ---
         VBox leftMenu = new VBox(20);
         leftMenu.setPadding(new Insets(25));
         leftMenu.setAlignment(Pos.TOP_CENTER);
-        leftMenu.setPrefWidth(350); // Increased width as requested
+        leftMenu.setPrefWidth(350);
 
-        // Nickname Section
         VBox profileBox = new VBox(8);
         profileBox.setAlignment(Pos.CENTER);
         Label headLabel = new Label("Logged in as:");
         headLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: gray;");
 
-        // Initialer Name aus dem Model
         nicknameLabel = new Label();
+        // BINDING: Nickname an das Model
         nicknameLabel.textProperty().bind(Bindings.concat("Your name: ", GameModel.getInstance().getName()));
         nicknameLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         profileBox.getChildren().addAll(headLabel, nicknameLabel);
 
-        // Action Buttons
         Button btnNickname = new Button("Change Nickname");
         Button btnJoin = new Button("Join Lobby");
         Button btnCreate = new Button("Create Lobby");
 
-        // Make buttons larger and fill width
         btnJoin.setMaxWidth(Double.MAX_VALUE);
         btnNickname.setMaxWidth(Double.MAX_VALUE);
         btnCreate.setMaxWidth(Double.MAX_VALUE);
@@ -62,17 +61,22 @@ public class HubScene implements SceneInterface {
         volumeSlider = new Slider(0, 100, 50);
         volumeSlider.setShowTickLabels(true);
 
-        leftMenu.getChildren().addAll(profileBox, btnNickname,new Separator(), btnJoin, btnCreate, new Separator(), volLabel, volumeSlider);
+        leftMenu.getChildren().addAll(profileBox, btnNickname, new Separator(), btnJoin, btnCreate, new Separator(), volLabel, volumeSlider);
 
         // --- RIGHT SIDE: Chat System ---
         VBox chatBox = new VBox(10);
         chatBox.setPadding(new Insets(15));
         HBox.setHgrow(chatBox, Priority.ALWAYS);
 
-        chatDisplay = new TextArea();
-        chatDisplay.setEditable(false);
-        chatDisplay.setWrapText(true);
+        // GEÄNDERT: ListView Initialisierung und BINDING
+        chatDisplay = new ListView<>();
+        chatDisplay.setItems(GameModel.getInstance().chatMessagesProperty()); // Hier passiert das Binding
         VBox.setVgrow(chatDisplay, Priority.ALWAYS);
+
+        // Optional: Automatisches Scrollen nach unten bei neuen Nachrichten
+        GameModel.getInstance().chatMessagesProperty().addListener((ListChangeListener<String>) c -> {
+            Platform.runLater(() -> chatDisplay.scrollTo(chatDisplay.getItems().size() - 1));
+        });
 
         HBox inputArea = new HBox(8);
         chatInput = new TextField();
@@ -84,26 +88,22 @@ public class HubScene implements SceneInterface {
         chatMode.setValue("Global");
         chatMode.setPrefWidth(100);
 
-        // Initializing the receiver-field
         whisperTargetInput = new TextField();
         whisperTargetInput.setPromptText("To whom?");
         whisperTargetInput.setPrefWidth(100);
-
-        // Field is now visible but only takes away place, when "Whisper" is chosen
         whisperTargetInput.visibleProperty().bind(Bindings.equal("Whisper", chatMode.valueProperty()));
         whisperTargetInput.managedProperty().bind(whisperTargetInput.visibleProperty());
 
         Button btnSend = new Button("Send");
         btnSend.setPrefWidth(80);
 
-        //--- ButtonAction ---
+        //--- Actions ---
         btnSend.setOnAction(e -> handleSendMessage());
         btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
         btnJoin.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.JOINLOBBY));
         btnCreate.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.CREATELOBBY));
         chatInput.setOnAction(e -> handleSendMessage());
 
-        // whisperTargetInput added to HBox (between chatMode and chatInput)
         inputArea.getChildren().addAll(chatMode, whisperTargetInput, chatInput, btnSend);
         chatBox.getChildren().addAll(new Label("Server Chat"), chatDisplay, inputArea);
 
@@ -114,11 +114,10 @@ public class HubScene implements SceneInterface {
         localScene = new Scene(mainLayout, 800, 450);
     }
 
+    // VERALTET: Da wir Binding nutzen, sollte man Nachrichten direkt ins Model schreiben.
+    // Ich lasse sie als Wrapper drin, falls du sie noch woanders aufrufst.
     public void addToChat(String msg) {
-        // UI-Update shifted to JavaFX-Thread, to minimize crashes
-        Platform.runLater(() -> {
-            chatDisplay.appendText(msg + "\n");
-        });
+        GameModel.getInstance().addChatMessage(msg);
     }
 
     private void handleSendMessage() {
@@ -126,24 +125,18 @@ public class HubScene implements SceneInterface {
         String mode = chatMode.getValue();
 
         if (!message.isEmpty()) {
-            // Wichtig: Strings vergleicht man in Java mit .equals()!
             if ("Global".equals(mode)) {
                 EventHandlers.getInstance().sendMessage(Command.UNICOM, message);
                 chatInput.clear();
             } else {
-                // Logic adapted to Whisper
                 String target = whisperTargetInput.getText().trim();
-
-                // We check, if user actually put in receiver
                 if (target.isEmpty()) {
-                    addToChat("You need to enter a target");
+                    // Fehlermeldung direkt ins Model schieben
+                    GameModel.getInstance().addChatMessage("SYSTEM: You need to enter a target");
                     return;
                 }
-                // we put goal and message with space together
-                // EventHandlers.java divides this with split(" ", 2).
-                EventHandlers.getInstance().sendMessage(Command.WHISPER, target + " " + message);
+                EventHandlers.getInstance().sendMessage(Command.WHISPER, target + " " +  message);
                 chatInput.clear();
-                // Optional: whisperTargetInput.clear(); // If we want to delete the name after sending
             }
         }
     }

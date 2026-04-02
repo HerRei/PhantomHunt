@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 
-import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
 
 public class CreateLobbyScene extends AbstractInputScene{

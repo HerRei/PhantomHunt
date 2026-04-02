@@ -51,9 +51,10 @@ public class EventHandlers {
             return;
         }
 
+
         //Sendet Nachricht an Server
         if (cmd == Command.WHISPER){
-            serverHandler.sendMessage(Packet.of(cmd, msg.split(" ", 2)));
+            serverHandler.sendMessage(Packet.of(cmd, msg));
         }
         else{
             serverHandler.sendMessage(Packet.of(cmd, msg));
