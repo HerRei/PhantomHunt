@@ -3,10 +3,9 @@ package ch.unibas.dmi.dbis.cs108.example.gui.javafx;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.*;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.*;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
+import ch.unibas.dmi.dbis.cs108.example.sound.SoundManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
-
-import java.util.logging.Logger;
 
 /*
  * Main Entry Point for the JavaFX Application.
@@ -17,8 +16,10 @@ public class GUI extends Application {
   @Override
   public void start(Stage primaryStage) {
     // Initialize Core Singletons
-    GameModel model = GameModel.getInstance();
-    EventHandlers handlers = EventHandlers.getInstance();
+    GameModel.getInstance();
+    EventHandlers.getInstance();
+    SoundManager soundManager = SoundManager.getInstance();
+    soundManager.initialize();
 
     // Setup Scene Infrastructure
     SceneManager manager = SceneManager.getInstance();
@@ -32,7 +33,8 @@ public class GUI extends Application {
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
-    manager.showScene(SceneProtocol.HOME);
+    primaryStage.setOnCloseRequest(event -> soundManager.shutdown());
+    manager.showScene(SceneProtocol.NICKNAME);
   }
   public static void main(String[] args) {
     launch(args);

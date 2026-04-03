@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.client.net;
 
 import org.junit.jupiter.api.Test;
+import java.io.IOException;
 import java.net.Socket;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +29,7 @@ public class ServerHandlerTest {
     }
 
     @Test
-    void testRun_closedSocketHandlesIOExceptionGracefully(){
+    void testRun_closedSocketHandlesIOExceptionGracefully() throws IOException {
         // Arrange
         Socket closedSocket = new Socket();
         closedSocket.close();
