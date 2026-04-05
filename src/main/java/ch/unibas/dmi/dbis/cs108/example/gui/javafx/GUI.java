@@ -15,8 +15,10 @@ public class GUI extends Application {
 
   @Override
   public void start(Stage primaryStage) {
-    // Initialize Core Singletons
-    GameModel.getInstance();
+    // Create the model instance. It is no longer a Singleton.
+    GameModel model = new GameModel();
+
+    // Initialize other Singletons (can be refactored later if needed)
     EventHandlers.getInstance();
     SoundManager soundManager = SoundManager.getInstance();
     soundManager.initialize();
@@ -25,17 +27,19 @@ public class GUI extends Application {
     SceneManager manager = SceneManager.getInstance();
     manager.setStage(primaryStage);
 
-    // Register Scenes (Scenes fetch Singletons internally)
+    // Register Scenes, injecting the model where needed
     manager.addScene(SceneProtocol.HOME, new HubScene());
     manager.addScene(SceneProtocol.NICKNAME, new NicknameScene());
     manager.addScene(SceneProtocol.CREATELOBBY, new CreateLobbyScene());
     manager.addScene(SceneProtocol.JOINLOBBY, new JoinLobbyScene());
+    manager.addScene(SceneProtocol.GAME, new GameScene(model));
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
     primaryStage.setOnCloseRequest(event -> soundManager.shutdown());
     manager.showScene(SceneProtocol.NICKNAME);
   }
+
   public static void main(String[] args) {
     launch(args);
   }
