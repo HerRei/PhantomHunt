@@ -13,6 +13,10 @@ import javafx.stage.Stage;
  */
 public class GUI extends Application {
 
+  /**
+   * @param primaryStage the primary stage for this application, onto which
+   *                     the application scene can be set.
+   */
   @Override
   public void start(Stage primaryStage) {
     // Initialize Core Singletons
@@ -30,12 +34,20 @@ public class GUI extends Application {
     manager.addScene(SceneProtocol.NICKNAME, new NicknameScene());
     manager.addScene(SceneProtocol.CREATELOBBY, new CreateLobbyScene());
     manager.addScene(SceneProtocol.JOINLOBBY, new JoinLobbyScene());
+    manager.addScene(SceneProtocol.GAME, new GameScene());
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
     primaryStage.setOnCloseRequest(event -> soundManager.shutdown());
     manager.showScene(SceneProtocol.NICKNAME);
   }
+
+  /**
+   * Fallback entry point for the JavaFX application.
+   * This is primarily used to launch the app from IDEs that don't fully support JavaFX natively.
+   *
+   * @param args command line arguments
+   */
   public static void main(String[] args) {
     launch(args);
   }
