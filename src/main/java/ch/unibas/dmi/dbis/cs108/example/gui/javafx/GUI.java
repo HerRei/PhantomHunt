@@ -13,12 +13,14 @@ import javafx.stage.Stage;
  */
 public class GUI extends Application {
 
+  /**
+   * @param primaryStage the primary stage for this application, onto which
+   *                     the application scene can be set.
+   */
   @Override
   public void start(Stage primaryStage) {
-    // Create the model instance. It is no longer a Singleton.
-    GameModel model = new GameModel();
-
-    // Initialize other Singletons (can be refactored later if needed)
+    // Initialize Core Singletons
+    GameModel.getInstance();
     EventHandlers.getInstance();
     SoundManager soundManager = SoundManager.getInstance();
     soundManager.initialize();
@@ -27,12 +29,12 @@ public class GUI extends Application {
     SceneManager manager = SceneManager.getInstance();
     manager.setStage(primaryStage);
 
-    // Register Scenes, injecting the model where needed
+    // Register Scenes (Scenes fetch Singletons internally)
     manager.addScene(SceneProtocol.HOME, new HubScene());
     manager.addScene(SceneProtocol.NICKNAME, new NicknameScene());
     manager.addScene(SceneProtocol.CREATELOBBY, new CreateLobbyScene());
     manager.addScene(SceneProtocol.JOINLOBBY, new JoinLobbyScene());
-    manager.addScene(SceneProtocol.GAME, new GameScene(model));
+    manager.addScene(SceneProtocol.GAME, new GameScene());
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
@@ -40,6 +42,12 @@ public class GUI extends Application {
     manager.showScene(SceneProtocol.NICKNAME);
   }
 
+  /**
+   * Fallback entry point for the JavaFX application.
+   * This is primarily used to launch the app from IDEs that don't fully support JavaFX natively.
+   *
+   * @param args command line arguments
+   */
   public static void main(String[] args) {
     launch(args);
   }

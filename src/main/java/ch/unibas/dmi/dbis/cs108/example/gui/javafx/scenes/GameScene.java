@@ -8,13 +8,26 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
+/**
+ * Represents the map screen where the game is played.
+ * This class is responsible for displaying the map and providing
+ * collision detection logic.
+ */
 public class GameScene implements SceneInterface {
 
   private Scene scene;
   private Image collisionMap;
   private PixelReader pixelReader;
 
-  public GameScene(GameModel model) {
+  /**
+   * Creates a new GameScene.
+   * It fetches the necessary map images from the GameModel and sets up
+   * the visual components of the scene.
+   */
+  public GameScene() {
+    // Get the model instance
+    GameModel model = GameModel.getInstance();
+
     // Get the map images from the model
     Image mapImage = model.getGameMap();
     ImageView mapView = new ImageView(mapImage);
@@ -35,11 +48,13 @@ public class GameScene implements SceneInterface {
   }
 
   /**
-   * Checks if a given coordinate is walkable.
+   * Checks if a specific coordinate on the map is walkable.
+   * It does this by checking the color of the pixel on the collision map.
+   * Black pixels are considered walls (not walkable).
    *
    * @param x The x-coordinate to check.
    * @param y The y-coordinate to check.
-   * @return {@code true} if the pixel at the given coordinates on the collision map is not black, {@code false} otherwise.
+   * @return true if the coordinate is walkable, false otherwise.
    */
   public boolean isWalkable(int x, int y) {
     // Ensure the coordinates are within the map boundaries
