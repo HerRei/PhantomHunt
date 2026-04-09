@@ -58,19 +58,13 @@ test {
     useJUnitPlatform()
 }
 
-tasks.register('FatJar', Jar) {
-    group = 'build'
-    description = 'Assembles a runnable fat JAR for the application.'
-
-    archiveClassifier = 'all'
+tasks.named('jar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName = 'phantom-hunt.jar'
 
     manifest {
-        attributes('Main-Class': application.mainClass)
+        attributes 'Main-Class': 'ch.unibas.dmi.dbis.cs108.example.Main'
     }
-
-    // include your compiled classes/resources
-    from(sourceSets.main.output)
 
     // make sure runtimeClasspath is resolved before we try to zipTree it
     dependsOn(configurations.runtimeClasspath)
@@ -81,4 +75,15 @@ tasks.register('FatJar', Jar) {
     }) {
         exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
     }
+}
+
+// Disable tasks created by the 'application' plugin that package additional deliverables, for only having one executable
+tasks.named('distZip').configure { enabled = false }
+tasks.named('distTar').configure { enabled = false }
+tasks.named('startScripts').configure { enabled = false }
+
+tasks.register('build-cs108'){
+    group = 'custom'
+    description = 'cs108 build task'
+    dependsOn 'clean', 'jar', 'javadoc'
 }
