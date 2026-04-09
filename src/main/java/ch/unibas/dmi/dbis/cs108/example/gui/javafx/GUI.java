@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx;
 
+import ch.unibas.dmi.dbis.cs108.example.Main;
+import ch.unibas.dmi.dbis.cs108.example.client.net.TcpClient;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.*;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.*;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
@@ -40,6 +42,12 @@ public class GUI extends Application {
     primaryStage.setTitle("Phantom Hunt");
     primaryStage.setOnCloseRequest(event -> soundManager.shutdown());
     manager.showScene(SceneProtocol.NICKNAME);
+
+    // GUI is now completely initialized
+    // We take address form Main and start Client
+    if (Main.targetHost != null) {
+      new TcpClient(Main.targetHost, Main.targetPort);
+    }
   }
 
   /**

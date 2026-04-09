@@ -13,6 +13,10 @@ public class Main {
 
   private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
+  // Saving Host and Port here, so Gui has access
+  public static String targetHost;
+  public static int targetPort;
+
   public static void main(String[] args) {
     // [0] = server/client [1] = port / host:port
     if (args.length == 2) {
@@ -23,9 +27,14 @@ public class Main {
             String[] socketInput = args[1].split(":");
             String host = socketInput[0];
             int port = Integer.parseInt(socketInput[1]);
+
+            // Make parameters ready for GUI
+            targetHost = host;
+            targetPort = port;
+
             connect(host, port, args);
 
-          } catch (Exception e) {
+          } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("invalid input format has to be <host>:<port>, not: {}", args[1]);
           }
         }
@@ -72,7 +81,7 @@ public class Main {
    */
   public static void connect(String host, int port, String[] args) {
     LOGGER.info("Connecting to {}:{}...", host, port);
-    new TcpClient(host, port);
+    // TcpClient deleted, since it should only start in GUI.
     Application.launch(GUI.class, args);
   }
 }
