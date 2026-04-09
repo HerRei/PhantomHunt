@@ -72,7 +72,7 @@ public class Main {
    */
   public static void connect(String host, int port, String[] args) {
     LOGGER.info("Connecting to {}:{}...", host, port);
-    new TcpClient(host, port);
+    GUI.setConnectionInfo(host, port); // Pass connection info to GUI
     Application.launch(GUI.class, args);
   }
 }

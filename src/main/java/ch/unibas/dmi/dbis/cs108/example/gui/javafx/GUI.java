@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx;
 
+import ch.unibas.dmi.dbis.cs108.example.client.net.TcpClient;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.*;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.*;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
@@ -13,12 +14,25 @@ import javafx.stage.Stage;
  */
 public class GUI extends Application {
 
+  private static String host;
+  private static int port;
+
+  public static void setConnectionInfo(String host, int port) {
+    GUI.host = host;
+    GUI.port = port;
+  }
+
   /**
    * @param primaryStage the primary stage for this application, onto which
    *                     the application scene can be set.
    */
   @Override
   public void start(Stage primaryStage) {
+    // Start the TCP client now that JavaFX is initialized
+    if (host != null) {
+      new TcpClient(host, port);
+    }
+
     // Initialize Core Singletons
     GameModel.getInstance();
     EventHandlers.getInstance();
