@@ -43,6 +43,11 @@ Befehle, die den Status oder den Namen eines Spielers auf dem Server verwalten.
     -   **Client:** NICK PhantomHunter
     -   **Server-Antwort (Erfolg):** CLEARED NICK PhantomHunter
     -   **Server-Antwort (Fehler/Name vergeben):** REJECT Name was taken. You are now: PhantomHunter1
+### WELCOME
+-   **Richtung:** Server -> Client
+-   **Beschreibung:** Begrüsst einen neu verbundenen Client.
+-   **Payload:** Der Name des Clients.
+-   **Beispiel:** WELCOME PhantomHunter
 ### CLEARED
 -   **Richtung:** Server -> Client
 -   **Beschreibung:** Bestätigt dem Client, dass eine systemkritische Aktion (z. B. eine NICK-Änderung) erfolgreich war.
@@ -55,6 +60,11 @@ Befehle, die den Status oder den Namen eines Spielers auf dem Server verwalten.
 -   **Beispiele:** 
     -   **REJECT Name was taken. You are now:** Player1 (Wenn der gewünschte Name bereits besetzt ist)
     -   **REJECT User not found:** Player2 (Wenn bei WHISPER das Ziel nicht online ist)
+### INFO
+-   **Richtung:** Server -> Client
+-   **Beschreibung:** Sendet eine allgemeine Information an den Client.
+-   **Payload:** Die Informationsnachricht.
+-   **Beispiel:** INFO This is an informational message.
 ### CHECKIN
 -   **Richtung:** Client -> Server
 -   **Beschreibung:** Reserviert für zukünftige Identitätsüberprüfungen (CHECKIN <name>). 
@@ -76,3 +86,25 @@ Befehle für die textbasierte Kommunikation zwischen Spielern.
 -   **Beispiel Client:** WHISPER PhantomHunter Watch out, behind you!
     -   **Fehlerfall (Server -> Client):** Wenn "PhantomHunter" nicht existiert, antwortet der Server
         mit **REJECT User not found:** PhantomHunter.
+### YAP
+-   **Richtung:** Client -> Server
+-   **Beschreibung:** Sendet eine Nachricht, die nur für die Lobby bestimmt ist.
+-   **Payload:** Die Chat-Nachricht.
+-   **Beispiel:** YAP Let's start the game!
+
+## 5. Lobby-Befehle
+Befehle zur Verwaltung von Spiellobbys.
+### MKL
+-   **Richtung:** Client -> Server
+-   **Beschreibung:** Erstellt eine neue Lobby.
+-   **Payload:** Der Name der Lobby.
+-   **Beispiel:** MKL My awesome lobby
+### SPEC
+-   **Richtung:** Client -> Server
+-   **Beschreibung:** Lässt den Client einer bestimmten Lobby als Zuschauer beitreten.
+-   **Payload:** Die ID der Lobby.
+-   **Beispiel:** SPEC 12345
+### START
+-   **Richtung:** Client -> Server
+-   **Beschreibung:** Startet das Spiel in der aktuellen Lobby.
+-   **Beispiel:** START
