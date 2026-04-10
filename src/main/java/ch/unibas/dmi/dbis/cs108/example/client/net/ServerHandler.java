@@ -4,6 +4,9 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.NameGenerator;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.LobbyScene;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.SceneProtocol;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,6 +15,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
 import javafx.application.Platform;
 
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
@@ -51,10 +56,10 @@ public class ServerHandler implements Runnable {
   @Override
   public void run() {
     try (
-        BufferedReader in = new BufferedReader(
-            new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-        BufferedWriter out = new BufferedWriter(
-            new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            BufferedWriter out = new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))
     ) {
       this.out = out;
       String line;
@@ -105,19 +110,42 @@ public class ServerHandler implements Runnable {
       case INFO:
         handleInfo(packet);
         break;
+      case LOBBY_INFO:
+        handleLobbyInfo(packet);
+        break;
       default:
         handleUnknown(packet);
         break;
     }
   }
 
+  private void handleLobbyInfo(Packet packet) {
+    String[] parts = packet.text().split(" ");
+    if (parts.length < 1) {
+      LOGGER.warn("Received invalid LOBBY_INFO packet");
+      return;
+    }
+    String lobbyId = parts[0];
+    String[] players = Arrays.copyOfRange(parts, 1, parts.length);
+
+    Platform.runLater(() -> {
+      SceneManager sceneManager = SceneManager.getInstance();
+      sceneManager.showScene(SceneProtocol.LOBBY);
+      LobbyScene lobbyScene = (LobbyScene) sceneManager.scenes.get(SceneProtocol.LOBBY);
+      if (lobbyScene != null) {
+        lobbyScene.updateLobbyInfo(lobbyId, players);
+      } else {
+        LOGGER.error("LobbyScene is not registered in SceneManager.");
+      }
+    });
+  }
 
   /**
    * Updates the name.
    */
   private void handleWelcome(Packet packet) {
     this.name = packet.text();
-    try{
+    try {
       Platform.runLater(() -> {
         GameModel.getInstance().setName(this.name);
       });
@@ -255,5 +283,7 @@ public class ServerHandler implements Runnable {
   }
 
   //---getters---
-  public String getName(){return this.name;}
+  public String getName() {
+    return this.name;
+  }
 }

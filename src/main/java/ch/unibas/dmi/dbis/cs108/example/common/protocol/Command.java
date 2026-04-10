@@ -25,5 +25,6 @@ public enum Command {
 
   // lobby
   SPEC, // SPEC <lobbyId>
-  START // START
+  START, // START
+  LOBBY_INFO // LOBBY_INFO <lobbyId> <player1> <player2> ...
 }

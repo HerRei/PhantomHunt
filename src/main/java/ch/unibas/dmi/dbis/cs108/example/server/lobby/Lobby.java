@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class Lobby {
 
@@ -87,6 +88,7 @@ public class Lobby {
 
         players.add(player);
         LOGGER.info("Player {} joined lobby {}", player.getName(), this.name);
+        broadcastLobbyInfo();
         return true;
     }
 
@@ -106,6 +108,7 @@ public class Lobby {
             host = players.get(0);
             LOGGER.info("Host left, new host is {}", host.getName());
         }
+        broadcastLobbyInfo();
         return true;
     }
 
@@ -129,4 +132,14 @@ public class Lobby {
         return true;
     }
 
+    public void broadcastLobbyInfo() {
+        String playerNames = players.stream()
+                                    .map(ClientHandler::getName)
+                                    .collect(Collectors.joining(" "));
+        String packetText = id + " " + playerNames;
+        Packet packet = Packet.of(Command.LOBBY_INFO, packetText);
+        for (ClientHandler player : players) {
+            player.sendMessage(packet);
+        }
+    }
 }

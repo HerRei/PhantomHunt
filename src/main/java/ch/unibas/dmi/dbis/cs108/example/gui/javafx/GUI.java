@@ -37,6 +37,8 @@ public class GUI extends Application {
     manager.addScene(SceneProtocol.CREATELOBBY, new CreateLobbyScene());
     manager.addScene(SceneProtocol.JOINLOBBY, new JoinLobbyScene());
     manager.addScene(SceneProtocol.GAME, new GameScene());
+    manager.addScene(SceneProtocol.LOBBY, new LobbyScene());
+
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
