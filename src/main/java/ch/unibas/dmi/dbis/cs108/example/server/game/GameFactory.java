@@ -18,21 +18,12 @@ import java.util.Objects;
  */
 public final class GameFactory {
 
-  private static final TileType[][] DEFAULT_MAP = new TileType[16][16]; //this is just a placholder please update this ismail or jan
-
-  static {
-    for (int i = 0; i < 16; i++) {
-      for (int j = 0; j < 16; j++) {
-        DEFAULT_MAP[i][j] = TileType.FLOOR;
-      }
-    }
-  }
 
   /**
    * Creates a game with the provided rules and map.
    */
   public GameState create(
-      String matchId, List<PlayerSeed> playerSeeds, GameRules rules, TileType[][] map) {
+          String matchId, List<PlayerSeed> playerSeeds, GameRules rules, TileType[][] map) {
     TileType[][] validatedMap = deepCopyAndValidateMap(map);
     List<PlayerState> players = createPlayers(playerSeeds, validatedMap);
     return new GameState(matchId, rules, validatedMap, players);
@@ -42,9 +33,9 @@ public final class GameFactory {
    * Creates a game using {@link GameRules#defaultRules()}.
    */
   public GameState createWithDefaultRules(
-      String matchId, List<PlayerSeed> playerSeeds, TileType[][] map) {
+          String matchId, List<PlayerSeed> playerSeeds, TileType[][] map) {
     if (map == null) { //fallback for no Map
-      return create(matchId, playerSeeds, GameRules.defaultRules(), DEFAULT_MAP);
+      return create(matchId, playerSeeds, GameRules.defaultRules(), map);
     }
     return create(matchId, playerSeeds, GameRules.defaultRules(), map);
   }
@@ -54,7 +45,7 @@ public final class GameFactory {
 
     if (playerSeeds.size() != GameState.REQUIRED_PLAYER_COUNT) {
       throw new IllegalArgumentException(
-          "A match requires exactly " + GameState.REQUIRED_PLAYER_COUNT + " players.");
+              "A match requires exactly " + GameState.REQUIRED_PLAYER_COUNT + " players.");
     }
 
     List<PlayerState> result = new ArrayList<>();
@@ -64,15 +55,15 @@ public final class GameFactory {
       PlayerSeed seed = Objects.requireNonNull(playerSeeds.get(i), "player seed must not be null");
 
       result.add(
-          new PlayerState(
-              requireNonBlank(seed.playerId(), "playerId must not be blank"),
-              requireNonBlank(seed.nickname(), "nickname must not be blank"),
-              PlayerRole.PHANTOM,
-              defaultSpawns.get(i).copy(),
-              new InputState(false, false, false, false),
-              0,
-              true,
-              false));
+              new PlayerState(
+                      requireNonBlank(seed.playerId(), "playerId must not be blank"),
+                      requireNonBlank(seed.nickname(), "nickname must not be blank"),
+                      PlayerRole.PHANTOM,
+                      defaultSpawns.get(i).copy(),
+                      new InputState(false, false, false, false),
+                      0,
+                      true,
+                      false));
     }
 
     return result;
@@ -81,17 +72,18 @@ public final class GameFactory {
   private static TileType[][] deepCopyAndValidateMap(TileType[][] source) {
     Objects.requireNonNull(source, "map must not be null");
 
-    if (source.length != 16) {
-      throw new IllegalArgumentException("Map must currently have height 16.");
+    if (source.length == 0 || source[0].length == 0) {
+      throw new IllegalArgumentException("Map must not be empty.");
     }
+    int width = source[0].length;
 
     TileType[][] copy = new TileType[source.length][];
 
     for (int y = 0; y < source.length; y++) {
       Objects.requireNonNull(source[y], "map row must not be null");
 
-      if (source[y].length != 16) {
-        throw new IllegalArgumentException("Map must currently have width 16 in every row.");
+      if (source[y].length != width) {
+        throw new IllegalArgumentException("All rows must have the same width.");
       }
 
       copy[y] = new TileType[source[y].length];
