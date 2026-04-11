@@ -234,6 +234,11 @@ public class ClientHandler implements Runnable {
     disconnect();
   }
 
+  private void handleLobbyLogout(Packet p){
+    String lobbyId = p.args().get(0);
+    lobbyHandler.leaveLobby(lobbyId, this);
+  }
+
   /**
    * Handles a client's check-in request to join a lobby.
    *
@@ -259,14 +264,18 @@ public class ClientHandler implements Runnable {
    * @param p packet containing whisper target and message text
    */
   private void handleWhisper(Packet p) {
-    if (p.argc() < 2) {
+    String[] args = p.args().get(0).split(" ", 2);
+    if (args.length < 2) {
       sendMessage(Packet.of(Command.REJECT, "Invalid whisper format. Use: WHISPER <user> <message>"));
       return;
     }
-    String target = p.args().get(0);
-    String message = String.join(" ", p.args().subList(1, p.args().size()));
+    String target = args[0];
+    String message = args[1];
     if (!registry.whisper(this, target, message)) {
       sendMessage(Packet.of(Command.REJECT, "User not found: " + target));
+    }
+    else{
+      sendMessage(Packet.of(Command.UNICOM, "You -> " + target+ ": "+ message));
     }
   }
 
@@ -357,6 +366,7 @@ public class ClientHandler implements Runnable {
             case MKL -> handleMkl(p);
             case SPEC -> handleSpec(p);
             case START -> handleStart(p);
+            case LOGOUT_LOBBY -> handleLobbyLogout(p);
             default -> handleDefault(p);
           }
         } catch (IllegalArgumentException e) {

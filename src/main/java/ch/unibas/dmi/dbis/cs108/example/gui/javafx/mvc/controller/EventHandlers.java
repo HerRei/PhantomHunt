@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller;
 
-import ch.unibas.dmi.dbis.cs108.example.client.ClientApp;
 import ch.unibas.dmi.dbis.cs108.example.client.net.ServerHandler;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
@@ -44,7 +43,11 @@ public class EventHandlers {
         SceneManager.getInstance().showScene(SceneProtocol.GAME);
     }
 
-    public void sendMessage(Command cmd, String msg){
+    public void quitLobby(String id){
+        serverHandler.sendMessage(Packet.of(Command.LOGOUT_LOBBY, id));
+    }
+
+    public void sendMessage(Command cmd, String... args){
         // Null-Check
         if (serverHandler == null) {
             LOGGER.warn("Cannot send message: Not connected to server.");
@@ -53,12 +56,7 @@ public class EventHandlers {
 
 
         //Sendet Nachricht an Server
-        if (cmd == Command.WHISPER){
-            serverHandler.sendMessage(Packet.of(cmd, msg));
-        }
-        else{
-            serverHandler.sendMessage(Packet.of(cmd, msg));
-        }
+        serverHandler.sendMessage(Packet.of(cmd, args));
     }
 
     public void handleNicknameUpdate(String name) {

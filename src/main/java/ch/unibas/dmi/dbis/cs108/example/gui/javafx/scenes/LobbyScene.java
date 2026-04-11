@@ -19,11 +19,11 @@ public class LobbyScene implements SceneInterface {
     private ListView<String> playerList;
     private Button startGameButton;
     private Button backButton;
+    private String id;
 
     public LobbyScene() {
         root = new VBox(10);
         root.setAlignment(Pos.CENTER);
-
         lobbyIdLabel = new Label("Lobby ID: ");
         playerList = new ListView<>();
         startGameButton = new Button("Start Game");
@@ -44,13 +44,14 @@ public class LobbyScene implements SceneInterface {
 
         backButton.setOnAction(e -> {
             // Logic to leave the lobby
-            EventHandlers.getInstance().sendMessage(Command.LOGOUT, "");
+            EventHandlers.getInstance().quitLobby(id);
             SceneManager.getInstance().showScene(SceneProtocol.HOME);
         });
     }
 
     public void updateLobbyInfo(String lobbyId, String[] players) {
-        lobbyIdLabel.setText("Lobby ID: " + lobbyId);
+        id = lobbyId;
+        lobbyIdLabel.setText("Lobby ID: " + id);
         playerList.getItems().setAll(players);
         // Show/hide start button based on whether the current player is the host
         String currentPlayerName = GameModel.getInstance().getName().get();

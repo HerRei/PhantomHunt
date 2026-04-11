@@ -135,7 +135,7 @@ public class HubScene implements SceneInterface {
                     GameModel.getInstance().addChatMessage("SYSTEM: You need to enter a target");
                     return;
                 }
-                EventHandlers.getInstance().sendMessage(Command.WHISPER, target + " " +  message);
+                EventHandlers.getInstance().sendMessage(Command.WHISPER, target, message);
                 chatInput.clear();
             }
         }

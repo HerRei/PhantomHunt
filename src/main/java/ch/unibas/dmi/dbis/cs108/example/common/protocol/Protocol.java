@@ -31,18 +31,8 @@ public class Protocol {
 
     // Split by first whitespace
     String[] parts = line.split("\\s+", 2);
-
     String cmdToken = parts[0];
     String rest = (parts.length > 1) ? parts[1] : "";
-
-    // Determine command (workaround for no message)
-    /*if (parts.length >= 2) {
-      cmdToken = parts[0];
-      rest = parts[1];
-    } else {
-      cmdToken = line;
-      rest = "";
-    } */
 
     try {
       Command cmd = Command.valueOf(cmdToken); // tests if the command is in the enum
