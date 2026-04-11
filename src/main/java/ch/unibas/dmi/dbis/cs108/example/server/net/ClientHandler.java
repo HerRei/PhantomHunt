@@ -274,9 +274,6 @@ public class ClientHandler implements Runnable {
     if (!registry.whisper(this, target, message)) {
       sendMessage(Packet.of(Command.REJECT, "User not found: " + target));
     }
-    else{
-      sendMessage(Packet.of(Command.UNICOM, "You -> " + target+ ": "+ message));
-    }
   }
 
   /**
