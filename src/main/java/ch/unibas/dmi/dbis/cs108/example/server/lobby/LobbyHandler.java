@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.cs108.example.server.game.GameFactory;
 import ch.unibas.dmi.dbis.cs108.example.server.game.GameHandler;
 import ch.unibas.dmi.dbis.cs108.example.server.game.state.GameState;
 import ch.unibas.dmi.dbis.cs108.example.server.game.state.TileType;
+import ch.unibas.dmi.dbis.cs108.example.server.game.util.MapLoader;
 import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -90,7 +91,7 @@ public class LobbyHandler {
       seeds.add(new GameState.PlayerSeed(player.getName(), player.getName()));
     }
 
-    TileType[][] map = null; //here the map has to be added
+    TileType[][] map = MapLoader.loadMapFromImage("/assets/map_collision_concept.png");
     GameState gameState = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
     GameHandler gameHandler = new GameHandler(gameState, this);
 
@@ -99,6 +100,7 @@ public class LobbyHandler {
     playingLobbies.add(lobby);
 
     gameHandler.startMatch(System.currentTimeMillis());
+    lobby.broadcastGameStart();
   }
 
   public Lobby createLobby(String name, ClientHandler host) {

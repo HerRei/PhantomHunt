@@ -113,10 +113,19 @@ public class ServerHandler implements Runnable {
       case LOBBY_INFO:
         handleLobbyInfo(packet);
         break;
+      case GAME_START:
+        handleGameStart();
+        break;
       default:
         handleUnknown(packet);
         break;
     }
+  }
+
+  private void handleGameStart() {
+    Platform.runLater(() -> {
+      SceneManager.getInstance().showScene(SceneProtocol.GAME);
+    });
   }
 
   private void handleLobbyInfo(Packet packet) {
