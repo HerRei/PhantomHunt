@@ -42,8 +42,8 @@ public final class RoundState {
     this.humanIndex = humanIndex;
   }
 
-  public void incrementHumanIndex() {
-    this.humanIndex++;
+  public void advanceHumanIndex(int playerCount) {
+    this.humanIndex = (this.humanIndex + 1) % playerCount;
   }
 
   public void setRoundStartTimeMillis(long roundStartTimeMillis) {

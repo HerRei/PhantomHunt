@@ -242,7 +242,7 @@ public class GameHandler {
 
     RoundState roundState = gameState.getMutableRoundState();
     roundState.incrementCurrentRound();
-    roundState.incrementHumanIndex();
+    roundState.advanceHumanIndex(gameState.getPlayerCount());
     startCurrentRound(nowMillis);
   }
 
