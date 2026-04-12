@@ -28,6 +28,7 @@ public class GameHandler {
   private ScheduledExecutorService gameLoopExecutor;
   private static final int TICKS_PER_SECOND = 20;
   private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
+  private static final long ROUND_END_WAIT_MS = 3000;
 
   public GameHandler(GameState gameState, LobbyHandler lobbyHandler, Lobby lobby) {
     this.lobby = lobby;
@@ -54,6 +55,14 @@ public class GameHandler {
    * Main game loop iteration (tick).
    */
   public void tick(double deltaTime, long now) {
+    if (gameState.getPhase() == GamePhase.ROUND_ENDED) {
+      long timeSinceRoundEnd = now - gameState.getLastRoundOutcome().get().getEndedAtMillis();
+      if (timeSinceRoundEnd >= ROUND_END_WAIT_MS) {
+        advanceToNextRound(now);
+      }
+      return;
+    }
+
     if (gameState.getPhase() != GamePhase.ROUND_RUNNING) {
       return;
     }
