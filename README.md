@@ -41,3 +41,19 @@ For example:
 To join as a client, set the mode to client and provide the IP address and port of the host server.
 For example:
 **java -jar build/libs/phantom-hunt.jar client 192.168.1.9:2222**
+
+## Running Tests and Quality Assurance
+
+To ensure the stability and correctness of the game, we use automated testing and coverage tools. Open the terminal in the root directory to run the following commands.
+
+**Execute Unit Tests:**
+To run all automated tests, execute: 
+**./gradlew test**
+Once finished, view the detailed test results by executing 
+**open build/reports/tests/test/index.html**.
+
+**Generate Code Coverage Report (JaCoCo):**
+To measure the line coverage of our test site, run: 
+**./gradlew test jacocoTestReport**
+The generated HTML report can be viewed by executing 
+**open build/reports/jacoco/test/html/index.html**.
