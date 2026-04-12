@@ -30,7 +30,7 @@ Before running the game, you need to compile the code and build the executable .
 **Run the Application**
 Once the build is successful you can start the game via the terminal using the following syntax:
 
-java -jar build/libs/phantom-hunt.jar **mode address/address:port**
+java -jar build/libs/phantom-hunt.jar *mode* and *port / address:port*
 
 **Starting as a Server:**
 To host a server, set the mode to server and specify the port you want to open.
