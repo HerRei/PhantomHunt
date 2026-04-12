@@ -162,6 +162,7 @@ public class ServerHandler implements Runnable {
   private void handleGameStart() {
     Platform.runLater(() -> {
       SceneManager.getInstance().showScene(SceneProtocol.GAME);
+      GameModel.getInstance().clearChat();
     });
   }
 

@@ -88,20 +88,6 @@ public class GameModel {
   }
 
   /**
-   * @return Observable list of lobbies for the TableView in JoinLobbyScene
-   */
-  public ObservableList<String> getAvailableLobbies() {
-    return availableLobbies;
-  }
-
-  /**
-   * @return Observable list of lobbies for the TableView in JoinLobbyScene
-   */
-  public ObservableList<String> getRunningLobbies() {
-    return runningLobbies;
-  }
-
-  /**
    * Updates the local list of lobbies when the server sends new data
    */
   public void updateLobbyList(List<String> runningLobbys, List<String> waitingLobbys) {
@@ -215,6 +201,14 @@ public class GameModel {
 
   public Image getGameMap() {
     return gameMap.get();
+  }
+
+  public ObservableList<String> getAvailableLobbies() {
+    return availableLobbies;
+  }
+
+  public ObservableList<String> getRunningLobbies() {
+    return runningLobbies;
   }
 
   public ObjectProperty<Image> gameMapProperty() {
