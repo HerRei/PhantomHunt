@@ -93,11 +93,13 @@ public class LobbyHandler {
 
     TileType[][] map = MapLoader.loadMapFromImage("/assets/map_collision_concept.png");
     GameState gameState = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
-    GameHandler gameHandler = new GameHandler(gameState, this);
+    GameHandler gameHandler = new GameHandler(gameState, this, lobby);
 
     lobby.attachGame(gameHandler);
     waitingLobbies.remove(lobby);
     playingLobbies.add(lobby);
+    lobby.getActiveGame().get().startGameLoop();
+    lobby.broadcast(Packet.of(Command.INFO, "GAME_STARTED"));
 
     gameHandler.startMatch(System.currentTimeMillis());
     lobby.broadcastGameStart();

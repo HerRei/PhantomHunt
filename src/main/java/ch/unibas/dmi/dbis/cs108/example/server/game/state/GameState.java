@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GameState {
   public static final int REQUIRED_PLAYER_COUNT = 4;
@@ -30,6 +31,43 @@ public class GameState {
     this.lastRoundOutcome = null;
   }
 
+  public synchronized boolean isColliding(double x, double y, double radius) {
+    // Check bounds of the map first
+    if (x - radius < 0 || x + radius >= getMapWidth() ||
+            y - radius < 0 || y + radius >= getMapHeight()) {
+      return true;
+    }
+
+    // Check the tiles overlapping with the player's bounding box
+    int startX = (int) Math.floor(x - radius);
+    int endX = (int) Math.floor(x + radius);
+    int startY = (int) Math.floor(y - radius);
+    int endY = (int) Math.floor(y + radius);
+
+    for (int ty = startY; ty <= endY; ty++) {
+      for (int tx = startX; tx <= endX; tx++) {
+        if (map[ty][tx] == TileType.WALL) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Serializes current player states for network transmission.
+   */
+  public synchronized String getSerializedPlayers() {
+    return players.stream()
+            .map(p -> String.format("%s:%s:%.2f:%.2f:%s",
+                    p.getNickname(),
+                    p.getRole().name(),
+                    p.getPosition().getX(),
+                    p.getPosition().getY(),
+                    p.getScore()))
+            .collect(Collectors.joining(";"));
+  }
+
   public synchronized Optional<PlayerState> findPlayer(String playerId) {
     for (PlayerState player : players) {
       if (player.getPlayerId().equals(playerId)) {
@@ -42,6 +80,10 @@ public class GameState {
   public synchronized PlayerState getHumanPlayer() {
     ensureAtLeastOneRoundStarted();
     return players.get(roundState.getHumanIndex()).copy();
+  }
+
+  public synchronized long getRoundTimeRemaining() {
+    return Math.max(0, roundState.getRoundEndTimeMillis() - System.currentTimeMillis());
   }
 
   public synchronized List<PlayerState> getPhantomPlayers() {
@@ -71,6 +113,8 @@ public class GameState {
   public synchronized int getPlayerCount() {
     return players.size();
   }
+
+  public synchronized List<PlayerState> getPlayers() {return this.players;}
 
   public synchronized RoundState getMutableRoundState() {
     return roundState;

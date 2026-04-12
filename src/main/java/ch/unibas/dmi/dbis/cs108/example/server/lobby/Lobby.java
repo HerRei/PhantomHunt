@@ -158,4 +158,18 @@ public class Lobby {
       player.sendMessage(packet);
     }
   }
+
+  /**
+   * Sends a packet to everyone in this lobby.
+   */
+  public void broadcast(Packet packet) {
+    // Send to active players
+    for (ClientHandler player : players) {
+      player.sendMessage(packet);
+    }
+    // Send to spectators
+    for (ClientHandler spectator : spectators) {
+      spectator.sendMessage(packet);
+    }
+  }
 }

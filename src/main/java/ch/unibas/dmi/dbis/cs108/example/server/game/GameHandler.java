@@ -1,31 +1,174 @@
 package ch.unibas.dmi.dbis.cs108.example.server.game;
 
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.GamePhase;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.GameState;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.InputState;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.PlayerRole;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.PlayerState;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.Position;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.RoundOutcome;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.RoundOutcomeType;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.RoundState;
+import ch.unibas.dmi.dbis.cs108.example.client.net.ServerHandler;
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
+import ch.unibas.dmi.dbis.cs108.example.server.game.state.*;
+import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.LobbyHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * GameHandler owns the match flow and mutates the extracted game state classes.
  */
 public class GameHandler {
 
+  private static final Logger LOGGER = LogManager.getLogger(GameHandler.class);
   private final GameState gameState;
   private final LobbyHandler lobbyHandler;
+  private final Lobby lobby;
+  private ScheduledExecutorService gameLoopExecutor;
+  private static final int TICKS_PER_SECOND = 20;
+  private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
 
-  public GameHandler(GameState gameState, LobbyHandler lobbyHandler) {
+  public GameHandler(GameState gameState, LobbyHandler lobbyHandler, Lobby lobby) {
+    this.lobby = lobby;
     this.gameState = Objects.requireNonNull(gameState, "gameState must not be null");
     this.lobbyHandler = Objects.requireNonNull(lobbyHandler, "lobbyHandler must not be null");
+  }
+
+  /**
+   * Broadcasts current positions and roles to all clients in the lobby.
+   */
+  public void broadcastGameState() {
+    if (gameState.getPhase() != GamePhase.ROUND_RUNNING) {
+      return;
+    }
+    String payload = String.format("%d %d %s",
+            gameState.getRoundStateSnapshot().getCurrentRound(),
+            gameState.getRoundTimeRemaining(),
+            gameState.getSerializedPlayers()
+    );
+    lobby.broadcast(Packet.of(Command.GSU, payload));
+  }
+
+  /**
+   * Main game loop iteration (tick).
+   */
+  public void tick(double deltaTime, long now) {
+    if (gameState.getPhase() != GamePhase.ROUND_RUNNING) {
+      return;
+    }
+
+    // 1. Update movement for all players
+    for (int i = 0; i < gameState.getPlayerCount(); i++) {
+      updatePlayerPositions(deltaTime);
+    }
+
+    // 2. Check if phantoms caught the human
+    checkCatchCollisions(now);
+
+    // 3. Check for round timeout
+    if (now >= gameState.getRoundEndTimeMillis()) {
+      endRoundHumanSurvived(now);
+    }
+
+    // 4. Inform all clients about the new state
+    broadcastGameState();
+  }
+
+  /**
+   * Calculates new position based on input and map collisions.
+   */
+  private void updatePlayerPositions(double deltaTime) {
+    double speed = gameState.getRules().moveSpeedPerSecond();
+
+    for (int i = 0; i < gameState.getPlayerCount(); i++) {
+      PlayerState ps = gameState.getMutablePlayerAt(i);
+      InputState input = ps.getInputState(); // This is the state updated by your new INPUT command
+      Position pos = ps.getPosition();
+
+      double moveX = 0;
+      double moveY = 0;
+
+      if (input.isUp())    moveY -= speed * deltaTime;
+      if (input.isDown())  moveY += speed * deltaTime;
+      if (input.isLeft())  moveX -= speed * deltaTime;
+      if (input.isRight()) moveX += speed * deltaTime;
+
+      // Check X direction
+      if (!isCollidingWithWall(pos.getX() + moveX, pos.getY())) {
+        pos.setX(pos.getX() + moveX);
+      }
+      // Check Y direction
+      if (!isCollidingWithWall(pos.getX(), pos.getY() + moveY)) {
+        pos.setY(pos.getY() + moveY);
+      }
+
+      ps.setPosition(pos);
+    }
+  }
+
+  private double calculateDistance(Position p1, Position p2) {
+    return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
+  }
+
+
+  private boolean isCollidingWithWall(double x, double y) {
+    int ix = (int) x;
+    int iy = (int) y;
+    if (ix < 0 || iy < 0 || iy >= gameState.getMapHeight() || ix >= gameState.getMapWidth()) {
+      LOGGER.info("HIER LIEGT DER FEHLER");
+      return true;
+    }
+    return gameState.getMapSnapshot()[iy][ix] == TileType.WALL;
+  }
+
+  /**
+   * Starts the game loop.
+   */
+  public void startGameLoop() {
+    if (gameLoopExecutor != null) return;
+
+    gameLoopExecutor = Executors.newSingleThreadScheduledExecutor();
+
+    // This runs the tick() method repeatedly
+    gameLoopExecutor.scheduleAtFixedRate(() -> {
+      try {
+        // Calculate deltaTime in seconds (1/30 = 0.0333)
+        double deltaTime = TICK_TIME_MS / 1000.0;
+        tick(deltaTime, System.currentTimeMillis());
+      } catch (Exception e) {
+        // Important: Catch exceptions so the loop doesn't stop
+        e.printStackTrace();
+      }
+    }, 0, TICK_TIME_MS, TimeUnit.MILLISECONDS);
+  }
+
+  /**
+   * Stops the game loop when the game ends.
+   */
+  public void stopGameLoop() {
+    if (gameLoopExecutor != null) {
+      gameLoopExecutor.shutdown();
+      gameLoopExecutor = null;
+    }
+  }
+
+  private void checkCatchCollisions(long now) {
+    PlayerState human = gameState.getMutablePlayerAt(gameState.getHumanIndex());
+    double radius = gameState.getRules().playerRadius();
+
+    for (int i = 0; i < gameState.getPlayerCount(); i++) {
+      if (i == gameState.getHumanIndex()) continue;
+
+      PlayerState phantom = gameState.getMutablePlayerAt(i);
+      double dist = calculateDistance(human.getPosition(), phantom.getPosition());
+
+      // If circles overlap, human is caught
+      if (dist < (radius * 2)) {
+        endRoundHumanCaught(phantom.getPlayerId(), now);
+        break;
+      }
+    }
   }
 
   public synchronized void startMatch(long nowMillis) {

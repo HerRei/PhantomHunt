@@ -1,14 +1,25 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 
+import ch.unibas.dmi.dbis.cs108.example.client.net.ServerHandler;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.Player;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen; // Import for screen dimensions
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents the map screen where the game is played.
@@ -17,9 +28,14 @@ import javafx.stage.Screen; // Import for screen dimensions
  */
 public class GameScene implements SceneInterface {
 
+  private static final Logger LOGGER = LogManager.getLogger(GameScene.class);
   private Scene scene;
   private Image collisionMap;
+  private final Pane gamePane;
   private PixelReader pixelReader;
+  private static final int TILE_SIZE = 32;
+  private final Map<Player, Rectangle> playerShapes = new HashMap<>();
+  private boolean w, a, s, d;
 
   /**
    * Creates a new GameScene.
@@ -33,6 +49,7 @@ public class GameScene implements SceneInterface {
     // Get the map images from the model
     Image mapImage = model.getGameMap();
     ImageView mapView = new ImageView(mapImage);
+    gamePane = new Pane();
 
     // --- Scale the map based on screen size ---
     Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -62,13 +79,16 @@ public class GameScene implements SceneInterface {
 
     // Create a layout and add the visual map
     StackPane root = new StackPane();
-    root.getChildren().add(mapView);
+    root.getChildren().addAll(mapView, gamePane);
 
     // Set the background of the root pane to black
     root.setStyle("-fx-background-color: black;");
 
     // Create the scene with the scaled dimensions
     this.scene = new Scene(root, scaledWidth, scaledHeight);
+
+    setupControls();
+    setupPlayerTracking();
   }
 
   /**
@@ -91,6 +111,81 @@ public class GameScene implements SceneInterface {
 
     // Assume black pixels are walls and anything else is walkable.
     return !Color.BLACK.equals(color);
+  }
+
+  /**
+   * Registers key listeners for WASD movement.
+   */
+  private void setupControls() {
+    scene.setOnKeyPressed(e -> handleKeyEvent(e.getCode(), true));
+    scene.setOnKeyReleased(e -> handleKeyEvent(e.getCode(), false));
+  }
+
+  private void handleKeyEvent(javafx.scene.input.KeyCode code, boolean pressed) {
+    boolean changed = false;
+    switch (code) {
+      case W -> { if (w != pressed) { w = pressed; changed = true; } }
+      case A -> { if (a != pressed) { a = pressed; changed = true; } }
+      case S -> { if (s != pressed) { s = pressed; changed = true; } }
+      case D -> { if (d != pressed) { d = pressed; changed = true; } }
+      default -> {}
+    }
+    // Only send to server if the state actually changed to save bandwidth
+    if (changed) {
+      EventHandlers.getInstance().sendInputs(w, s, a, d);
+    }
+  }
+  /**
+   * Observes the player list and creates/removes rectangles accordingly.
+   */
+  private void setupPlayerTracking() {
+    GameModel model = GameModel.getInstance();
+    model.getPlayers().addListener((ListChangeListener<Player>) change -> {
+      while (change.next()) {
+        if (change.wasAdded()) {
+          for (Player p : change.getAddedSubList()) {
+            addPlayerShape(p);
+          }
+        }
+        if (change.wasRemoved()) {
+          for (Player p : change.getRemoved()) {
+            removePlayerShape(p);
+          }
+        }
+      }
+    });
+
+    // Add initially existing players
+    for (Player p : model.getPlayers()) {
+      addPlayerShape(p);
+    }
+  }
+
+  /**
+   * Creates a rectangle for a player and binds its position.
+   */
+  private void addPlayerShape(Player player) {
+    Rectangle rect = new Rectangle(20, 20); // Width and Height of the player
+
+    // Choose color based on role (skin property)
+    // Assume "HUMAN" = Red, others (Phantoms) = White
+    if ("HUMAN".equalsIgnoreCase(player.skinProperty().get())) {
+      rect.setFill(Color.RED);
+    } else {
+      rect.setFill(Color.WHITE);
+    }
+    rect.layoutXProperty().bind(player.xPosition().multiply(TILE_SIZE));
+    rect.layoutYProperty().bind(player.yPosition().multiply(TILE_SIZE));
+
+    playerShapes.put(player, rect);
+    gamePane.getChildren().add(rect);
+  }
+
+  private void removePlayerShape(Player player) {
+    Rectangle rect = playerShapes.remove(player);
+    if (rect != null) {
+      gamePane.getChildren().remove(rect);
+    }
   }
 
   @Override

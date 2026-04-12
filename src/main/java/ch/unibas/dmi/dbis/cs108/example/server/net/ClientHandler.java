@@ -3,8 +3,11 @@ package ch.unibas.dmi.dbis.cs108.example.server.net;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
+import ch.unibas.dmi.dbis.cs108.example.server.game.GameHandler;
+import ch.unibas.dmi.dbis.cs108.example.server.game.state.GameState;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.LobbyHandler;
+import ch.unibas.dmi.dbis.cs108.example.server.game.state.InputState;
 import ch.unibas.dmi.dbis.cs108.example.server.session.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -276,6 +279,36 @@ public class ClientHandler implements Runnable {
     }
   }
 
+  private void handleInput(Packet p) {
+    // 1. Check if the player is actually in a lobby
+    Lobby lobby = this.getCurrentLobby();
+    if (lobby == null) return;
+
+    // 2. Check if there is an active game session
+    // Make sure Lobby.java has a method public GameHandler getActiveGame()
+    GameHandler gameHandler = lobby.getActiveGame().get();
+    if (gameHandler == null) return;
+
+    try {
+      boolean u = p.args().get(0).equals("1");
+      boolean d = p.args().get(1).equals("1");
+      boolean l = p.args().get(2).equals("1");
+      boolean r = p.args().get(3).equals("1");
+
+      GameState state = gameHandler.getGameState();
+
+      // 3. Update the specific player's input state
+      // We use 'this.name' from ClientHandler to identify the player
+      state.getPlayers().stream()
+              .filter(ps -> ps.equals(this.name))
+              .findFirst()
+              .ifPresent(ps -> ps.setInputState(new InputState(u, d, l, r)));
+
+    } catch (Exception e) {
+      LOGGER.error("Error parsing input for player {}: {}", name, p.args());
+    }
+  }
+
   /**
    * Applies a nickname change request and ensures the assigned nickname is unique.
    *
@@ -356,6 +389,7 @@ public class ClientHandler implements Runnable {
               handleLogout();
               return;
             }
+            case INPUT -> handleInput(p);
             case NICK -> handleNickChange(p);
             case WHISPER -> handleWhisper(p);
             case CHECKIN -> handleCheckin(p);

@@ -116,6 +116,9 @@ public class ServerHandler implements Runnable {
       case GAME_START:
         handleGameStart();
         break;
+      case GSU:
+        handleGameStateUpdate(packet);
+        break;
       default:
         handleUnknown(packet);
         break;
@@ -162,6 +165,19 @@ public class ServerHandler implements Runnable {
       LOGGER.info("JavaFX nicht vorhanden");
     }
 
+  }
+
+  private void handleGameStateUpdate(Packet p) {
+    String payload = p.args().get(0);
+
+    // We use Platform.runLater because this updates the UI-bound GameModel
+    Platform.runLater(() -> {
+      try {
+        GameModel.getInstance().updatePlayersFromServer(payload);
+      } catch (Exception e) {
+        LOGGER.error("Failed to process Game State Update: {}", payload, e);
+      }
+    });
   }
 
 

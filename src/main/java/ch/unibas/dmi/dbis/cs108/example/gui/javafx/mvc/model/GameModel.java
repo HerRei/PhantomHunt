@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model;
 
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
+import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.GameScene;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -44,6 +46,51 @@ public class GameModel {
     return instance;
   }
 
+  /**
+   * Updates the local game state based on the server's broadcast.
+   * @param payload The raw string from the GSU packet
+   */
+  public void updatePlayersFromServer(String payload) {
+    // 1. Split top-level components (Round, Time, Players)
+    String[] sections = payload.split(" ");
+    if (sections.length < 3) return;
+    int currentRound = Integer.parseInt(sections[0]);
+    int timeRemaining = Integer.parseInt(sections[1]);
+    String playersData = sections[2];
+    String[] playerEntries = playersData.split(";");
+
+    for (String entry : playerEntries) {
+      // Format: "Name:Role:X:Y:Score"
+      String[] data = entry.split(":");
+      if (data.length < 5) continue;
+
+      String name = data[0];
+      String role = data[1];
+      double x = Double.parseDouble(data[2]);
+      double y = Double.parseDouble(data[3]);
+      int score = Integer.parseInt(data[4]);
+
+      // 3. Find existing player in our list or create a new one
+      updateOrAddPlayer(name, role, x, y, score);
+    }
+  }
+
+  private void updateOrAddPlayer(String name, String role, double x, double y, int score) {
+    // Search for player by nickname
+    Player player = players.stream()
+            .filter(p -> p.nameProperty().get().equals(name))
+            .findFirst()
+            .orElse(null);
+
+    if (player != null) {
+      player.xPosition().set((int) x); // or double if you change your Player class
+      player.yPosition().set((int) y);
+      player.setScore(score);
+      // Note: You could also add a roleProperty to the Player class
+    } else {
+      players.add(new Player(name, role, score, (int) x, (int) y));
+    }
+  }
   private void loadMaps() {
     try {
       Image gameMapImage = new Image(getClass().getResourceAsStream("/assets/map_concept.png"));

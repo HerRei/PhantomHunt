@@ -31,6 +31,20 @@ public class EventHandlers {
         //model.players = xx
     }
 
+    /**
+     * Sends the current movement input state to the server.
+     * Format: "INPUT u,d,l,r" where 1 is pressed and 0 is released.
+     */
+    public void sendInputs(boolean up, boolean down, boolean left, boolean right) {
+        if (serverHandler == null) return;
+
+        String payload = String.format("%d %d %d %d",
+                up ? 1 : 0, down ? 1 : 0, left ? 1 : 0, right ? 1 : 0);
+
+        // Sending as a dedicated INPUT command
+        serverHandler.sendMessage(Packet.of(Command.INPUT, payload));
+    }
+
     public void setSH(ServerHandler sh) {
         // sh.getName() could be null here. idk if this would create a crash
         GameModel.getInstance().setName(sh.getName());
