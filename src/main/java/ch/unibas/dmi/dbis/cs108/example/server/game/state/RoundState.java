@@ -43,6 +43,9 @@ public final class RoundState {
   }
 
   public void advanceHumanIndex(int playerCount) {
+    if (playerCount <= 0) {
+      throw new IllegalArgumentException("playerCount must be positive");
+    }
     this.humanIndex = (this.humanIndex + 1) % playerCount;
   }
 

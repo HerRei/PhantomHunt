@@ -114,12 +114,12 @@ public class GameModel {
             .orElse(null);
 
     if (player != null) {
-      player.xPosition().set((int) x); // or double if you change your Player class
-      player.yPosition().set((int) y);
+      player.xPosition().set(x);
+      player.yPosition().set(y);
       player.setScore(score);
-      // Note: You could also add a roleProperty to the Player class
+      player.setSkin(role);
     } else {
-      lobbyPlayers.add(new Player(name, role, score, (int) x, (int) y));
+      lobbyPlayers.add(new Player(name, role, score, x, y));
     }
   }
   private void loadMaps() {
@@ -204,7 +204,7 @@ public class GameModel {
   }
 
   public void resetModel() {
-    this.players.clear();
+    this.lobbyPlayers.clear();
     this.playerScore.set(0);
     this.clearChat();
   }
