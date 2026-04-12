@@ -98,11 +98,10 @@ public class LobbyHandler {
     lobby.attachGame(gameHandler);
     waitingLobbies.remove(lobby);
     playingLobbies.add(lobby);
-    lobby.getActiveGame().get().startGameLoop();
-    lobby.broadcast(Packet.of(Command.INFO, "GAME_STARTED"));
-
+    
     gameHandler.startMatch(System.currentTimeMillis());
     lobby.broadcastGameStart();
+    gameHandler.startGameLoop();
   }
 
   public Lobby createLobby(String name, ClientHandler host) {
