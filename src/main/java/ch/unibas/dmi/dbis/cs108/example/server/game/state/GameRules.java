@@ -4,15 +4,27 @@ package ch.unibas.dmi.dbis.cs108.example.server.game.state;
  * Defines the immutable configuration and parameters for a match
  */
 public record GameRules(
-    int totalRounds,
-    long roundDurationMillis,
-    double playerRadius,
-    double moveSpeedPerSecond,
-    int humanPointsPerSecond,
-    int humanRoundWinBonus,
-    int phantomCatchBonus,
-    int phantomRoundWinBonus) {
+        int totalRounds,
+        long roundDurationMillis,
+        double playerRadius,
+        double moveSpeedPerSecond,
+        int humanPointsPerSecond,
+        int humanRoundWinBonus,
+        int phantomCatchBonus,
+        int phantomRoundWinBonus) {
 
+  /**
+   * Creates a new instance of game rules and validates the parameters.
+   *
+   * @param totalRounds
+   * @param roundDurationMillis
+   * @param playerRadius
+   * @param moveSpeedPerSecond
+   * @param humanPointsPerSecond
+   * @param humanRoundWinBonus
+   * @param phantomCatchBonus
+   * @param phantomRoundWinBonus
+   */
   public GameRules {
     if (totalRounds <= 0) {
       throw new IllegalArgumentException("totalRounds must be > 0");
@@ -35,13 +47,13 @@ public record GameRules(
    */
   public static GameRules defaultRules() {
     return new GameRules(
-        4,
-        30000,
-        0.25,
-        3.0,
-        1,
-        50,
-        10,
-        10);
+            4,
+            30000,
+            0.25,
+            3.0,
+            1,
+            50,
+            10,
+            10);
   }
 }

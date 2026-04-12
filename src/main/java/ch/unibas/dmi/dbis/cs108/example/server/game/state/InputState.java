@@ -9,6 +9,14 @@ public final class InputState {
   private final boolean left;
   private final boolean right;
 
+  /**
+   * Constructs a new InputState with the specified directional intentions.
+   *
+   * @param up    True if player moves upwards, false otherwise.
+   * @param down  True if player moves downwards, false otherwise.
+   * @param left  True if player moves left, false otherwise.
+   * @param right True if player moves right, false otherwise.
+   */
   public InputState(boolean up, boolean down, boolean left, boolean right) {
     this.up = up;
     this.down = down;
@@ -16,6 +24,11 @@ public final class InputState {
     this.right = right;
   }
 
+  /**
+   * Creates a copy of this InputState.
+   *
+   * @return A new InputState object with the same values.
+   */
   public InputState copy() {
     return new InputState(up, down, left, right);
   }

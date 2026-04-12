@@ -20,6 +20,14 @@ public class GameState {
   private final RoundState roundState;
   private RoundOutcome lastRoundOutcome;
 
+  /**
+   * Constructs a new GameState for a match.
+   *
+   * @param matchId A unique identifier for this specific match.
+   * @param rules   defining how this match should be played.
+   * @param map     2D array representing the map.
+   * @param players A list representing the players.
+   */
   public GameState(String matchId, GameRules rules, TileType[][] map, List<PlayerState> players) {
     this.matchId = requireNonBlank(matchId, "Must not be blank");
     this.rules = Objects.requireNonNull(rules, "Rules must not be null (stp)");
@@ -27,7 +35,7 @@ public class GameState {
     this.players = new ArrayList<>(Objects.requireNonNull(players, "players must not be null"));
     if (this.players.size() != REQUIRED_PLAYER_COUNT) {
       throw new IllegalArgumentException(
-          "A match requires exactly " + REQUIRED_PLAYER_COUNT + " players.");
+              "A match requires exactly " + REQUIRED_PLAYER_COUNT + " players.");
     }
     this.phase = GamePhase.WAITING_TO_START;
     this.roundState = new RoundState(0, -1, 0L, 0L);
@@ -117,6 +125,8 @@ public class GameState {
 
   /**
    * Determines the winner if the match has ended.
+   *
+   * @return a copy of the winning players state.
    */
   public synchronized Optional<PlayerState> getWinner() {
     if (phase != GamePhase.MATCH_ENDED) {
@@ -209,5 +219,6 @@ public class GameState {
   /**
    * Initial data required to seed a player into the game.
    */
-  public record PlayerSeed(String playerId, String nickname) {}
+  public record PlayerSeed(String playerId, String nickname) {
+  }
 }

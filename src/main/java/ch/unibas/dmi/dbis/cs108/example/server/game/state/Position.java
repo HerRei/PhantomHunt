@@ -12,6 +12,11 @@ public final class Position {
     this.y = y;
   }
 
+  /**
+   * Creates a copy of this position.
+   *
+   * @return A new Position object with the same values.
+   */
   public Position copy() {
     return new Position(x, y);
   }

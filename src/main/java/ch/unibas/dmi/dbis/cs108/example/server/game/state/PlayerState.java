@@ -20,14 +20,14 @@ public final class PlayerState {
    * Creates an independent copy of this player's state.
    */
   public PlayerState(
-      String playerId,
-      String nickname,
-      PlayerRole role,
-      Position position,
-      InputState inputState,
-      int score,
-      boolean connected,
-      boolean caughtThisRound) {
+          String playerId,
+          String nickname,
+          PlayerRole role,
+          Position position,
+          InputState inputState,
+          int score,
+          boolean connected,
+          boolean caughtThisRound) {
     this.playerId = Objects.requireNonNull(playerId, "playerId must not be null");
     this.nickname = Objects.requireNonNull(nickname, "nickname must not be null");
     this.role = Objects.requireNonNull(role, "role must not be null");
@@ -38,16 +38,21 @@ public final class PlayerState {
     this.caughtThisRound = caughtThisRound;
   }
 
+  /**
+   * Creates a copy of this player's state.
+   *
+   * @return A new PlayerState object with the same values.
+   */
   public PlayerState copy() {
     return new PlayerState(
-        playerId,
-        nickname,
-        role,
-        position.copy(),
-        inputState.copy(),
-        score,
-        connected,
-        caughtThisRound);
+            playerId,
+            nickname,
+            role,
+            position.copy(),
+            inputState.copy(),
+            score,
+            connected,
+            caughtThisRound);
   }
 
   public String getPlayerId() {

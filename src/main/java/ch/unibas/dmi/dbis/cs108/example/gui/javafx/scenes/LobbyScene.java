@@ -26,6 +26,10 @@ public class LobbyScene implements SceneInterface {
   private ListView<String> chatArea;
   private TextField chatInput;
 
+  /**
+   * Constructs a new LobbyScene.
+   * Initializes UI components, binds the chat to the game model
+   */
   public LobbyScene() {
     root = new VBox(10);
     root.setAlignment(Pos.CENTER);

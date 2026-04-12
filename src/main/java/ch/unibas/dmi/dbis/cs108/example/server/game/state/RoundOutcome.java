@@ -14,27 +14,45 @@ public final class RoundOutcome {
   private final long endedAtMillis;
   private final String reason;
 
+  /**
+   * Constructs a new RoundOutcome.
+   *
+   * @param roundNumber     Number of the round that ended.
+   * @param type            Type of outcome (e.g. "HUMAN_SURVIVED")
+   * @param humanPlayerId   ID of the player that was the human this round.
+   * @param catcherPlayerId ID of the players that were the ghosts
+   * @param endedAtMillis   Timestamp when the round ended.
+   */
   public RoundOutcome(
-      int roundNumber,
-      RoundOutcomeType type,
-      String humanPlayerId,
-      Optional<String> catcherPlayerId,
-      long endedAtMillis) {
+          int roundNumber,
+          RoundOutcomeType type,
+          String humanPlayerId,
+          Optional<String> catcherPlayerId,
+          long endedAtMillis) {
     this(roundNumber, type, humanPlayerId, catcherPlayerId, endedAtMillis, null);
   }
 
+  /**
+   *
+   * @param roundNumber
+   * @param type
+   * @param humanPlayerId
+   * @param catcherPlayerId
+   * @param endedAtMillis
+   * @param reason
+   */
   public RoundOutcome(
-      int roundNumber,
-      RoundOutcomeType type,
-      String humanPlayerId,
-      Optional<String> catcherPlayerId,
-      long endedAtMillis,
-      String reason) {
+          int roundNumber,
+          RoundOutcomeType type,
+          String humanPlayerId,
+          Optional<String> catcherPlayerId,
+          long endedAtMillis,
+          String reason) {
     this.roundNumber = roundNumber;
     this.type = Objects.requireNonNull(type, "type must not be null");
     this.humanPlayerId = humanPlayerId;
     this.catcherPlayerId =
-        Objects.requireNonNull(catcherPlayerId, "catcherPlayerId must not be null");
+            Objects.requireNonNull(catcherPlayerId, "catcherPlayerId must not be null");
     this.endedAtMillis = endedAtMillis;
     this.reason = reason;
   }

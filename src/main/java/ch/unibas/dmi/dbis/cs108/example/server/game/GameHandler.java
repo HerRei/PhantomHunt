@@ -28,6 +28,7 @@ public class GameHandler {
     this.gameState = Objects.requireNonNull(gameState, "gameState must not be null");
     this.lobbyHandler = Objects.requireNonNull(lobbyHandler, "lobbyHandler must not be null");
   }
+
   /**
    * Starts the match and initializes the first round.
    *
@@ -61,12 +62,12 @@ public class GameHandler {
     human.setCaughtThisRound(true);
 
     RoundOutcome outcome =
-        new RoundOutcome(
-            roundState.getCurrentRound(),
-            RoundOutcomeType.HUMAN_CAUGHT,
-            human.getPlayerId(),
-            Optional.of(catcher.getPlayerId()),
-            nowMillis);
+            new RoundOutcome(
+                    roundState.getCurrentRound(),
+                    RoundOutcomeType.HUMAN_CAUGHT,
+                    human.getPlayerId(),
+                    Optional.of(catcher.getPlayerId()),
+                    nowMillis);
 
     applyRoundScoring(outcome, nowMillis);
     finishRound(outcome);
@@ -84,12 +85,12 @@ public class GameHandler {
     PlayerState human = gameState.getMutablePlayerAt(roundState.getHumanIndex());
 
     RoundOutcome outcome =
-        new RoundOutcome(
-            roundState.getCurrentRound(),
-            RoundOutcomeType.HUMAN_SURVIVED,
-            human.getPlayerId(),
-            Optional.empty(),
-            nowMillis);
+            new RoundOutcome(
+                    roundState.getCurrentRound(),
+                    RoundOutcomeType.HUMAN_SURVIVED,
+                    human.getPlayerId(),
+                    Optional.empty(),
+                    nowMillis);
 
     applyRoundScoring(outcome, nowMillis);
     finishRound(outcome);
@@ -106,13 +107,13 @@ public class GameHandler {
     }
     gameState.setPhase(GamePhase.ABORTED);
     gameState.setLastRoundOutcome(
-        new RoundOutcome(
-            gameState.getCurrentRound(),
-            RoundOutcomeType.ROUND_ABORTED,
-            null,
-            Optional.empty(),
-            System.currentTimeMillis(),
-            reason));
+            new RoundOutcome(
+                    gameState.getCurrentRound(),
+                    RoundOutcomeType.ROUND_ABORTED,
+                    null,
+                    Optional.empty(),
+                    System.currentTimeMillis(),
+                    reason));
     lobbyHandler.finishLobby(gameState.getMatchId());
   }
 
@@ -136,11 +137,23 @@ public class GameHandler {
     startCurrentRound(nowMillis);
   }
 
+  /**
+   * Checks if the round time has expired.
+   *
+   * @param nowMillis The current server time in milliseconds.
+   * @return True if the round time has expired, false otherwise.
+   */
   public synchronized boolean isRoundTimeExpired(long nowMillis) {
     return gameState.getPhase() == GamePhase.ROUND_RUNNING
-        && nowMillis >= gameState.getRoundEndTimeMillis();
+            && nowMillis >= gameState.getRoundEndTimeMillis();
   }
 
+  /**
+   * Gets the remaining time in the current round.
+   *
+   * @param nowMillis The current server time in milliseconds.
+   * @return The remaining time in the current round in milliseconds.
+   */
   public synchronized long getRemainingRoundTimeMillis(long nowMillis) {
     if (gameState.getPhase() != GamePhase.ROUND_RUNNING) {
       return 0L;
@@ -148,16 +161,35 @@ public class GameHandler {
     return Math.max(0L, gameState.getRoundEndTimeMillis() - nowMillis);
   }
 
+  /**
+   * Checks if there is a next round
+   *
+   * @return True if there is a next round, false otherwise.
+   */
   public synchronized boolean hasNextRound() {
     return gameState.getCurrentRound() < gameState.getRules().totalRounds();
   }
 
-  public synchronized boolean gameIsRunning(){
+  /**
+   * Checks if the game is running.
+   *
+   * @return True if the game is running, false otherwise.
+   */
+  public synchronized boolean gameIsRunning() {
     return gameState.getPhase() == GamePhase.ROUND_RUNNING || gameState.getPhase() == GamePhase.ROUND_ENDED;
   }
 
+  /**
+   * Updates the input state of a player.
+   *
+   * @param playerId The ID of the player.
+   * @param up       True if the up key is pressed, false otherwise.
+   * @param down     True if the down key is pressed, false otherwise.
+   * @param left     True if the left key is pressed, false otherwise.
+   * @param right    True if the right key is pressed, false otherwise.
+   */
   public synchronized void updateInput(
-      String playerId, boolean up, boolean down, boolean left, boolean right) {
+          String playerId, boolean up, boolean down, boolean left, boolean right) {
     PlayerState player = gameState.requireMutablePlayer(playerId);
     player.setInputState(new InputState(up, down, left, right));
   }
@@ -222,9 +254,9 @@ public class GameHandler {
     RoundState roundState = gameState.getMutableRoundState();
 
     if (roundState.getCurrentRound() < 1
-        || roundState.getCurrentRound() > gameState.getRules().totalRounds()) {
+            || roundState.getCurrentRound() > gameState.getRules().totalRounds()) {
       throw new IllegalStateException(
-          "Cannot start illegal round number: " + roundState.getCurrentRound());
+              "Cannot start illegal round number: " + roundState.getCurrentRound());
     }
     if (roundState.getHumanIndex() < 0 || roundState.getHumanIndex() >= gameState.getPlayerCount()) {
       throw new IllegalStateException("Invalid humanIndex: " + roundState.getHumanIndex());
@@ -257,7 +289,7 @@ public class GameHandler {
 
   private void resetPlayersForNewRound() {
     List<Position> spawns =
-        GameFactory.createDefaultSpawnPositions(gameState.getMapHeight(), gameState.getMapWidth());
+            GameFactory.createDefaultSpawnPositions(gameState.getMapHeight(), gameState.getMapWidth());
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
       player.setPosition(spawns.get(i).copy());
@@ -273,9 +305,9 @@ public class GameHandler {
 
   private void applyRoundScoring(RoundOutcome outcome, long nowMillis) {
     long survivedMillis =
-        Math.max(
-            0L,
-            Math.min(nowMillis, gameState.getRoundEndTimeMillis()) - gameState.getRoundStartTimeMillis());
+            Math.max(
+                    0L,
+                    Math.min(nowMillis, gameState.getRoundEndTimeMillis()) - gameState.getRoundStartTimeMillis());
     int survivedWholeSeconds = (int) Math.ceil(survivedMillis / 1000L);
 
     int humanIndex = gameState.getHumanIndex();
@@ -294,11 +326,11 @@ public class GameHandler {
       }
 
       outcome
-          .getCatcherPlayerId()
-          .ifPresent(
-              catcherId ->
-                  gameState.requireMutablePlayer(catcherId).addScore(
-                      gameState.getRules().phantomCatchBonus()));
+              .getCatcherPlayerId()
+              .ifPresent(
+                      catcherId ->
+                              gameState.requireMutablePlayer(catcherId).addScore(
+                                      gameState.getRules().phantomCatchBonus()));
     }
   }
 

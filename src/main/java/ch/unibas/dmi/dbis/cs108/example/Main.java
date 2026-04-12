@@ -22,8 +22,17 @@ public class Main {
   public static int targetPort;
 
   // private constructor to prevent instantiation
-  private Main() {}
+  private Main() {
+  }
 
+  /**
+   * The main method to start the application.
+   * It parses command-line arguments to start either a server or a client.
+   * For a client, it expects "client" and "host:port".
+   * For a server, it expects "server" and "port".
+   *
+   * @param args the command-line arguments
+   */
   public static void main(String[] args) {
     // [0] = server/client [1] = port / host:port
     if (args.length == 2) {
