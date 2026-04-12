@@ -7,6 +7,12 @@ import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
+/**
+ * Represents a lobby where players can gather before starting a game.
+ * A lobby has a unique ID, a name, a host, and a list of players and spectators.
+ * It also manages the game associated with the lobby.
+ */
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
@@ -27,6 +33,13 @@ public class Lobby {
   // Constructor
   // ---------------------------------------------------------------------------------------------
 
+  /**
+   * Creates a new lobby with the given name and host.
+   *
+   * @param id   the unique ID of the lobby
+   * @param name the name of the lobby
+   * @param host the host of the lobby
+   */
   public Lobby(String id, String name, ClientHandler host) {
     this.id = id;
     this.name = name;
@@ -81,6 +94,12 @@ public class Lobby {
   // Player Management
   // ---------------------------------------------------------------------------------------------
 
+  /**
+   * Adds a player to the lobby
+   *
+   * @param player the player to add
+   * @return true if the player was added, false otherwise
+   */
   public boolean addPlayer(ClientHandler player) {
     if (hasActiveGame()) {
       player.sendMessage(Packet.of(Command.REJECT, "Game is already running."));
@@ -101,6 +120,12 @@ public class Lobby {
     return true;
   }
 
+  /**
+   * Removes a player from the lobby
+   *
+   * @param player the player to remove
+   * @return true if the player was removed, false otherwise
+   */
   public boolean removePlayer(ClientHandler player) {
     if (hasActiveGame()) {
       player.sendMessage(Packet.of(Command.REJECT, "Game is already running."));
@@ -121,6 +146,12 @@ public class Lobby {
     return true;
   }
 
+  /**
+   * Adds a spectator to the lobby.
+   *
+   * @param spectator the spectator to add
+   * @return true if the spectator was added, false otherwise
+   */
   public boolean addSpectator(ClientHandler spectator) {
     if (spectators.contains(spectator)) {
       LOGGER.warn("Spectator {} is already in lobby {}", spectator.getName(), this.id);
@@ -131,6 +162,12 @@ public class Lobby {
     return true;
   }
 
+  /**
+   * Removes a spectator from the lobby.
+   *
+   * @param spectator the spectator to remove
+   * @return true if the spectator was removed, false otherwise
+   */
   public boolean removeSpectator(ClientHandler spectator) {
     if (!spectators.contains(spectator)) {
       LOGGER.warn("Spectator {} is not in lobby {}", spectator.getName(), this.id);
@@ -141,6 +178,9 @@ public class Lobby {
     return true;
   }
 
+  /**
+   * Broadcasts the current lobby information to all players in the lobby.
+   */
   public void broadcastLobbyInfo() {
     String playerNames = players.stream()
             .map(ClientHandler::getName)
@@ -152,6 +192,9 @@ public class Lobby {
     }
   }
 
+  /**
+   * Broadcasts a game start message to all players in the lobby.
+   */
   public void broadcastGameStart() {
     Packet packet = Packet.of(Command.GAME_START);
     for (ClientHandler player : players) {
