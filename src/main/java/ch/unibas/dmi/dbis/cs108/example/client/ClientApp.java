@@ -20,7 +20,7 @@ public class ClientApp {
   private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
 
   public final TcpClient tcpClient;
-  //for thread safety
+
   private static volatile String confirmedNickname; // private since data encapsulation
   private static volatile Consumer<String> globalMessageListener;
   private static volatile Consumer<String> whisperMessageListener;
@@ -46,6 +46,20 @@ public class ClientApp {
   }
 
   /**
+   * Helper method to safely send a packet to the server if the connection is active.
+   * Centralizes the null-check to avoid code duplication.
+   *
+   * @param packet the packet to be sent
+   */
+  private void sendPacket(Packet packet) {
+    if (tcpClient.getServerHandler() != null) {
+      tcpClient.getServerHandler().sendMessage(packet);
+    } else {
+      LOGGER.error("Not connected to server. Failed to send packet: {}", packet.cmd());
+    }
+  }
+
+  /**
    * Sends a nickname change request to the server.
    *
    * @param nickname requested nickname
@@ -56,13 +70,8 @@ public class ClientApp {
       LOGGER.warn("Nickname was blank --> not sent to server");
       return false;
     }
-    // Null-Check
-    if (tcpClient.getServerHandler() != null) {
-      tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, nickname.trim()));
-      return true;
-    }
-    LOGGER.error("Not connected to server. Nickname request failed.");
-    return false;
+    sendPacket(Packet.of(Command.NICK, nickname.trim()));
+    return true;
   }
 
   /**
@@ -95,11 +104,8 @@ public class ClientApp {
       return;
     }
 
-    // Null-Check
-    if (tcpClient.getServerHandler() != null) {
-      LOGGER.info("ClientApp sends UNICOM: {}", message); //Debugging
-      tcpClient.getServerHandler().sendMessage(Packet.of(Command.UNICOM, message.trim()));
-    }
+    LOGGER.info("ClientApp sends UNICOM: {}", message);
+    sendPacket(Packet.of(Command.UNICOM, message.trim()));
   }
 
   /**
@@ -154,10 +160,7 @@ public class ClientApp {
       return;
     }
 
-    // Null-Check added
-    if (tcpClient.getServerHandler() != null) {
-      tcpClient.getServerHandler().sendMessage(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
-    }
+    sendPacket(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
   }
 
   /**
@@ -171,11 +174,8 @@ public class ClientApp {
       return;
     }
 
-    // Null-Check
-    if (tcpClient.getServerHandler() != null) {
-      LOGGER.info("ClientApp sends YAP: {}", message); //Debugging
-      tcpClient.getServerHandler().sendMessage(Packet.of(Command.YAP, message.trim()));
-    }
+    LOGGER.info("ClientApp sends YAP: {}", message);
+    sendPacket(Packet.of(Command.YAP, message.trim()));
   }
 
   /**
@@ -209,10 +209,7 @@ public class ClientApp {
       return;
     }
 
-    // Null-Check added
-    if (tcpClient.getServerHandler() != null) {
-      tcpClient.getServerHandler().sendMessage(Packet.of(Command.SPEC, lobbyId));
-    }
+    sendPacket(Packet.of(Command.SPEC,lobbyId));
   }
 
   /**
@@ -223,5 +220,13 @@ public class ClientApp {
     if (tcpClient.getServerHandler() != null) {
       tcpClient.getServerHandler().sendMessage(Packet.of(Command.LOGOUT));
     }
+  }
+  /**
+   * Gets the underlying TCP client.
+   *
+   * @return the active TCP client
+   */
+  public TcpClient getTcpClient() {
+    return this.tcpClient;
   }
 }
