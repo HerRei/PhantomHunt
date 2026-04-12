@@ -23,7 +23,6 @@ public class GameScene implements SceneInterface {
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
   private boolean w, a, s, d;
-  private static final int TILE_SIZE = 32;
 
   public GameScene() {
     GameModel model = GameModel.getInstance();
@@ -154,8 +153,8 @@ public class GameScene implements SceneInterface {
   private void addPlayer(Player p) {
     Rectangle r = new Rectangle(20, 20);
     r.setFill("HUMAN".equalsIgnoreCase(p.skinProperty().get()) ? Color.RED : Color.WHITE);
-    r.layoutXProperty().bind(p.xPosition().multiply(TILE_SIZE));
-    r.layoutYProperty().bind(p.yPosition().multiply(TILE_SIZE));
+    r.layoutXProperty().bind(p.xPosition());
+    r.layoutYProperty().bind(p.yPosition());
     playerShapes.put(p, r);
     gamePane.getChildren().add(r);
   }
