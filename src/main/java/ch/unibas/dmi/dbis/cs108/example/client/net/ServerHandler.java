@@ -37,10 +37,9 @@ public class ServerHandler implements Runnable {
   private String name;
 
   /**
-   * Creates a new handler for the server connection and starts immediately
-   * the read thread.
+   * Creates a new handler for the server connection and starts the read thread immediately
    *
-   * @param socket The connected Socket, through which communication with the server takes place.
+   * @param socket The connected socket through which communication with the server takes place.
    */
   public ServerHandler(Socket socket) {
     this.socket = socket;
@@ -122,12 +121,22 @@ public class ServerHandler implements Runnable {
     }
   }
 
+  /**
+   * Handles the game start packet by switching the UI to the game scene
+   * This action is executed on the JavaFX Application Thread.
+   */
   private void handleGameStart() {
     Platform.runLater(() -> {
       SceneManager.getInstance().showScene(SceneProtocol.GAME);
     });
   }
 
+  /**
+   * Parses lobby information received from the server and updates the lobby scene.
+   * If the lobby scene is active, it updates the lobby ID and the list of connected players.
+   *
+   * @param packet the packet containing the lobby ID and player names
+   */
   private void handleLobbyInfo(Packet packet) {
     String[] parts = packet.text().split(" ");
     if (parts.length < 1) {
@@ -150,7 +159,9 @@ public class ServerHandler implements Runnable {
   }
 
   /**
-   * Updates the name.
+   * Updates the internal name and synchronizes it with the GameModel on the UI thread.
+   *
+   * @param packet the welcome packet containing the assigned name.
    */
   private void handleWelcome(Packet packet) {
     this.name = packet.text();
@@ -159,11 +170,10 @@ public class ServerHandler implements Runnable {
         GameModel.getInstance().setName(this.name);
       });
     } catch (Exception e) {
-      LOGGER.info("JavaFX nicht vorhanden");
+      LOGGER.info("JavaFX is not available");
     }
 
   }
-
 
   /**
    * Responds to a server ping with a pong packet.
@@ -183,9 +193,9 @@ public class ServerHandler implements Runnable {
   }
 
   /**
-   * adds Infos such as Nickname Change or left player to chat
+   * Adds Infos such as Nickname Change or left player to chat.
    *
-   * @param packet
+   * @param packet the info packet containing the server message
    */
   private void handleInfo(Packet packet) {
     LOGGER.info("Info: {}", packet.text());
@@ -222,13 +232,11 @@ public class ServerHandler implements Runnable {
   }
 
   /**
-   * Processes a rejection sent by the server and updates the confirmed nickname if needed.
+   * Processes a rejection sent by the server and logs the error.
    *
    * @param packet packet containing the rejection text
    */
   private void handleReject(Packet packet) {
-    String text = packet.text();
-    String marker = "You are now: ";
     LOGGER.error("Error: {}", packet.text());
   }
 
@@ -257,7 +265,7 @@ public class ServerHandler implements Runnable {
   /**
    * Sends a packet to the server over the active socket connection.
    *
-   * @param p
+   * @param p the packet to be sent to the server
    */
   public synchronized void sendMessage(Packet p) {
     if (p == null) {
@@ -291,7 +299,6 @@ public class ServerHandler implements Runnable {
     }
   }
 
-  //---getters---
   public String getName() {
     return this.name;
   }
