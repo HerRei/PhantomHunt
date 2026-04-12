@@ -6,25 +6,30 @@ public class Player {
     private final StringProperty name;
     private final IntegerProperty score;
     private final StringProperty skin; // Pfad zum Bild oder Enum-Name
-    private final IntegerProperty xPosition; // Ranglisten-Platz oder X Koordinate
-    private final IntegerProperty yPosition; // Ranglisten-Platz oder X Koordinate
+    private final DoubleProperty xPosition; // Ranglisten-Platz oder X Koordinate
+    private final DoubleProperty yPosition; // Ranglisten-Platz oder X Koordinate
 
-    public Player(String name, String skin, int score, int x, int y) {
+    public Player(String name, String skin, int score, double x, double y) {
         this.name = new SimpleStringProperty(name);
         this.skin = new SimpleStringProperty(skin);
         this.score = new SimpleIntegerProperty(score);
-        this.xPosition = new SimpleIntegerProperty(x);
-        this.yPosition = new SimpleIntegerProperty(y);
+        this.xPosition = new SimpleDoubleProperty(x);
+        this.yPosition = new SimpleDoubleProperty(y);
     }
 
     // Getters
     public StringProperty nameProperty() { return name; }
     public IntegerProperty scoreProperty() { return score; }
     public StringProperty skinProperty() { return skin; }
-    public IntegerProperty xPosition() { return xPosition; }
-    public IntegerProperty yPosition() { return yPosition; }
+    public DoubleProperty xPosition() { return xPosition; }
+    public DoubleProperty yPosition() { return yPosition; }
 
 
     // Standard-Getter/Setter für die Werte selbst
     public void setScore(int newScore) { this.score.set(newScore); }
+    
+    public void setPosition(double x, double y) {
+        this.xPosition.set(x);
+        this.yPosition.set(y);
+    }
 }
