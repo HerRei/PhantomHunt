@@ -78,6 +78,7 @@ public class GameHandler {
    */
   private void updatePlayerPositions(double deltaTime) {
     double speed = gameState.getRules().moveSpeedPerSecond();
+    double playerRadius = gameState.getRules().playerRadius();
 
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState ps = gameState.getMutablePlayerAt(i);
@@ -93,11 +94,11 @@ public class GameHandler {
       if (input.isRight()) moveX += speed * deltaTime;
 
       // Check X direction
-      if (!isCollidingWithWall(pos.getX() + moveX, pos.getY())) {
+      if (!isCollidingWithWall(pos.getX() + moveX, pos.getY(), playerRadius)) {
         pos.setX(pos.getX() + moveX);
       }
       // Check Y direction
-      if (!isCollidingWithWall(pos.getX(), pos.getY() + moveY)) {
+      if (!isCollidingWithWall(pos.getX(), pos.getY() + moveY, playerRadius)) {
         pos.setY(pos.getY() + moveY);
       }
 
@@ -110,14 +111,8 @@ public class GameHandler {
   }
 
 
-  private boolean isCollidingWithWall(double x, double y) {
-    int ix = (int) x;
-    int iy = (int) y;
-    if (ix < 0 || iy < 0 || iy >= gameState.getMapHeight() || ix >= gameState.getMapWidth()) {
-      LOGGER.info("HIER LIEGT DER FEHLER");
-      return true;
-    }
-    return gameState.getMapSnapshot()[iy][ix] == TileType.WALL;
+  private boolean isCollidingWithWall(double x, double y, double radius) {
+    return MapCollision.collidesWithWall(gameState.getMapSnapshot(), x, y, radius);
   }
 
   /**
