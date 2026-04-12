@@ -130,7 +130,7 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Identifikation noch fehlender oder unvollständig umgesetzter Punkte.
 - Die verbleibenden Aufgaben wurden auf die Teammitglieder aufgeteilt, um die Deadline einzuhalten.
 
-## 2026-03-11 - 2026-03-14 - Implementierung GUI ##
+## 2026-03-11 - 2026-03-14 - Jan ##
 **Dauer:** ~12h
 **Ziel:** Erstellen einer ersten UI, Verbindung aufbauen zwischen UI und Server/ Frontend&Backend, UI - Nickname Eingaben, UI - GlobalChat, UI - Wisper Function, UI Change Nickname, UI Nickname vorschlag und korrekte verwendung der Nicknames.
 **Was gemacht:**
@@ -175,6 +175,21 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 
 **Nächstes:**
 - Konkrete Schwachstellen in der Fehlerbehandlung und beim Threadin gim Client beheben.
+
+## 2026-03-28 - 2026-03-29 - Jan ##
+**Dauer:** ~1d 
+**Ziel:** GameState soweit vorzubereiten, dass das Frontend begonnen werden kann.
+**Was gemacht:**
+- **Planung-GameState:** Planung, Recherche und skzzieren des geplanten und GameState. 
+- **Round-Management:** Implementierung der Klassen des GameState verantwortlich für (Rundenwechsel, Countdoun, Rollenwechsel, ...).
+- **Score-Management:** Implementierung der Klassen des GameState zusätzlich verantowrtlich für (verteilung der Punkte)
+- **Player-Management:** Implementierung der Klassen des GameState zusätzlich verantwortlich für das PlayerHandling (Authority for 1 Match: Roles, Positions, Speed, State, Score)
+
+**Nächstes:**
+- Da die Implementierung der Klasse sehr "sloppy" ausgefallen ist, muss die Klasse GameState nochmals aufgeräumt werden. Womögliche unterteilung der Klasse in viele Unterklassen.
+- Dennoch kann nun mit der Implementierung des Frontends gestarted werden
+
+**Nächstes:**
 
 ## 2026-04-01 — Vera ##
 **Dauer:** ~4h
