@@ -295,19 +295,13 @@ public class ClientHandler implements Runnable {
     if (gameHandler == null) return;
 
     try {
-      boolean u = p.args().get(0).equals("1");
-      boolean d = p.args().get(1).equals("1");
-      boolean l = p.args().get(2).equals("1");
-      boolean r = p.args().get(3).equals("1");
+      String[] inputs = p.args().get(0).split("\\s+");
+      boolean u = inputs[0].equals("1");
+      boolean d = inputs[1].equals("1");
+      boolean l = inputs[2].equals("1");
+      boolean r = inputs[3].equals("1");
 
-      GameState state = gameHandler.getGameState();
-
-      // 3. Update the specific player's input state
-      // We use 'this.name' from ClientHandler to identify the player
-      state.getPlayers().stream()
-              .filter(ps -> ps.equals(this.name))
-              .findFirst()
-              .ifPresent(ps -> ps.setInputState(new InputState(u, d, l, r)));
+      gameHandler.updateInput(getName(), u, d, l, r);
 
     } catch (Exception e) {
       LOGGER.error("Error parsing input for player {}: {}", name, p.args());
