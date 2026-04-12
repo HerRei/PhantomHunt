@@ -39,11 +39,10 @@ public class GUI extends Application {
     manager.addScene(SceneProtocol.GAME, new GameScene());
     manager.addScene(SceneProtocol.LOBBY, new LobbyScene());
 
-
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
     primaryStage.setOnCloseRequest(event -> soundManager.shutdown());
-    manager.showScene(SceneProtocol.NICKNAME);
+    manager.showScene(SceneProtocol.HOME);
 
     // GUI is now completely initialized
     // We take address form Main and start Client
