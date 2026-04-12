@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.example.client.net;
 
+import ch.unibas.dmi.dbis.cs108.example.Main;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.NameGenerator;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
@@ -141,7 +142,6 @@ public class ServerHandler implements Runnable {
   }
 
   private void handlePlayers(Packet packet) {
-    LOGGER.info(packet.args());
     if (packet.args() == null) return;
     Platform.runLater(() -> {
       String[] names = packet.args().get(0).split(" ");
@@ -217,7 +217,6 @@ public class ServerHandler implements Runnable {
     LOGGER.trace("Received Ping {}", System.currentTimeMillis());
   }
 
-  private void handle
 
   /**
    * Stores the nickname confirmed by the server.
@@ -292,6 +291,9 @@ public class ServerHandler implements Runnable {
    */
   private void initializeUser() {
     String systemName = System.getProperty("user.name");
+    if (Main.nickname != null){
+      systemName = Main.nickname;
+    }
     if (systemName == null || systemName.isBlank()) {
       systemName = NameGenerator.randomName();
       LOGGER.debug("No system username found, generated random name: {}", systemName);

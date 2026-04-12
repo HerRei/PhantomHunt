@@ -16,6 +16,7 @@ public class Main {
   // Saving Host and Port here, so Gui has access
   public static String targetHost;
   public static int targetPort;
+  public static String nickname;
 
   public static void main(String[] args) {
     // [0] = server/client [1] = port / host:port [2] username
@@ -31,6 +32,9 @@ public class Main {
             // Make parameters ready for GUI
             targetHost = host;
             targetPort = port;
+            if (args.length >= 3){
+              nickname = args[2];
+            }
             connect(host, port, args);
 
           } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
@@ -53,7 +57,7 @@ public class Main {
         }
       }
     } else {
-      LOGGER.error("Expected format: role (<host>:)<port>");
+      LOGGER.error("Expected format: role (<host>:)<port> (<username>)");
     }
   }
 
