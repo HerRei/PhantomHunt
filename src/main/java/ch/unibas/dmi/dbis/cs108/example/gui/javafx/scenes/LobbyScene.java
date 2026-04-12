@@ -64,8 +64,8 @@ public class LobbyScene implements SceneInterface {
   }
 
   private void bindChat() {
-    chatArea.setItems(GameModel.getInstance().chatMessagesProperty());
-    GameModel.getInstance().chatMessagesProperty().addListener((ListChangeListener<String>) c -> {
+    chatArea.setItems(GameModel.getInstance().lobbyChatMessagesProperty());
+    GameModel.getInstance().lobbyChatMessagesProperty().addListener((ListChangeListener<String>) c -> {
       Platform.runLater(() -> chatArea.scrollTo(chatArea.getItems().size() - 1));
     });
   }

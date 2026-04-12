@@ -21,6 +21,7 @@ public class GameModel {
   private final ObservableList<Player> players = FXCollections.observableArrayList();
   private final StringProperty playerName = new SimpleStringProperty();
   private final ObservableList<String> chatMessages = FXCollections.observableArrayList();
+  private final ObservableList<String> lobbyChatMessages = FXCollections.observableArrayList();
 
   // Map properties
   private final ObjectProperty<Image> gameMap = new SimpleObjectProperty<>();
@@ -73,10 +74,27 @@ public class GameModel {
   }
 
   /**
+   * Adds a message to the lobby chat
+   *
+   * @param msg the message to add.
+   */
+  public void addLobbyChatMessage(String msg) {
+    Platform.runLater(() -> lobbyChatMessages.add(msg));
+  }
+
+  /**
    * @return The list of chat messages.
    */
   public ObservableList<String> chatMessagesProperty() {
     return chatMessages;
+  }
+
+
+  /**
+   * @return The list of lobby chat messages.
+   */
+  public ObservableList<String> lobbyChatMessagesProperty() {
+    return lobbyChatMessages;
   }
 
   /**
@@ -84,6 +102,13 @@ public class GameModel {
    */
   public void clearChat() {
     Platform.runLater(chatMessages::clear);
+  }
+
+  /**
+   * Clears all messages from the lobby chat.
+   */
+  public void clearLobbyChat() {
+    Platform.runLater(lobbyChatMessages::clear);
   }
 
   // ---GETTERS---

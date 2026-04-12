@@ -217,7 +217,7 @@ public class ServerHandler implements Runnable {
 
   private void handleYap(Packet packet) {
     LOGGER.info("YAP: {}", packet.text());
-    GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
+    GameModel.getInstance().addLobbyChatMessage(packet.text()); //adds message to text
   }
 
   /**
