@@ -203,3 +203,33 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 **Nächstes:**
 - Die neuen Funktionen für den Zuschauer-Modus (Spectator) an die GUI anbinden.
 - Prüfen, ob die Logik für Leerzeichen in Usernamen bei allen Befehlen (Whisper, MKL) einwandfrei funktioniert.
+
+## 2026-04-8 bis 2026-04-09 — Vera ##
+**Dauer:** ~7h
+**Ziel:** Grundlage für das QA-Konzept erarbeiten und erste Ausformulierung erstellen.
+**Was gemacht:**
+- Mind Map erstellt, um alle wichtigen Aspekte des QA-Konzepts zu sammeln und zu strukturieren.
+- Inhalte in ein schriftliches Konzept überführt.
+- Intensive Auseinandersetzung mit den einzelnen Themen, um ein besseres Verständnis zu entwickeln.
+- Erste Struktur und Formulierungen ausgearbeitet, sodass das Konzept nachvollziehbar aufgebaut ist.
+
+**Nächstes:**
+- Das Konzept weiter vertiefen und zusätzliche Aspekte ergänzen.
+
+## 2026-04-11 — Vera ##
+**Dauer:** ~2.5h
+**Ziel:** QA-Konzept erweitern (Advanced-Inhalte).
+**Was gemacht:**
+- Fortgeschrittene Themen in das Konzept integriert und bestehende Inhalte ergänzt.
+- Einzelne Abschnitte präzisiert und weiter ausgearbeitet.
+
+**Nächstes:**
+- Gesamtes Konzept nochmals kritisch durchgehen und überarbeiten.
+
+## 2026-04-12 — Vera ##
+**Dauer:** ~3.5h
+**Ziel:** Überarbeitung des Konzepts und Javadoc Anpassungen.
+**Was gemacht:**
+- Das komplette QA-Konzept überarbeitet und verständlicher formuliert.
+- Struktur verbessert, damit der Aufbau logischer ist.
+- Javadoc überarbeitet und allgemeines Housekeeping im Code durchgeführt (Kommentare verbessert, kleinere Unsauberkeiten behoben).
