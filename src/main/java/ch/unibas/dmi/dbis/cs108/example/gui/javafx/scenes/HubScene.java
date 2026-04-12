@@ -13,6 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * The primary hub scene displaying the global chat, profile options, and lobby navigation.
+ */
 public class HubScene implements SceneInterface {
 
     private ListView<String> chatDisplay;
@@ -27,6 +30,9 @@ public class HubScene implements SceneInterface {
         createScene();
     }
 
+    /**
+     * Constructs the UI layout for the hub.
+     */
     public void createScene() {
         GameModel model = GameModel.getInstance();
 

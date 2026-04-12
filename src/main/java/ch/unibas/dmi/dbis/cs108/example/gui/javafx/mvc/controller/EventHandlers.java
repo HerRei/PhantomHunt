@@ -8,100 +8,115 @@ import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.SceneProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
-
+/**
+ * Singleton controller that handles UI events and translates them into
+ * network commands or scene changes.
+ */
 public class EventHandlers {
-    private static final Logger LOGGER = LogManager.getLogger(EventHandlers.class);
-    private static EventHandlers instance;
-    private GameModel model;
-    private ServerHandler serverHandler;
+  private static final Logger LOGGER = LogManager.getLogger(EventHandlers.class);
+  private static EventHandlers instance;
+  private ServerHandler serverHandler;
 
-    private EventHandlers() {
-        model = GameModel.getInstance();
-    }// Private constructor
+  private EventHandlers() {}
 
-    public static synchronized EventHandlers getInstance() {
-        if (instance == null) {
-            instance = new EventHandlers();
-        }
-        return instance;
+  /**
+   * Retrieves the singleton instance of EventHandlers.
+   *
+   * @return the singleton instance
+   */
+  public static synchronized EventHandlers getInstance() {
+    if (instance == null) {
+      instance = new EventHandlers();
+    }
+    return instance;
+  }
+
+  /**
+   * Sends the current movement input state to the server.
+   * Format: "INPUT u d l r", where 1 is pressed and 0 is released.
+   */
+  public void sendInputs(boolean up, boolean down, boolean left, boolean right) {
+    if (serverHandler == null) {
+      LOGGER.warn("Cannot send inputs: Not connected to server.");
+      return;
     }
 
+    String payload = String.format("%d %d %d %d",
+        up ? 1 : 0, down ? 1 : 0, left ? 1 : 0, right ? 1 : 0);
 
-    public void updateDatas() {
-        //überschreibt model datas für spiel
-        //model.players = xx
+    serverHandler.sendMessage(Packet.of(Command.INPUT, payload));
+  }
+
+  /**
+   * Sets the ServerHandler used for network communication.
+   * Synchronizes the GameModel nickname if one is already set.
+   *
+   * @param sh the active ServerHandler
+   */
+  public void setSH(ServerHandler sh) {
+    this.serverHandler = sh;
+    if (sh != null && sh.getName() != null) {
+      GameModel.getInstance().setName(sh.getName());
     }
+  }
 
-    /**
-     * Sends the current movement input state to the server.
-     * Format: "INPUT u,d,l,r" where 1 is pressed and 0 is released.
-     */
-    public void sendInputs(boolean up, boolean down, boolean left, boolean right) {
-        if (serverHandler == null) return;
+  /**
+   * Resets game state and switches the UI back to the hub.
+   */
+  public void resetAndBackToHub() {
+    GameModel.getInstance().resetModel();
+    SceneManager.getInstance().showScene(SceneProtocol.HOME);
+  }
 
-        String payload = String.format("%d %d %d %d",
-                up ? 1 : 0, down ? 1 : 0, left ? 1 : 0, right ? 1 : 0);
+  /**
+   * Switches the UI to the main game scene.
+   */
+  public void handleStartGame() {
+    SceneManager.getInstance().showScene(SceneProtocol.GAME);
+  }
 
-        // Sending as a dedicated INPUT command
-        serverHandler.sendMessage(Packet.of(Command.INPUT, payload));
+  /**
+   * Sends a request to the server to leave the specified lobby.
+   *
+   * @param id the ID of the lobby to leave
+   */
+  public void quitLobby(String id) {
+    sendMessage(Command.LOGOUT_LOBBY, id);
+  }
+
+  /**
+   * Sends a request to the server to join the specified lobby.
+   *
+   * @param id the ID of the lobby to join
+   */
+  public void joinLobby(String id) {
+    sendMessage(Command.CHECKIN, id);
+  }
+
+  /**
+   * Sends a generic network packet to the server if connected.
+   *
+   * @param cmd the protocol command
+   * @param args optional arguments for the command
+   */
+  public void sendMessage(Command cmd, String... args) {
+    if (serverHandler == null) {
+      LOGGER.warn("Cannot send message: Not connected to server.");
+      return;
     }
+    serverHandler.sendMessage(Packet.of(cmd, args));
+  }
 
-    public void setSH(ServerHandler sh) {
-        // sh.getName() could be null here. idk if this would create a crash
-        GameModel.getInstance().setName(sh.getName());
-        serverHandler = sh;
+  /**
+   * Sends a nickname change request to the server.
+   *
+   * @param name the requested nickname
+   */
+  public void handleNicknameUpdate(String name) {
+    if (name == null || name.trim().isEmpty()) {
+      LOGGER.warn("Nickname update rejected: Input is empty.");
+      return;
     }
-
-
-    //Handle-methods (eventFunctions)
-    public void resetAndBackToHub() {
-        GameModel.getInstance().resetModel();
-        SceneManager.getInstance().showScene(SceneProtocol.HOME);
-    }
-
-    public void handleStartGame() {
-        SceneManager.getInstance().showScene(SceneProtocol.GAME);
-    }
-
-    public void updateLobbies(List<String> lobbys){}
-
-    public void quitLobby(String id){
-        serverHandler.sendMessage(Packet.of(Command.LOGOUT_LOBBY, id));
-    }
-
-    public void joinLobby(String id){
-        serverHandler.sendMessage(Packet.of(Command.CHECKIN, id));
-    }
-
-    public void sendMessage(Command cmd, String... args){
-        // Null-Check
-        if (serverHandler == null) {
-            LOGGER.warn("Cannot send message: Not connected to server.");
-            return;
-        }
-
-
-        //Sendet Nachricht an Server
-        serverHandler.sendMessage(Packet.of(cmd, args));
-    }
-
-    public void handleNicknameUpdate(String name) {
-        name = name.trim();
-        if (!name.isEmpty()) {
-            // Null-Check
-            if (serverHandler != null) {
-                serverHandler.sendMessage(Packet.of(Command.NICK, name));
-            } else {
-                LOGGER.warn("Cannot send nickname: Not connected to server.");
-            }
-        }
-        else{
-            LOGGER.info("Nickname is empty.");
-        }
-    }
-
-    public void updateLists() {
-        serverHandler.sendMessage(Packet.of(Command.LIST_LOBBY));
-    }
+    sendMessage(Command.NICK, name.trim());
+  }
 }

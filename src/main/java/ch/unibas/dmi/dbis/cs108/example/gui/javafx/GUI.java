@@ -9,13 +9,15 @@ import ch.unibas.dmi.dbis.cs108.example.sound.SoundManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-/*
+/**
  * Main Entry Point for the JavaFX Application.
  * Manages the lifecycle and links Singletons.
  */
 public class GUI extends Application {
 
   /**
+   * Initializes the primary stage, sets up the scene infrastructure, and launches the UI.
+   *
    * @param primaryStage the primary stage for this application, onto which
    *                     the application scene can be set.
    */
@@ -40,16 +42,15 @@ public class GUI extends Application {
     manager.addScene(SceneProtocol.LOBBY, new LobbyScene());
     manager.addScene(SceneProtocol.END, new EndScene());
 
-
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
     primaryStage.setOnCloseRequest(event -> soundManager.shutdown());
-    manager.showScene(SceneProtocol.NICKNAME);
+    manager.showScene(SceneProtocol.HOME);
 
     // GUI is now completely initialized
     // We take address form Main and start Client
-    if (Main.targetHost != null) {
-      new TcpClient(Main.targetHost, Main.targetPort);
+    if (Main.getTargetHost() != null) {
+      new TcpClient(Main.getTargetHost(), Main.getTargetPort());
     }
   }
 

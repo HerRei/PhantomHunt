@@ -12,15 +12,25 @@ import javax.imageio.ImageIO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Utility class responsible for translating a visual map image (PNG/JPG)
+ * into a 2D array of logical TileTypes for collision detection.
+ */
 public final class MapLoader {
 
   private static final Logger LOGGER = LogManager.getLogger(MapLoader.class);
   private static final int BLACK_RGB = Color.BLACK.getRGB();
 
-  private MapLoader() {
-    // Utility class should not be instantiated
-  }
+  private MapLoader() {}
 
+  /**
+   * Loads a map from an image resource in the classpath.
+   * Pure black pixels are interpreted as WALLs, all other colors as FLOOR.
+   *
+   * @param resourcePath The internal path to the image resource.
+   * @return A 2D array representing the map layout.
+   * @throws RuntimeException if the image cannot be found or decoded.
+   */
   public static TileType[][] loadMapFromImage(String resourcePath) {
     try (InputStream stream = MapLoader.class.getResourceAsStream(resourcePath)) {
       Objects.requireNonNull(stream, "Map resource not found: " + resourcePath);

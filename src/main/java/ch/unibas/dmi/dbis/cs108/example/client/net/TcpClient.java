@@ -36,10 +36,10 @@ public class TcpClient {
     }
 
     /**
-     * Connects The client to the server
+     * Connects the client to the server
      * @param host The IP address or hostname of the server
      * @param port The port on which the server listens
-     * @return
+     * @return the initialized ServerHandler managing the connection
      * @throws IOException If the connection cannot be established
      */
     public ServerHandler connect(String host, int port) throws IOException {
@@ -48,7 +48,6 @@ public class TcpClient {
         return new ServerHandler(this.socket);
     }
 
-    //getters
     public ServerHandler getServerHandler() {
         return serverHandler;
     }

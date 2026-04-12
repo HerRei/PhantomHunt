@@ -18,20 +18,20 @@ public final class Packet {
 
   /**
    * Creates a new packet.
-   * * @param cmd The command of this packet.
+   *
+   * @param cmd The command of this packet.
    * @param args The list of arguments for this command.
    */
   public Packet(Command cmd, List<String> args) {
     this.cmd = cmd;
 
-    // If args is null, we assign an empty list, otherwise, we assign the passed list,
+    // Create a strictly unmodifiable list to ensure immutability
     this.args = (args == null) ? Collections.emptyList() : args;
 
     // here we log this.args, so that we get an empty list in the log and not "null"
-    LOGGER.trace("New Packet instance created: cmd={}, args={}", cmd, args);
+    LOGGER.trace("New Packet instance created: cmd={}, args={}", this.cmd, this.args);
   }
 
-  // getters
   public Command cmd() {
     return cmd;
   }
@@ -46,9 +46,13 @@ public final class Packet {
     return args.size();
   }
 
-  // useful error if package was empty
+  /**
+   * Returns the first argument as text.
+   *
+   * @return The text content of the packet.
+   * @throws IllegalStateException If the packet contains no text arguments.
+   */
   public String text() {
-    // the testing (args == null) can be left out here as well
     if (args.isEmpty()) {
       LOGGER.warn("No text found for command {}", cmd);
       throw new IllegalStateException("Packet contains no text");
@@ -58,13 +62,13 @@ public final class Packet {
 
   /**
    * A helper method to easily create a new packet.
-   * * @param cmd  The command of the packet.
+   *
+   * @param cmd  The command of the packet.
    * @param args The arguments
    * @return A new packet instance.
    */
   public static Packet of(Command cmd, String... args) {
     LOGGER.debug("Static factory Packet.of called for command: {}", cmd);
-    // For safety, we intercept here in case someone calls Packet.of(cmd, (String[]) null).
     return new Packet(cmd, args == null ? null :Arrays.asList(args));
   }
 

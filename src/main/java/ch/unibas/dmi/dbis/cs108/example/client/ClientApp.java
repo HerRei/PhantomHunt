@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.function.Consumer;
 
 /**
@@ -19,10 +20,11 @@ public class ClientApp {
   private static final Logger LOGGER = LogManager.getLogger(ClientApp.class);
 
   public final TcpClient tcpClient;
-  //for thread safety
+
   private static volatile String confirmedNickname; // private since data encapsulation
   private static volatile Consumer<String> globalMessageListener;
   private static volatile Consumer<String> whisperMessageListener;
+  private static volatile Consumer<String> lobbyMessageListener;
 
   /**
    * Creates a client app that connects to the default host and port.
@@ -44,6 +46,20 @@ public class ClientApp {
   }
 
   /**
+   * Helper method to safely send a packet to the server if the connection is active.
+   * Centralizes the null-check to avoid code duplication.
+   *
+   * @param packet the packet to be sent
+   */
+  private void sendPacket(Packet packet) {
+    if (tcpClient.getServerHandler() != null) {
+      tcpClient.getServerHandler().sendMessage(packet);
+    } else {
+      LOGGER.error("Not connected to server. Failed to send packet: {}", packet.cmd());
+    }
+  }
+
+  /**
    * Sends a nickname change request to the server.
    *
    * @param nickname requested nickname
@@ -54,13 +70,8 @@ public class ClientApp {
       LOGGER.warn("Nickname was blank --> not sent to server");
       return false;
     }
-    // Null-Check
-    if (tcpClient.getServerHandler() != null) {
-      tcpClient.getServerHandler().sendMessage(Packet.of(Command.NICK, nickname.trim()));
-      return true;
-    }
-    LOGGER.error("Not connected to server. Nickname request failed.");
-    return false;
+    sendPacket(Packet.of(Command.NICK, nickname.trim()));
+    return true;
   }
 
   /**
@@ -68,7 +79,7 @@ public class ClientApp {
    *
    * @param confirmedNickname nickname accepted by the server
    */
-  public static void setConfirmedNickname(String confirmedNickname){ //setter
+  public static void setConfirmedNickname(String confirmedNickname) { //setter
     ClientApp.confirmedNickname = confirmedNickname;
   }
 
@@ -93,11 +104,8 @@ public class ClientApp {
       return;
     }
 
-    // Null-Check
-    if (tcpClient.getServerHandler() != null) {
-      LOGGER.info("ClientApp sends UNICOM: {}", message); //Debugging
-      tcpClient.getServerHandler().sendMessage(Packet.of(Command.UNICOM, message.trim()));
-    }
+    LOGGER.info("ClientApp sends UNICOM: {}", message);
+    sendPacket(Packet.of(Command.UNICOM, message.trim()));
   }
 
   /**
@@ -144,7 +152,7 @@ public class ClientApp {
    * Sends a private whisper message to another user.
    *
    * @param targetUser nickname of the whisper recipient
-   * @param message whisper text
+   * @param message    whisper text
    */
   public void sendWhisper(String targetUser, String message) {
     if (targetUser == null || targetUser.isBlank() || message == null || message.isBlank()) {
@@ -152,10 +160,41 @@ public class ClientApp {
       return;
     }
 
-    // Null-Check added
-    if (tcpClient.getServerHandler() !=null) {
-      tcpClient.getServerHandler()
-              .sendMessage(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
+    sendPacket(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
+  }
+
+  /**
+   * Sends a lobby chat message to the server.
+   *
+   * @param message lobby chat message
+   */
+  public void sendLobbyMessage(String message) {
+    if (message == null || message.isBlank()) {
+      LOGGER.warn("Message is blank --> Not sent");
+      return;
+    }
+
+    LOGGER.info("ClientApp sends YAP: {}", message);
+    sendPacket(Packet.of(Command.YAP, message.trim()));
+  }
+
+  /**
+   * Registers the listener callback for received lobby chat messages.
+   *
+   * @param listener callback for received lobby chat messages.
+   */
+  public static void setLobbyMessageListener(Consumer<String> listener) {
+    lobbyMessageListener = listener;
+  }
+
+  /**
+   * Forwards a reveived lobby chat message to the registered listener.
+   *
+   * @param message lobby chat message received from the server.
+   */
+  public static void notifyLobbyMessageReceived(String message) {
+    if (lobbyMessageListener != null && message != null && !message.isBlank()) {
+      lobbyMessageListener.accept(message);
     }
   }
 
@@ -170,10 +209,7 @@ public class ClientApp {
       return;
     }
 
-    // Null-Check added
-    if (tcpClient.getServerHandler() != null) {
-      tcpClient.getServerHandler().sendMessage(Packet.of(Command.SPEC, lobbyId));
-    }
+    sendPacket(Packet.of(Command.SPEC,lobbyId));
   }
 
   /**
@@ -184,5 +220,13 @@ public class ClientApp {
     if (tcpClient.getServerHandler() != null) {
       tcpClient.getServerHandler().sendMessage(Packet.of(Command.LOGOUT));
     }
+  }
+  /**
+   * Gets the underlying TCP client.
+   *
+   * @return the active TCP client
+   */
+  public TcpClient getTcpClient() {
+    return this.tcpClient;
   }
 }

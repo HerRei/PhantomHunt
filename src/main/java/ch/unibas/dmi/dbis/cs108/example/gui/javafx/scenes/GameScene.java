@@ -7,17 +7,30 @@ import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.Player;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.image.PixelReader;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Scene displaying the game world map and a sidebar with game state info.
+ * Represents the map screen where the game is played.
+ * Handles the display of the map, players, game chat, and pixel-based collision detection.
  */
 public class GameScene implements SceneInterface {
   private final Scene scene;
@@ -25,17 +38,27 @@ public class GameScene implements SceneInterface {
   private final Map<Player, Rectangle> playerShapes = new HashMap<>();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
-  private boolean w, a, s, d;
+  private final Image collisionMap;
+  private final PixelReader pixelReader;
+  private boolean w;
+  private boolean a;
+  private boolean s;
+  private boolean d;
   private final double mapScale;
 
+  /**
+   * Initializes the game scene, fetching the map images and scaling them to the screen.
+   */
   public GameScene() {
     GameModel model = GameModel.getInstance();
-    ImageView mapView = new ImageView(model.getGameMap());
+    Image mapImage = model.getGameMap();
+    ImageView mapView = new ImageView(mapImage);
     mapView.setPreserveRatio(true);
-    mapView.setFitHeight(720); // Fixed map display height
+    mapView.setFitHeight(720);
 
-    // Scale logic: displayed height / original image height (512)
-    this.mapScale = 720.0 / 512.0;
+    this.mapScale = 720.0 / mapImage.getHeight();
+    this.collisionMap = model.getCollisionMap();
+    this.pixelReader = collisionMap.getPixelReader();
 
     StackPane gameStack = new StackPane(mapView, gamePane);
     gameStack.setStyle("-fx-background-color: black;");
@@ -52,17 +75,13 @@ public class GameScene implements SceneInterface {
     setupChatBinding();
   }
 
-  /**
-   * Builds the sidebar with game status, scores, and chat.
-   */
   private VBox createSidebar(GameModel model) {
     VBox box = new VBox(15);
     box.setPadding(new Insets(15));
     box.setPrefWidth(250);
-    box.setPrefHeight(720);// Fixed sidebar width
+    box.setPrefHeight(720);
     box.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
 
-    // --- 1. Game Status (Role, Round, Time) ---
     VBox statusBox = new VBox(5);
 
     Label roleLabel = new Label();
@@ -78,7 +97,6 @@ public class GameScene implements SceneInterface {
 
     statusBox.getChildren().addAll(roleLabel, roundLabel, timeLabel);
 
-    // --- 2. Personal Score ---
     Label scoreTitle = new Label("Your Score:");
     scoreTitle.setStyle("-fx-font-weight: bold;");
 
@@ -88,38 +106,41 @@ public class GameScene implements SceneInterface {
 
     VBox scoreBox = new VBox(2, scoreTitle, scoreValue);
 
-    // --- 3. Player List ---
+    Label tableLabel = new Label("Players");
+    tableLabel.setStyle("-fx-text-fill: white;");
+
     TableView<Player> table = new TableView<>(model.getPlayers());
     table.setPrefHeight(180);
 
     TableColumn<Player, String> nameCol = new TableColumn<>("Name");
     nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+
     TableColumn<Player, Integer> scCol = new TableColumn<>("Score");
     scCol.setCellValueFactory(new PropertyValueFactory<>("score"));
 
     table.getColumns().addAll(nameCol, scCol);
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-    // --- 4. Chat ---
+    Label chatLabel = new Label("Chat");
+    chatLabel.setStyle("-fx-text-fill: white;");
+
     chatArea.setEditable(false);
     chatArea.setWrapText(true);
     chatArea.setPrefHeight(250);
+
     chatInput.setPromptText("Send message...");
     chatInput.setOnAction(e -> sendMessage());
 
-    box.getChildren().addAll(statusBox, new Separator(), scoreBox, new Label("Players:"), table, new Label("Chat:"), chatArea, chatInput);
+    box.getChildren().addAll(statusBox, new Separator(), scoreBox, tableLabel, table, chatLabel, chatArea, chatInput);
     VBox.setVgrow(chatArea, Priority.ALWAYS);
 
     return box;
   }
 
-  /**
-   * Updates chat area when new messages arrive in model.
-   */
   private void setupChatBinding() {
-    GameModel.getInstance().chatMessagesProperty().addListener((ListChangeListener<String>) c -> {
+    GameModel.getInstance().lobbyChatMessagesProperty().addListener((ListChangeListener<String>) c -> {
       StringBuilder sb = new StringBuilder();
-      for (String msg : GameModel.getInstance().chatMessagesProperty()) {
+      for (String msg : GameModel.getInstance().lobbyChatMessagesProperty()) {
         sb.append(msg).append("\n");
       }
       chatArea.setText(sb.toString());
@@ -129,7 +150,10 @@ public class GameScene implements SceneInterface {
 
   private void sendMessage() {
     String msg = chatInput.getText().trim();
-    if (!msg.isEmpty()) EventHandlers.getInstance().sendMessage(Command.YAP, msg);
+    if (msg.isEmpty()) {
+      return;
+    }
+    EventHandlers.getInstance().sendMessage(Command.YAP, msg);
     chatInput.clear();
   }
 
@@ -139,50 +163,105 @@ public class GameScene implements SceneInterface {
   }
 
   private void handleKey(javafx.scene.input.KeyCode code, boolean pressed) {
-    if (chatInput.isFocused()) return;
+    if (chatInput.isFocused()) {
+      return;
+    }
     boolean changed = false;
     switch (code) {
-      case W -> { if (w != pressed) { w = pressed; changed = true; } }
-      case S -> { if (s != pressed) { s = pressed; changed = true; } }
-      case A -> { if (a != pressed) { a = pressed; changed = true; } }
-      case D -> { if (d != pressed) { d = pressed; changed = true; } }
+      case W -> {
+        if (w != pressed) {
+          w = pressed;
+          changed = true;
+        }
+      }
+      case S -> {
+        if (s != pressed) {
+          s = pressed;
+          changed = true;
+        }
+      }
+      case A -> {
+        if (a != pressed) {
+          a = pressed;
+          changed = true;
+        }
+      }
+      case D -> {
+        if (d != pressed) {
+          d = pressed;
+          changed = true;
+        }
+      }
+      default -> {
+      }
     }
-    if (changed) EventHandlers.getInstance().sendInputs(w, s, a, d);
+    if (changed) {
+      EventHandlers.getInstance().sendInputs(w, s, a, d);
+    }
   }
 
   private void setupPlayerTracking() {
     GameModel.getInstance().getPlayers().addListener((ListChangeListener<Player>) c -> {
       while (c.next()) {
-        if (c.wasAdded()) c.getAddedSubList().forEach(this::addPlayer);
-        if (c.wasRemoved()) c.getRemoved().forEach(this::removePlayer);
+        if (c.wasAdded()) {
+          c.getAddedSubList().forEach(this::addPlayer);
+        }
+        if (c.wasRemoved()) {
+          c.getRemoved().forEach(this::removePlayer);
+        }
       }
     });
     GameModel.getInstance().getPlayers().forEach(this::addPlayer);
   }
 
+  private void addPlayer(Player player) {
+    Rectangle shape = new Rectangle(20, 20);
+    double playerHalfWidth = shape.getWidth() / 2;
+    double playerHalfHeight = shape.getHeight() / 2;
+
+    player.skinProperty().addListener((obs, oldSkin, newSkin) -> updatePlayerColor(shape, newSkin));
+    updatePlayerColor(shape, player.skinProperty().get());
+
+    shape.layoutXProperty().bind(player.xPosition().multiply(mapScale).subtract(playerHalfWidth));
+    shape.layoutYProperty().bind(player.yPosition().multiply(mapScale).subtract(playerHalfHeight));
+
+    playerShapes.put(player, shape);
+    gamePane.getChildren().add(shape);
+  }
+
+  private void updatePlayerColor(Rectangle shape, String skin) {
+    if ("HUMAN".equalsIgnoreCase(skin)) {
+      shape.setFill(Color.RED);
+    } else {
+      shape.setFill(Color.WHITE);
+    }
+  }
+
+  private void removePlayer(Player player) {
+    Rectangle shape = playerShapes.remove(player);
+    if (shape != null) {
+      gamePane.getChildren().remove(shape);
+    }
+  }
+
   /**
-   * Adds and binds a player rectangle to the map.
+   * Checks if a specific coordinate on the map is walkable.
+   *
+   * @param x the x-coordinate to check
+   * @param y the y-coordinate to check
+   * @return true if the coordinate is walkable, false otherwise
    */
-  private void addPlayer(Player p) {
-    Rectangle r = new Rectangle(20, 20);
+  public boolean isWalkable(int x, int y) {
+    if (x < 0 || x >= collisionMap.getWidth() || y < 0 || y >= collisionMap.getHeight()) {
+      return false;
+    }
 
-    // Skin-based color listener
-    p.skinProperty().addListener((obs, old, newSkin) ->
-            r.setFill("HUMAN".equalsIgnoreCase(newSkin) ? Color.RED : Color.WHITE));
-    r.setFill("HUMAN".equalsIgnoreCase(p.skinProperty().get()) ? Color.RED : Color.WHITE);
-
-    // Position binding with map scaling
-    r.layoutXProperty().bind(p.xPosition().multiply(mapScale).subtract(10));
-    r.layoutYProperty().bind(p.yPosition().multiply(mapScale).subtract(10));
-
-    playerShapes.put(p, r);
-    gamePane.getChildren().add(r);
+    Color color = pixelReader.getColor(x, y);
+    return !Color.BLACK.equals(color);
   }
 
-  private void removePlayer(Player p) {
-    Rectangle r = playerShapes.remove(p);
-    if (r != null) gamePane.getChildren().remove(r);
+  @Override
+  public Scene getScene() {
+    return scene;
   }
-
-  @Override public Scene getScene() { return scene; }
 }

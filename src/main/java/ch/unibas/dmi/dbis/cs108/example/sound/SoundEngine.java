@@ -51,8 +51,8 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
  * A sound engine powered by LWJGL and OpenAL for playing audio.
- * Modeled after the "GamesWithGabe" OpenAL 2D Game Engine tutorial from YoutTube
- * It has to be disclosed that this is pretty much a 1:1 copy
+ * Modeled after the "GamesWithGabe" OpenAL 2D Game Engine tutorial from YouTube
+ * It has to be disclosed that this is pretty much a 1:1 copy.
  */
 public final class SoundEngine {
 
@@ -64,6 +64,12 @@ public final class SoundEngine {
   private final Map<SoundEffect, Integer> bufferIds = new EnumMap<>(SoundEffect.class);
   private final Map<SoundEffect, Integer> sourceIds = new EnumMap<>(SoundEffect.class);
 
+  /**
+   * Initializes the OpenAL audio device and context.
+   * Must be called before loading or playing any sounds.
+   *
+   * @throws IllegalStateException if OpenAL is unsupported or fails to initialize.
+   */
   public synchronized void init() {
     if (initialized) {
       return;
@@ -92,7 +98,11 @@ public final class SoundEngine {
     initialized = true;
     LOGGER.info("OpenAL sound engine initialized successfully.");
   }
-
+  /**
+   * Loads a sound effect into memory and assigns it an OpenAL source ID.
+   *
+   * @param effect the sound effect to load.
+   */
   public synchronized void loadSound(SoundEffect effect) {
     ensureInitialized();
     if (sourceIds.containsKey(effect)) {
@@ -107,6 +117,11 @@ public final class SoundEngine {
     LOGGER.info("Loaded sound '{}'", effect.name());
   }
 
+  /**
+   * Plays the specified sound effect. If it is already playing, it will be restarted.
+   *
+   * @param effect the sound effect to play.
+   */
   public void playSound(SoundEffect effect) {
     Integer sourceId = getSourceId(effect);
     if (sourceId == null) {
@@ -122,6 +137,11 @@ public final class SoundEngine {
     alSourcePlay(sourceId);
   }
 
+  /**
+   * Stops the specified sound effect if it is currently playing.
+   *
+   * @param effect the sound effect to stop.
+   */
   public void stopSound(SoundEffect effect) {
     Integer sourceId = getSourceId(effect);
     if (sourceId == null) {
@@ -131,12 +151,19 @@ public final class SoundEngine {
     alSourceStop(sourceId);
   }
 
+  /**
+   * Stops all currently playing sounds.
+   */
   public synchronized void stopAll() {
     for (Integer sourceId : sourceIds.values()) {
       alSourceStop(sourceId);
     }
   }
 
+  /**
+   * Cleans up all OpenAL resources, buffers, and destroys the audio context.
+   * Should be called when the application is closing.
+   */
   public synchronized void shutdown() {
     for (Integer sourceId : sourceIds.values()) {
       alDeleteSources(sourceId);
