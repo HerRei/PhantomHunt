@@ -29,7 +29,7 @@ public record GameRules(
     return new GameRules(
         4,
         30000,
-        10.0,
+        6.0,
         100.0,
         1,
         50,

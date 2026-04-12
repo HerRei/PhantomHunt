@@ -32,7 +32,7 @@ public class EndScene implements SceneInterface {
         Label finalScoreLabel = new Label("0");
         finalScoreLabel.setStyle("-fx-text-fill: #00FF00; -fx-font-size: 48px; -fx-font-weight: bold;");
         if (model.getName() != null) {
-            finalScoreLabel.setText(String.valueOf(model.getScore()));
+            finalScoreLabel.textProperty().bind(model.getScore().asString("%d"));
         }
 
         // Table with all scores

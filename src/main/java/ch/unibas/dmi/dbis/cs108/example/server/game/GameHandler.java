@@ -247,6 +247,7 @@ public class GameHandler {
     if (!hasNextRound()) {
       gameState.setPhase(GamePhase.MATCH_ENDED);
       lobbyHandler.finishLobby(gameState.getMatchId());
+      lobby.broadcast(Packet.of(Command.GAME_FINISH));
       return;
     }
 

@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model;
 
-import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -24,7 +23,10 @@ public class GameModel {
   private final ObservableList<Player> lobbyPlayers = FXCollections.observableArrayList();
   public final ObservableList<String> players = FXCollections.observableArrayList();
   private final StringProperty playerName = new SimpleStringProperty();
+  private final StringProperty playerRole = new SimpleStringProperty();
   private final IntegerProperty playerScore = new SimpleIntegerProperty();
+  private final IntegerProperty remainingTime = new SimpleIntegerProperty();
+  private final IntegerProperty round = new SimpleIntegerProperty();
   private final ObservableList<String> chatMessages = FXCollections.observableArrayList();
   private final ObservableList<String> availableLobbies = FXCollections.observableArrayList();
   private final ObservableList<String> runningLobbies = FXCollections.observableArrayList();
@@ -62,6 +64,8 @@ public class GameModel {
     if (sections.length < 3) return;
     int currentRound = Integer.parseInt(sections[0]);
     int timeRemaining = Integer.parseInt(sections[1]);
+    remainingTime.set(timeRemaining/1000);
+    round.set(currentRound);
     String playersData = sections[2];
     String[] playerEntries = playersData.split(";");
 
@@ -75,8 +79,9 @@ public class GameModel {
       double x = Double.parseDouble(data[2]);
       double y = Double.parseDouble(data[3]);
       int score = Integer.parseInt(data[4]);
-      if (name == playerName.get()){
+      if (name.endsWith(playerName.getValue())){
         playerScore.set(score);
+        playerRole.set(role);
       }
 
       // 3. Find existing player in our list or create a new one
@@ -168,6 +173,18 @@ public class GameModel {
 
   public StringProperty getName() {
     return playerName;
+  }
+
+  public StringProperty getRole() {
+    return playerRole;
+  }
+
+  public IntegerProperty getRound() {
+    return round;
+  }
+
+  public IntegerProperty getTime() {
+    return remainingTime;
   }
 
   public IntegerProperty getScore() {

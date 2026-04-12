@@ -16,6 +16,9 @@ import javafx.scene.shape.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Scene displaying the game world map and a sidebar with game state info.
+ */
 public class GameScene implements SceneInterface {
   private final Scene scene;
   private final Pane gamePane = new Pane();
@@ -23,21 +26,20 @@ public class GameScene implements SceneInterface {
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
   private boolean w, a, s, d;
-  private final double mapScale; // New field for map scale
+  private final double mapScale;
 
   public GameScene() {
     GameModel model = GameModel.getInstance();
     ImageView mapView = new ImageView(model.getGameMap());
     mapView.setPreserveRatio(true);
-    mapView.setFitHeight(720); // Map displayed height
+    mapView.setFitHeight(720); // Fixed map display height
 
-    // Calculate map scale based on displayed height and original height (512x512)
+    // Scale logic: displayed height / original image height (512)
     this.mapScale = 720.0 / 512.0;
 
     StackPane gameStack = new StackPane(mapView, gamePane);
     gameStack.setStyle("-fx-background-color: black;");
 
-    // Sidebar erstellen
     VBox sidebar = createSidebar(model);
 
     BorderPane root = new BorderPane();
@@ -47,67 +49,71 @@ public class GameScene implements SceneInterface {
     this.scene = new Scene(root);
     setupControls();
     setupPlayerTracking();
-    setupChatBinding(); // Chat-Bindung initialisieren
+    setupChatBinding();
   }
 
+  /**
+   * Builds the sidebar with game status, scores, and chat.
+   */
   private VBox createSidebar(GameModel model) {
-    VBox box = new VBox(15); // Etwas mehr Abstand zwischen den Elementen
+    VBox box = new VBox(15);
     box.setPadding(new Insets(15));
-    box.setPrefWidth(250);
+    box.setPrefWidth(250); // Fixed sidebar width
     box.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
 
-    // 1. Dein Score (Ganz oben)
-    Label yourScoreTitle = new Label("Your Score:");
-    yourScoreTitle.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+    // --- 1. Game Status (Role, Round, Time) ---
+    VBox statusBox = new VBox(5);
 
-    Label scoreLabel = new Label("0");
-    scoreLabel.setStyle("-fx-text-fill: #00FF00; -fx-font-size: 24px; -fx-font-weight: bold;");
+    Label roleLabel = new Label();
+    roleLabel.setStyle("-fx-text-fill: #00BFFF; -fx-font-weight: bold; -fx-font-size: 14px;");
+    roleLabel.textProperty().bind(model.getRole().concat(" Role"));
 
-    // Bindet den Score des lokalen Spielers (angenommen model.getLocalPlayer() existiert)
-    scoreLabel.textProperty().bind(GameModel.getInstance().getScore().asString());
+    Label roundLabel = new Label();
+    roundLabel.textProperty().bind(model.getRound().asString("Round: %d"));
 
-    VBox scoreContainer = new VBox(5, yourScoreTitle, scoreLabel);
-    scoreContainer.setPadding(new Insets(0, 0, 10, 0));
+    Label timeLabel = new Label();
+    timeLabel.setStyle("-fx-text-fill: #FFD700; -fx-font-weight: bold;");
+    timeLabel.textProperty().bind(model.getTime().asString("Time: %d s"));
 
-    // 2. Scoreboard (Alle Spieler)
-    Label tableLabel = new Label("Players");
-    tableLabel.setStyle("-fx-text-fill: white;");
+    statusBox.getChildren().addAll(roleLabel, roundLabel, timeLabel);
 
+    // --- 2. Personal Score ---
+    Label scoreTitle = new Label("Your Score:");
+    scoreTitle.setStyle("-fx-font-weight: bold;");
+
+    Label scoreValue = new Label();
+    scoreValue.setStyle("-fx-text-fill: #00FF00; -fx-font-size: 22px; -fx-font-weight: bold;");
+    scoreValue.textProperty().bind(model.getScore().asString());
+
+    VBox scoreBox = new VBox(2, scoreTitle, scoreValue);
+
+    // --- 3. Player List ---
     TableView<Player> table = new TableView<>(model.getPlayers());
-    table.setPrefHeight(200);
+    table.setPrefHeight(180);
 
     TableColumn<Player, String> nameCol = new TableColumn<>("Name");
     nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+    TableColumn<Player, Integer> scCol = new TableColumn<>("Score");
+    scCol.setCellValueFactory(new PropertyValueFactory<>("score"));
 
-    TableColumn<Player, Integer> scoreCol = new TableColumn<>("Score");
-    scoreCol.setCellValueFactory(new PropertyValueFactory<>("score"));
-
-    table.getColumns().addAll(nameCol, scoreCol);
+    table.getColumns().addAll(nameCol, scCol);
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-    // 3. Chat (Ganz unten)
-    Label chatLabel = new Label("Chat");
-    chatLabel.setStyle("-fx-text-fill: white;");
-
+    // --- 4. Chat ---
     chatArea.setEditable(false);
     chatArea.setWrapText(true);
-    chatArea.setPrefHeight(300);
-
-    chatInput.setPromptText("Type a message...");
+    chatArea.setPrefHeight(250);
+    chatInput.setPromptText("Send message...");
     chatInput.setOnAction(e -> sendMessage());
 
-    // Alles zur Sidebar hinzufügen
-    box.getChildren().addAll(scoreContainer, tableLabel, table, chatLabel, chatArea, chatInput);
-
-    // Damit der Chat-Bereich den restlichen Platz einnimmt, falls nötig
+    box.getChildren().addAll(statusBox, new Separator(), scoreBox, new Label("Players:"), table, new Label("Chat:"), chatArea, chatInput);
     VBox.setVgrow(chatArea, Priority.ALWAYS);
 
     return box;
   }
 
   /**
-   * Bindet das TextArea an die Chat-Liste im Model.
-   * Jedes Mal, wenn eine neue Nachricht kommt, wird der Text aktualisiert.
+   * Updates chat area when new messages arrive in model.
    */
   private void setupChatBinding() {
     GameModel.getInstance().chatMessagesProperty().addListener((ListChangeListener<String>) c -> {
@@ -116,14 +122,13 @@ public class GameScene implements SceneInterface {
         sb.append(msg).append("\n");
       }
       chatArea.setText(sb.toString());
-      chatArea.setScrollTop(Double.MAX_VALUE); // Auto-Scroll nach unten
+      chatArea.setScrollTop(Double.MAX_VALUE);
     });
   }
 
   private void sendMessage() {
     String msg = chatInput.getText().trim();
-    if (msg.isEmpty()) return;
-    EventHandlers.getInstance().sendMessage(Command.YAP, msg);
+    if (!msg.isEmpty()) EventHandlers.getInstance().sendMessage(Command.YAP, msg);
     chatInput.clear();
   }
 
@@ -154,30 +159,20 @@ public class GameScene implements SceneInterface {
     GameModel.getInstance().getPlayers().forEach(this::addPlayer);
   }
 
+  /**
+   * Adds and binds a player rectangle to the map.
+   */
   private void addPlayer(Player p) {
-    Rectangle r = new Rectangle(20, 20); // Player visual size
-    double playerHalfWidth = r.getWidth() / 2;
-    double playerHalfHeight = r.getHeight() / 2;
+    Rectangle r = new Rectangle(20, 20);
 
-    // Listen for changes in the skin property and update the color accordingly
-    p.skinProperty().addListener((obs, oldSkin, newSkin) -> {
-        if ("HUMAN".equalsIgnoreCase(newSkin)) {
-            r.setFill(Color.RED);
-        } else {
-            r.setFill(Color.WHITE);
-        }
-    });
+    // Skin-based color listener
+    p.skinProperty().addListener((obs, old, newSkin) ->
+            r.setFill("HUMAN".equalsIgnoreCase(newSkin) ? Color.RED : Color.WHITE));
+    r.setFill("HUMAN".equalsIgnoreCase(p.skinProperty().get()) ? Color.RED : Color.WHITE);
 
-    // Set initial color
-    if ("HUMAN".equalsIgnoreCase(p.skinProperty().get())) {
-        r.setFill(Color.RED);
-    } else {
-        r.setFill(Color.WHITE);
-    }
-
-    // Bind player position, applying map scale and centering the rectangle
-    r.layoutXProperty().bind(p.xPosition().multiply(mapScale).subtract(playerHalfWidth));
-    r.layoutYProperty().bind(p.yPosition().multiply(mapScale).subtract(playerHalfHeight));
+    // Position binding with map scaling
+    r.layoutXProperty().bind(p.xPosition().multiply(mapScale).subtract(10));
+    r.layoutYProperty().bind(p.yPosition().multiply(mapScale).subtract(10));
 
     playerShapes.put(p, r);
     gamePane.getChildren().add(r);
