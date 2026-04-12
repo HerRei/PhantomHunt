@@ -32,4 +32,8 @@ public class Player {
         this.xPosition.set(x);
         this.yPosition.set(y);
     }
+
+    public void setSkin(String newSkin) {
+        this.skin.set(newSkin);
+    }
 }
