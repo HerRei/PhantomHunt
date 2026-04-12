@@ -8,6 +8,8 @@ import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.SceneProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 public class EventHandlers {
     private static final Logger LOGGER = LogManager.getLogger(EventHandlers.class);
     private static EventHandlers instance;
@@ -62,8 +64,14 @@ public class EventHandlers {
         SceneManager.getInstance().showScene(SceneProtocol.GAME);
     }
 
+    public void updateLobbies(List<String> lobbys){}
+
     public void quitLobby(String id){
         serverHandler.sendMessage(Packet.of(Command.LOGOUT_LOBBY, id));
+    }
+
+    public void joinLobby(String id){
+        serverHandler.sendMessage(Packet.of(Command.CHECKIN, id));
     }
 
     public void sendMessage(Command cmd, String... args){

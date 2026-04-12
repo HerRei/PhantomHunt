@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model;
 
-import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
-import ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes.GameScene;
+import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -9,6 +8,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
 
 /**
  * Holds all the important data for the game.
@@ -25,6 +26,8 @@ public class GameModel {
   private final StringProperty playerName = new SimpleStringProperty();
   private final IntegerProperty playerScore = new SimpleIntegerProperty();
   private final ObservableList<String> chatMessages = FXCollections.observableArrayList();
+  private final ObservableList<String> availableLobbies = FXCollections.observableArrayList();
+  private final ObservableList<String> runningLobbies = FXCollections.observableArrayList();
 
   // Map properties
   private final ObjectProperty<Image> gameMap = new SimpleObjectProperty<>();
@@ -79,6 +82,28 @@ public class GameModel {
       // 3. Find existing player in our list or create a new one
       updateOrAddPlayer(name, role, x, y, score);
     }
+  }
+
+  /**
+   * @return Observable list of lobbies for the TableView in JoinLobbyScene
+   */
+  public ObservableList<String> getAvailableLobbies() {
+    return availableLobbies;
+  }
+
+  /**
+   * @return Observable list of lobbies for the TableView in JoinLobbyScene
+   */
+  public ObservableList<String> getRunningLobbies() {
+    return runningLobbies;
+  }
+
+  /**
+   * Updates the local list of lobbies when the server sends new data
+   */
+  public void updateLobbyList(List<String> runningLobbys, List<String> waitingLobbys) {
+    this.availableLobbies.setAll(waitingLobbys);
+    this.runningLobbies.setAll(runningLobbys);
   }
 
   private void updateOrAddPlayer(String name, String role, double x, double y, int score) {

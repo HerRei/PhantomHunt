@@ -30,7 +30,8 @@ public enum Command {
   LOGOUT_LOBBY, //Logout Lobby
   LOBBY_INFO, // LOBBY_INFO <lobbyId> <player1> <player2> ...
   GAME_START, // GAME_START
-  GAME_FINISH, //Game is finished
+  GAME_FINISH,
+  LIST_LOBBY,//Game is finished
   GSU,
   INPUT
 }
