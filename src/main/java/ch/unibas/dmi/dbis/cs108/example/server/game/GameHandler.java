@@ -59,9 +59,7 @@ public class GameHandler {
     }
 
     // 1. Update movement for all players
-    for (int i = 0; i < gameState.getPlayerCount(); i++) {
-      updatePlayerPositions(deltaTime);
-    }
+    updatePlayerPositions(deltaTime);
 
     // 2. Check if phantoms caught the human
     checkCatchCollisions(now);
