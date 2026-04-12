@@ -9,6 +9,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * Main entry point for the application.
+ * Starts either the server or the JavaFX client based on command-line arguments.
+ */
 public class Main {
 
   private static final Logger LOGGER = LogManager.getLogger(Main.class);
@@ -16,6 +20,9 @@ public class Main {
   // Saving Host and Port here, so Gui has access
   public static String targetHost;
   public static int targetPort;
+
+  // private constructor to prevent instantiation
+  private Main() {}
 
   public static void main(String[] args) {
     // [0] = server/client [1] = port / host:port
@@ -59,8 +66,9 @@ public class Main {
   }
 
   /**
-   * @param port port for socket
-   *             User is host
+   * Starts the server application on a new thread.
+   *
+   * @param port the port on which the server will listen
    */
   public static void startServer(int port) {
     LOGGER.info("Starting Server...");
@@ -75,13 +83,24 @@ public class Main {
   }
 
   /**
-   * @param host ip-adress for socket
-   * @param port port for socket
-   *             User is client
+   * Launches the JavaFX client application
+   *
+   * @param host the server IP address or hostname
+   * @param port port for the server port
+   * @param args the command-line arguments to pass the JavaFX application.
    */
   public static void connect(String host, int port, String[] args) {
     LOGGER.info("Connecting to {}:{}...", host, port);
     // TcpClient deleted, since it should only start in GUI.
     Application.launch(GUI.class, args);
+  }
+
+  // Getters for GUI
+  public static String getTargetHost() {
+    return targetHost;
+  }
+
+  public static int getTargetPort() {
+    return targetPort;
   }
 }

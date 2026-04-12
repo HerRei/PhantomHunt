@@ -6,16 +6,16 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * mostly here to start the server - provides the main method and the logic of the ports. i somehow
- * thought
- * we would need to be able to start it from any given port thats why this logic is in here
- * i am not too sure on what happens if the default port is already taken
+ * The main entry point for the server application.
+ * Initializes the TCP server on a specified custom port or falls back to the default.
  */
 public final class ServerApp {
 
   private static final Logger log = LogManager.getLogger(ServerApp.class);
   private static final int DEFAULT_PORT = 2222;
 
+  // Private constructor to prevent instantiation of this utility class
+  private ServerApp() {}
 
   /**
    * Starts the server application.
@@ -34,14 +34,23 @@ public final class ServerApp {
     }
   }
 
-  // this for starting the server with a custom port
+  /**
+   * Parses the port from command line arguments or returns the default port.
+   * Ensures the port is within the valid range (1-65535)
+   *
+   * @param args Command line arguments
+   * @param defaultPort Fallback port
+   * @return A valid port number
+   */
   private static int parsePortOrDefault(String[] args, int defaultPort) {
     if (args == null || args.length == 0) return defaultPort;
+
     try {
       int p = Integer.parseInt(args[0]);
-      if (!(p >= 1 && p <= 65535))
+      if (p < 1 || p > 65535) {
         throw new IllegalArgumentException(
-            "Not a valid port"); // all the valid port, 1-1024 should maye be left out?
+                "Port out of bounds: " + p); // all the valid port, 1-1024 should maye be left out?
+      }
       return p;
     } catch (NumberFormatException e) {
       log.warn("Invalid port format '{}'. Using default port {}.", args[0], defaultPort);
