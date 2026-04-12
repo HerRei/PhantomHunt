@@ -23,17 +23,18 @@ public final class Registry {
   // better idea - please do indulge me.
 
   private static final Logger log =
-      LogManager.getLogger(
-          Registry.class); // somehow here i called it log, i dont wanna change it...
+          LogManager.getLogger(
+                  Registry.class); // somehow here i called it log, i dont wanna change it...
   private final Vector<ClientHandler> sessions = new Vector<>(); //zwar O(n) for get but easier to work with than the hashMap with a dummy.
   private final ConcurrentHashMap<String, ClientHandler> byName =
-      new ConcurrentHashMap<>(); // Nickname handling
+          new ConcurrentHashMap<>(); // Nickname handling
 
   /**
    * Assign a requested nickname to a client.
    * If the name is taken, it adds a number to the end
+   *
    * @param requestedName Name the player wants
-   * @param h Client handler requesting the name
+   * @param h             Client handler requesting the name
    * @return final unique nickname
    */
   public String claimName(String requestedName, ClientHandler h) {
@@ -61,8 +62,9 @@ public final class Registry {
 
   /**
    * Makes nickname available.
+   *
    * @param name Nickname to release.
-   * @param h Client handler with this nickname.
+   * @param h    Client handler with this nickname.
    */
   public void releaseName(String name, ClientHandler h) {
     byName.remove(name, h);
@@ -71,6 +73,7 @@ public final class Registry {
 
   /**
    * keeping track of all the people that got a client handler.
+   *
    * @param h Client handler to add.
    */
   public void register(ClientHandler h) {
@@ -80,6 +83,7 @@ public final class Registry {
 
   /**
    * Removes client from the registry when disconnected.
+   *
    * @param h Client handler to remove.
    */
   public void unregister(ClientHandler h) {
@@ -88,11 +92,11 @@ public final class Registry {
   }
 
 
-
   /**
    * Send messages to all clients except for the sender.
+   *
    * @param sender Client who send the broadcast.
-   * @param p message to send.
+   * @param p      message to send.
    */
   public void broadcast(ClientHandler sender, Packet p) {
     log.debug("registry brioadcat packet from {}: {}", sender.getName(), p.cmd());
@@ -107,23 +111,24 @@ public final class Registry {
   public void yapping(ClientHandler sender, Packet p) {
     log.debug("registry yapping packet from {}: {}", sender.getName(), p.cmd());
     Lobby senderLobby = sender.getCurrentLobby();
-    if(senderLobby == null) {
-        sender.sendMessage(Packet.of(Command.REJECT, "You are not in a lobby, what are you \" yapping \""));
-        return;
+    if (senderLobby == null) {
+      sender.sendMessage(Packet.of(Command.REJECT, "You are not in a lobby, what are you \" yapping \""));
+      return;
     }
 
     for (ClientHandler h : sessions) {
-      if(h.isInLobby(senderLobby)) {
-          h.sendMessage(p);
+      if (h.isInLobby(senderLobby)) {
+        h.sendMessage(p);
       }
     }
   }
 
   /**
    * Private message from client to client.
+   *
    * @param sender
    * @param targetName Nickname of the receiver.
-   * @param message The text.
+   * @param message    The text.
    * @return True or false
    */
   public boolean whisper(ClientHandler sender, String targetName, String message) {

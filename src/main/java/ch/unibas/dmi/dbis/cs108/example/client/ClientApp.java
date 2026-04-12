@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.function.Consumer;
 
 /**
@@ -23,6 +24,7 @@ public class ClientApp {
   private static volatile String confirmedNickname; // private since data encapsulation
   private static volatile Consumer<String> globalMessageListener;
   private static volatile Consumer<String> whisperMessageListener;
+  private static volatile Consumer<String> lobbyMessageListener;
 
   /**
    * Creates a client app that connects to the default host and port.
@@ -68,7 +70,7 @@ public class ClientApp {
    *
    * @param confirmedNickname nickname accepted by the server
    */
-  public static void setConfirmedNickname(String confirmedNickname){ //setter
+  public static void setConfirmedNickname(String confirmedNickname) { //setter
     ClientApp.confirmedNickname = confirmedNickname;
   }
 
@@ -144,7 +146,7 @@ public class ClientApp {
    * Sends a private whisper message to another user.
    *
    * @param targetUser nickname of the whisper recipient
-   * @param message whisper text
+   * @param message    whisper text
    */
   public void sendWhisper(String targetUser, String message) {
     if (targetUser == null || targetUser.isBlank() || message == null || message.isBlank()) {
@@ -153,9 +155,46 @@ public class ClientApp {
     }
 
     // Null-Check added
-    if (tcpClient.getServerHandler() !=null) {
-      tcpClient.getServerHandler()
-              .sendMessage(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
+    if (tcpClient.getServerHandler() != null) {
+      tcpClient.getServerHandler().sendMessage(Packet.of(Command.WHISPER, targetUser.trim() + " " + message.trim()));
+    }
+  }
+
+  /**
+   * Sends a lobby chat message to the server.
+   *
+   * @param message lobby chat message
+   */
+  public void sendLobbyMessage(String message) {
+    if (message == null || message.isBlank()) {
+      LOGGER.warn("Message is blank --> Not sent");
+      return;
+    }
+
+    // Null-Check
+    if (tcpClient.getServerHandler() != null) {
+      LOGGER.info("ClientApp sends YAP: {}", message); //Debugging
+      tcpClient.getServerHandler().sendMessage(Packet.of(Command.YAP, message.trim()));
+    }
+  }
+
+  /**
+   * Registers the listener callback for received lobby chat messages.
+   *
+   * @param listener callback for received lobby chat messages.
+   */
+  public static void setLobbyMessageListener(Consumer<String> listener) {
+    lobbyMessageListener = listener;
+  }
+
+  /**
+   * Forwards a reveived lobby chat message to the registered listener.
+   *
+   * @param message lobby chat message received from the server.
+   */
+  public static void notifyLobbyMessageReceived(String message) {
+    if (lobbyMessageListener != null && message != null && !message.isBlank()) {
+      lobbyMessageListener.accept(message);
     }
   }
 

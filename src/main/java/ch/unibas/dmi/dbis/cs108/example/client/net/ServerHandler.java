@@ -116,6 +116,9 @@ public class ServerHandler implements Runnable {
       case GAME_START:
         handleGameStart();
         break;
+      case YAP:
+        handleYap(packet);
+        break;
       default:
         handleUnknown(packet);
         break;
@@ -210,6 +213,11 @@ public class ServerHandler implements Runnable {
   private void handleWhisper(Packet packet) {
     LOGGER.info("Whisper: {}", packet.text());
     GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
+  }
+
+  private void handleYap(Packet packet) {
+    LOGGER.info("YAP: {}", packet.text());
+    GameModel.getInstance().addLobbyChatMessage(packet.text()); //adds message to text
   }
 
   /**
