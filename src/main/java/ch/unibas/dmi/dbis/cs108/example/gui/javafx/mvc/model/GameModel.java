@@ -13,8 +13,7 @@ import java.util.List;
 /**
  * Holds all the important data for the game.
  * This includes the player list, chat messages, and game maps.
- * It's a Singleton, meaning there is only one instance of this class
- * for the entire application.
+ * Operates as a Singleton
  */
 @SuppressWarnings("java:S6548")
 public class GameModel {
@@ -30,6 +29,7 @@ public class GameModel {
   private final ObservableList<String> chatMessages = FXCollections.observableArrayList();
   private final ObservableList<String> availableLobbies = FXCollections.observableArrayList();
   private final ObservableList<String> runningLobbies = FXCollections.observableArrayList();
+  private final ObservableList<String> lobbyChatMessages = FXCollections.observableArrayList();
 
   // Map properties
   private final ObjectProperty<Image> gameMap = new SimpleObjectProperty<>();
@@ -42,11 +42,9 @@ public class GameModel {
 
   /**
    * Gets the single instance of the GameModel.
-   * This is used by other classes to access the game's data.
    *
    * @return The one and only instance of GameModel.
    */
-  // The Singleton pattern is used intentionally here.
   public static synchronized GameModel getInstance() { // NOSONAR
     if (instance == null) {
       instance = new GameModel();
@@ -79,7 +77,7 @@ public class GameModel {
       double x = Double.parseDouble(data[2]);
       double y = Double.parseDouble(data[3]);
       int score = Integer.parseInt(data[4]);
-      if (name.endsWith(playerName.getValue())){
+      if (name.endsWith(playerName.getValue())) {
         playerScore.set(score);
         playerRole.set(role);
       }
@@ -156,10 +154,27 @@ public class GameModel {
   }
 
   /**
+   * Adds a message to the lobby chat
+   *
+   * @param msg the message to add.
+   */
+  public void addLobbyChatMessage(String msg) {
+    Platform.runLater(() -> lobbyChatMessages.add(msg));
+  }
+
+  /**
    * @return The list of chat messages.
    */
   public ObservableList<String> chatMessagesProperty() {
     return chatMessages;
+  }
+
+
+  /**
+   * @return The list of lobby chat messages.
+   */
+  public ObservableList<String> lobbyChatMessagesProperty() {
+    return lobbyChatMessages;
   }
 
   /**
@@ -167,6 +182,13 @@ public class GameModel {
    */
   public void clearChat() {
     Platform.runLater(chatMessages::clear);
+  }
+
+  /**
+   * Clears all messages from the lobby chat.
+   */
+  public void clearLobbyChat() {
+    Platform.runLater(lobbyChatMessages::clear);
   }
 
   // ---GETTERS---
@@ -224,5 +246,6 @@ public class GameModel {
     this.lobbyPlayers.clear();
     this.playerScore.set(0);
     this.clearChat();
+    this.clearLobbyChat();
   }
 }

@@ -5,6 +5,9 @@ import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
 import javafx.beans.binding.Bindings;
 
+/**
+ * Scene allowing the user to update their current nickname.
+ */
 public class NicknameScene extends AbstractInputScene {
     public NicknameScene(){
         super();

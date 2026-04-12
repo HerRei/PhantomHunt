@@ -1,39 +1,98 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model;
 
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class Player {
-    private final StringProperty name;
-    private final IntegerProperty score;
-    private final StringProperty skin; // Pfad zum Bild oder Enum-Name
-    private final DoubleProperty xPosition; // Ranglisten-Platz oder X Koordinate
-    private final DoubleProperty yPosition; // Ranglisten-Platz oder X Koordinate
+  private final StringProperty name;
+  private final IntegerProperty score;
+  private final StringProperty skin;
+  private final DoubleProperty xPosition;
+  private final DoubleProperty yPosition;
 
-    public Player(String name, String skin, int score, double x, double y) {
-        this.name = new SimpleStringProperty(name);
-        this.skin = new SimpleStringProperty(skin);
-        this.score = new SimpleIntegerProperty(score);
-        this.xPosition = new SimpleDoubleProperty(x);
-        this.yPosition = new SimpleDoubleProperty(y);
-    }
+  /**
+   * Creates a new Player instance.
+   *
+   * @param name The player's nickname
+   * @param skin The path to the image or enum name representing the player's appearance
+   * @param score The initial score
+   * @param x The X coordinate
+   * @param y The Y coordinate
+   */
+  public Player(String name, String skin, int score, double x, double y) {
+    this.name = new SimpleStringProperty(name);
+    this.skin = new SimpleStringProperty(skin);
+    this.score = new SimpleIntegerProperty(score);
+    this.xPosition = new SimpleDoubleProperty(x);
+    this.yPosition = new SimpleDoubleProperty(y);
+  }
 
-    // Getters
-    public StringProperty nameProperty() { return name; }
-    public IntegerProperty scoreProperty() { return score; }
-    public StringProperty skinProperty() { return skin; }
-    public DoubleProperty xPosition() { return xPosition; }
-    public DoubleProperty yPosition() { return yPosition; }
+  public String getName() {
+    return name.get();
+  }
 
+  public void setName(String value) {
+    name.set(value);
+  }
 
-    // Standard-Getter/Setter für die Werte selbst
-    public void setScore(int newScore) { this.score.set(newScore); }
-    
-    public void setPosition(double x, double y) {
-        this.xPosition.set(x);
-        this.yPosition.set(y);
-    }
+  public StringProperty nameProperty() {
+    return name;
+  }
 
-    public void setSkin(String newSkin) {
-        this.skin.set(newSkin);
-    }
+  public String getSkin() {
+    return skin.get();
+  }
+
+  public void setSkin(String value) {
+    skin.set(value);
+  }
+
+  public StringProperty skinProperty() {
+    return skin;
+  }
+
+  public int getScore() {
+    return score.get();
+  }
+
+  public void setScore(int value) {
+    score.set(value);
+  }
+
+  public IntegerProperty scoreProperty() {
+    return score;
+  }
+
+  public double getXPosition() {
+    return xPosition.get();
+  }
+
+  public void setXPosition(double value) {
+    xPosition.set(value);
+  }
+
+  public DoubleProperty xPosition() {
+    return xPosition;
+  }
+
+  public double getYPosition() {
+    return yPosition.get();
+  }
+
+  public void setYPosition(double value) {
+    yPosition.set(value);
+  }
+
+  public DoubleProperty yPosition() {
+    return yPosition;
+  }
+
+  public void setPosition(double x, double y) {
+    xPosition.set(x);
+    yPosition.set(y);
+  }
 }

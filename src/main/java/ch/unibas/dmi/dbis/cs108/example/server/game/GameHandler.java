@@ -1,14 +1,11 @@
 package ch.unibas.dmi.dbis.cs108.example.server.game;
 
-import ch.unibas.dmi.dbis.cs108.example.client.net.ServerHandler;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.server.game.state.*;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Objects;
@@ -18,11 +15,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * GameHandler owns the match flow and mutates the extracted game state classes.
+ * Owns the match flow and mutates the extracted game state classes safely.
+ * Acts as the authoritative controller for a running game.
  */
 public class GameHandler {
 
-  private static final Logger LOGGER = LogManager.getLogger(GameHandler.class);
   private final GameState gameState;
   private final LobbyHandler lobbyHandler;
   private final Lobby lobby;
@@ -175,6 +172,11 @@ public class GameHandler {
     }
   }
 
+  /**
+   * Starts the match and initializes the first round.
+   *
+   * @param nowMillis The current server time in milliseconds.
+   */
   public synchronized void startMatch(long nowMillis) {
     ensurePhase(GamePhase.WAITING_TO_START, "Match has already been started.");
     RoundState roundState = gameState.getMutableRoundState();
@@ -183,6 +185,12 @@ public class GameHandler {
     startCurrentRound(nowMillis);
   }
 
+  /**
+   * Concludes the round immediately with the human being caught.
+   *
+   * @param catcherPlayerId The ID of the phantom who caught the human.
+   * @param nowMillis       The current server time in milliseconds.
+   */
   public synchronized void endRoundHumanCaught(String catcherPlayerId, long nowMillis) {
     ensurePhase(GamePhase.ROUND_RUNNING, "Round is not running.");
 
@@ -208,6 +216,11 @@ public class GameHandler {
     finishRound(outcome);
   }
 
+  /**
+   * Concludes the round immediately with the human surviving the time limit.
+   *
+   * @param nowMillis The current server time in milliseconds.
+   */
   public synchronized void endRoundHumanSurvived(long nowMillis) {
     ensurePhase(GamePhase.ROUND_RUNNING, "Round is not running.");
 
@@ -226,6 +239,11 @@ public class GameHandler {
     finishRound(outcome);
   }
 
+  /**
+   * Aborts the entire match prematurely (e.g., due to player disconnect).
+   *
+   * @param reason The reason for the abort.
+   */
   public synchronized void abortMatch(String reason) {
     if (gameState.getPhase() == GamePhase.MATCH_ENDED || gameState.getPhase() == GamePhase.ABORTED) {
       return;
@@ -242,6 +260,11 @@ public class GameHandler {
     lobbyHandler.finishLobby(gameState.getMatchId());
   }
 
+  /**
+   * Progresses the game to the next round, or finishes the match if all rounds are played.
+   *
+   * @param nowMillis The current server time in milliseconds.
+   */
   public synchronized void advanceToNextRound(long nowMillis) {
     ensurePhase(GamePhase.ROUND_ENDED, "Can only advance after a round has ended.");
 

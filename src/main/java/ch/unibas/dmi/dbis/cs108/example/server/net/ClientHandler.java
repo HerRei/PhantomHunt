@@ -4,10 +4,8 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.example.server.game.GameHandler;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.GameState;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.LobbyHandler;
-import ch.unibas.dmi.dbis.cs108.example.server.game.state.InputState;
 import ch.unibas.dmi.dbis.cs108.example.server.session.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,16 +21,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
- //---------------------------------------------------------------------------------------------
- //Attention - 29.3.26
- // Please refrain form putting anymore GameLogic into this Class
- // Should mainly do: Socket reading, Packet sending, and sending
- //---------------------------------------------------------------------------------------------
-
-
 /**
  * Handles the connection to a single client on the server. Listens for incoming packets, processes
  * them, and can send packets back.
+ * <p>
+ * <b>Attention:</b> Please refrain from putting any GameLogic into this class.
+ * It should mainly handle Socket reading, Packet decoding, and sending.
  */
 public class ClientHandler implements Runnable {
 
@@ -53,8 +47,8 @@ public class ClientHandler implements Runnable {
   /**
    * Creates a new handler for a connected client.
    *
-   * @param socket The socket connection to the client.
-   * @param registry The server registry that manages all connected players.
+   * @param socket       The socket connection to the client.
+   * @param registry     The server registry that manages all connected players.
    * @param lobbyHandler The handler for managing lobbies.
    */
   public ClientHandler(Socket socket, Registry registry, LobbyHandler lobbyHandler) {
@@ -143,7 +137,7 @@ public class ClientHandler implements Runnable {
     } catch (IOException e) {
       LOGGER.error("Error while closing socket for client {}", getName(), e);
     }
-    registry.broadcast(this, Packet.of(Command.INFO,  getName() + ": left the Server"));
+    registry.broadcast(this, Packet.of(Command.INFO, getName() + ": left the Server"));
     LOGGER.info("Client {} disconnected.", name);
     sendPlayers();
   }
@@ -205,6 +199,10 @@ public class ClientHandler implements Runnable {
    * @param p The packet containing the yap message.
    */
   private void handleYap(Packet p) {
+    if (currentLobby == null) {
+      sendMessage(Packet.of(Command.REJECT, "You are not in a lobby."));
+      return;
+    }
     String msg = String.join(" ", p.args());
     LOGGER.info("YAP from {}: {}", name, msg);
     registry.yapping(this, Packet.of(Command.YAP, getName() + ": " + msg));
@@ -238,11 +236,14 @@ public class ClientHandler implements Runnable {
     disconnect();
   }
 
-  private void sendPlayers(){
+  private void sendPlayers() {
     registry.broadcast(this, Packet.of(Command.PLAYERS, registry.names()));
   }
 
-  private void handleLobbyLogout(Packet p){
+  private void handleLobbyLogout(Packet p) {
+    if (p.argc() < 1) {
+      return;
+    }
     String lobbyId = p.args().get(0);
     lobbyHandler.leaveLobby(lobbyId, this);
   }
@@ -285,17 +286,25 @@ public class ClientHandler implements Runnable {
   }
 
   private void handleInput(Packet p) {
-    // 1. Check if the player is actually in a lobby
     Lobby lobby = this.getCurrentLobby();
-    if (lobby == null) return;
+    if (lobby == null) {
+      return;
+    }
 
-    // 2. Check if there is an active game session
-    // Make sure Lobby.java has a method public GameHandler getActiveGame()
-    GameHandler gameHandler = lobby.getActiveGame().get();
-    if (gameHandler == null) return;
+    GameHandler gameHandler = lobby.getActiveGame().orElse(null);
+    if (gameHandler == null) {
+      return;
+    }
 
     try {
+      if (p.argc() < 1) {
+        return;
+      }
       String[] inputs = p.args().get(0).split("\\s+");
+      if (inputs.length < 4) {
+        sendMessage(Packet.of(Command.REJECT, "Invalid input packet."));
+        return;
+      }
       boolean u = inputs[0].equals("1");
       boolean d = inputs[1].equals("1");
       boolean l = inputs[2].equals("1");
@@ -314,7 +323,8 @@ public class ClientHandler implements Runnable {
    * @param p packet containing the requested nickname
    */
   private void handleNickChange(Packet p) {
-    String newNick = String.join(" ", p.args());
+    String newNick = String.join(" ", p.args()).replaceAll("\\s+", "_");
+
     if (newNick.isBlank()) {
       sendMessage(Packet.of(Command.REJECT, "Nickname cannot be blank."));
       return;
@@ -333,11 +343,10 @@ public class ClientHandler implements Runnable {
       sendMessage(Packet.of(Command.REJECT, "Name was taken. You are now: " + this.name));
     }
     sendMessage(Packet.of(Command.WELCOME, this.name));
-    if(oldName!= null){
-      registry.broadcast(this, Packet.of(Command.INFO,  oldName + ": changed nickname to -> " + this.name));
-    }
-    else {
-      registry.broadcast(this, Packet.of(Command.INFO,  "Welcome to the Server: " + this.name));
+    if (oldName != null) {
+      registry.broadcast(this, Packet.of(Command.INFO, oldName + ": changed nickname to -> " + this.name));
+    } else {
+      registry.broadcast(this, Packet.of(Command.INFO, "Welcome to the Server: " + this.name));
     }
     sendPlayers();
   }
@@ -371,7 +380,7 @@ public class ClientHandler implements Runnable {
   @Override
   public void run() {
     try (var in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-        var out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
+         var out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
       this.out = out;
       registry.register(this);
       LOGGER.info("New client connected: {}", name);

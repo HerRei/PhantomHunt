@@ -4,6 +4,9 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
 
+/**
+ * Scene allowing the user to create a new multiplayer lobby.
+ */
 public class CreateLobbyScene extends AbstractInputScene {
   public CreateLobbyScene() {
     super();

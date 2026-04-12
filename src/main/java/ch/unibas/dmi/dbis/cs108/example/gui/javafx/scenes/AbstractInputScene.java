@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
- * Abstract base class for scenes with a description, an input field, and two buttons.
+ * Abstract base class for scenes with a description, an input field, and confirmation/back buttons.
  */
 public abstract class AbstractInputScene implements SceneInterface {
 
@@ -20,10 +20,11 @@ public abstract class AbstractInputScene implements SceneInterface {
     protected Button backButton;
     protected Scene scene;
 
+    /**
+     * Initializes the UI components and calls the setup methods.
+     */
     public AbstractInputScene() {
-        // Initialize the UI components and layout
         buildBaseLayout();
-        // Call abstract methods to be implemented by child classes
         setupTexts();
         setupEvents();
     }
@@ -66,15 +67,12 @@ public abstract class AbstractInputScene implements SceneInterface {
     }
 
     /**
-     * Subclasses must implement this to set specific text for:
-     * - descriptionLabel
-     * - inputField (prompt text)
-     * - confirmButton
+     * Configures the specific text values for the UI components.
      */
     protected abstract void setupTexts();
 
     /**
-     * Subclasses must implement this to define event handlers for the buttons.
+     * Configures the event handlers for user interaction.
      */
     protected abstract void setupEvents();
 

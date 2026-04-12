@@ -38,10 +38,9 @@ public class ServerHandler implements Runnable {
   private String name;
 
   /**
-   * Creates a new handler for the server connection and starts immediately
-   * the read thread.
+   * Creates a new handler for the server connection and starts the read thread immediately
    *
-   * @param socket The connected Socket, through which communication with the server takes place.
+   * @param socket The connected socket through which communication with the server takes place.
    */
   public ServerHandler(Socket socket) {
     this.socket = socket;
@@ -142,24 +141,31 @@ public class ServerHandler implements Runnable {
   }
 
   private void handlePlayers(Packet packet) {
-    if (packet.args() == null) return;
+    if (packet.argc() < 1) {
+      return;
+    }
     Platform.runLater(() -> {
       String[] names = packet.args().get(0).split(" ");
       GameModel.getInstance().players.setAll(names);
     });
   }
 
-  private void handleYap(Packet packet) {
-    LOGGER.info("Yap: {}", packet.text());
-    GameModel.getInstance().addChatMessage(packet.text()); //adds message to chat
-  }
-
+  /**
+   * Handles the game start packet by switching the UI to the game scene
+   * This action is executed on the JavaFX Application Thread.
+   */
   private void handleGameStart() {
     Platform.runLater(() -> {
       SceneManager.getInstance().showScene(SceneProtocol.GAME);
     });
   }
 
+  /**
+   * Parses lobby information received from the server and updates the lobby scene.
+   * If the lobby scene is active, it updates the lobby ID and the list of connected players.
+   *
+   * @param packet the packet containing the lobby ID and player names
+   */
   private void handleLobbyInfo(Packet packet) {
     String[] parts = packet.text().split(" ");
     if (parts.length < 1) {
@@ -172,7 +178,7 @@ public class ServerHandler implements Runnable {
     Platform.runLater(() -> {
       SceneManager sceneManager = SceneManager.getInstance();
       sceneManager.showScene(SceneProtocol.LOBBY);
-      LobbyScene lobbyScene = (LobbyScene) sceneManager.scenes.get(SceneProtocol.LOBBY);
+      LobbyScene lobbyScene = (LobbyScene) sceneManager.getScene(SceneProtocol.LOBBY);
       if (lobbyScene != null) {
         lobbyScene.updateLobbyInfo(lobbyId, players);
       } else {
@@ -182,7 +188,9 @@ public class ServerHandler implements Runnable {
   }
 
   /**
-   * Updates the name.
+   * Updates the internal name and synchronizes it with the GameModel on the UI thread.
+   *
+   * @param packet the welcome packet containing the assigned name.
    */
   private void handleWelcome(Packet packet) {
     this.name = packet.text();
@@ -191,11 +199,15 @@ public class ServerHandler implements Runnable {
         GameModel.getInstance().setName(this.name);
       });
     } catch (Exception e) {
-      LOGGER.info("JavaFX not available");
+      LOGGER.info("JavaFX is not available");
     }
   }
 
   private void handleGameStateUpdate(Packet p) {
+    if (p.argc() < 1) {
+      LOGGER.warn("Received empty game state update packet");
+      return;
+    }
     String payload = p.args().get(0);
 
     // We use Platform.runLater because this updates the UI-bound GameModel
@@ -207,7 +219,6 @@ public class ServerHandler implements Runnable {
       }
     });
   }
-
 
   /**
    * Responds to a server ping with a pong packet.
@@ -228,9 +239,9 @@ public class ServerHandler implements Runnable {
   }
 
   /**
-   * adds Infos such as Nickname Change or left player to chat
+   * Adds Infos such as Nickname Change or left player to chat.
    *
-   * @param packet
+   * @param packet the info packet containing the server message
    */
   private void handleInfo(Packet packet) {
     LOGGER.info("Info: {}", packet.text());
@@ -257,6 +268,11 @@ public class ServerHandler implements Runnable {
     GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
   }
 
+  private void handleYap(Packet packet) {
+    LOGGER.info("YAP: {}", packet.text());
+    GameModel.getInstance().addLobbyChatMessage(packet.text()); //adds message to text
+  }
+
   /**
    * Logs a successful server-side action such as a nickname change confirmation.
    *
@@ -267,13 +283,11 @@ public class ServerHandler implements Runnable {
   }
 
   /**
-   * Processes a rejection sent by the server and updates the confirmed nickname if needed.
+   * Processes a rejection sent by the server and logs the error.
    *
    * @param packet packet containing the rejection text
    */
   private void handleReject(Packet packet) {
-    String text = packet.text();
-    String marker = "You are now: ";
     LOGGER.error("Error: {}", packet.text());
   }
 
@@ -305,7 +319,7 @@ public class ServerHandler implements Runnable {
   /**
    * Sends a packet to the server over the active socket connection.
    *
-   * @param p
+   * @param p the packet to be sent to the server
    */
   public synchronized void sendMessage(Packet p) {
     if (p == null) {
@@ -339,7 +353,6 @@ public class ServerHandler implements Runnable {
     }
   }
 
-  //---getters---
   public String getName() {
     return this.name;
   }

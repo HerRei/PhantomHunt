@@ -21,6 +21,12 @@ public final class GameFactory {
 
   /**
    * Creates a game with the provided rules and map.
+   *
+   * @param matchId The unique identifier for th match.
+   * @param playerSeeds Initial configuration data for players.
+   * @param rules The specific game rules to apply.
+   * @param map The collision map for the game.
+   * @return A newly initialized GameState.
    */
   public GameState create(
           String matchId, List<PlayerSeed> playerSeeds, GameRules rules, TileType[][] map) {
@@ -31,6 +37,11 @@ public final class GameFactory {
 
   /**
    * Creates a game using {@link GameRules#defaultRules()}.
+   *
+   * @param matchId The unique identifier for the match.
+   * @param playerSeeds Initial configuration data for players.
+   * @param map The collision map for the game.
+   * @return A newly initialized GameState.
    */
   public GameState createWithDefaultRules(
           String matchId, List<PlayerSeed> playerSeeds, TileType[][] map) {

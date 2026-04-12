@@ -3,6 +3,9 @@ package ch.unibas.dmi.dbis.cs108.example.server.game.state;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Encapsulates the results and statistics of a completed game round.
+ */
 public final class RoundOutcome {
   private final int roundNumber;
   private final RoundOutcomeType type;

@@ -1,5 +1,8 @@
 package ch.unibas.dmi.dbis.cs108.example.server.game.state;
 
+/**
+ * Represents the current movement intentions of a player based on their client input.
+ */
 public final class InputState {
   private final boolean up;
   private final boolean down;

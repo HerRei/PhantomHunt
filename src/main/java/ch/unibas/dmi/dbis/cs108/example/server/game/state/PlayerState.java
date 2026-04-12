@@ -2,6 +2,10 @@ package ch.unibas.dmi.dbis.cs108.example.server.game.state;
 
 import java.util.Objects;
 
+/**
+ * Tracks the mutable state of a specific player during a match,
+ * including position, score, and connection status.
+ */
 public final class PlayerState {
   private final String playerId;
   private String nickname;
@@ -12,6 +16,9 @@ public final class PlayerState {
   private boolean connected;
   private boolean caughtThisRound;
 
+  /**
+   * Creates an independent copy of this player's state.
+   */
   public PlayerState(
       String playerId,
       String nickname,

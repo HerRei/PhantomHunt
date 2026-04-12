@@ -1,5 +1,8 @@
 package ch.unibas.dmi.dbis.cs108.example.server.game.state;
 
+/**
+ * Defines the immutable configuration and parameters for a match
+ */
 public record GameRules(
     int totalRounds,
     long roundDurationMillis,
@@ -25,6 +28,11 @@ public record GameRules(
     }
   }
 
+  /**
+   * Provides the standard ruleset for a default game.
+   *
+   * @return A GameRules instance with default parameters.
+   */
   public static GameRules defaultRules() {
     return new GameRules(
         4,

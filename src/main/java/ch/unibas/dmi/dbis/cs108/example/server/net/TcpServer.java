@@ -19,6 +19,11 @@ public class TcpServer {
   private final int port;
   private CountDownLatch readyLatch;
 
+  /**
+   * Creates a new TCP server without a readiness latch.
+   *
+   * @param port The port the server will listen on.
+   */
   public TcpServer(int port){this.port = port;} //should be deleted soon left it for serverApp
 
   /**
@@ -31,10 +36,14 @@ public class TcpServer {
     this.readyLatch = readyLatch;
   }
 
-  // this starts the server
+  /**
+   * Starts the server loop, accepting incoming connections and assigning each
+   * to a new dedicated ClientHandler thread.
+   */
   public void start() {
     try (ServerSocket serverSocket = new ServerSocket(port)) {
       LOGGER.info("Server listening on port: {}", port);
+
       if (readyLatch != null) {
         readyLatch.countDown();
       }
@@ -45,8 +54,7 @@ public class TcpServer {
       while (true) {
         Socket socket =
             serverSocket
-                .accept(); // lopps until succesful connection, this is the last step of the server
-        // activation!
+                .accept(); // loops until successful connection, this is the last step of the server activation
         LOGGER.info(
             "Connection to server from client-adress: {}",
             socket.getRemoteSocketAddress()); // debug logs

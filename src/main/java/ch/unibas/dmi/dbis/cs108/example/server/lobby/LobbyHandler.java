@@ -14,6 +14,10 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Manages all lobbies on the server including creating, joining, leaving,
+ * spectating lobbies, and transitioning to active games.
+ */
 public class LobbyHandler {
 
   private static final Logger LOGGER = LogManager.getLogger(LobbyHandler.class);
@@ -40,6 +44,11 @@ public class LobbyHandler {
     return Optional.ofNullable(finishedLobbies);
   }
 
+  /**
+   * Returning a comma-separated string with the IDs of the lobbies across all states.
+   *
+   * @return a String with the IDs of the lobbies
+   */
   public String getLobbies() {
     StringBuilder sb = new StringBuilder();
     for (Lobby lobby : waitingLobbies) {
@@ -61,6 +70,13 @@ public class LobbyHandler {
   // ---------------------------------------------------------------------------------------------
   // Lobby Management & Methods
   // ---------------------------------------------------------------------------------------------
+
+  /**
+   * Starts a game in the given lobby.
+   *
+   * @param id        the ID of the lobby to start the game in
+   * @param requester the client requesting the game start
+   */
   public void startGame(String id, ClientHandler requester) {
     Optional<Lobby> lobbyOpt = findLobbyById(id, waitingLobbies);
     if (lobbyOpt.isEmpty()) {
@@ -104,6 +120,13 @@ public class LobbyHandler {
     gameHandler.startGameLoop();
   }
 
+  /**
+   * Creates a new lobby with the given name and host.
+   *
+   * @param name the name of the lobby
+   * @param host the host of the lobby
+   * @return the created lobby
+   */
   public Lobby createLobby(String name, ClientHandler host) {
     String id = "lobby" + lobbyCounter.getAndIncrement();
 
@@ -116,6 +139,12 @@ public class LobbyHandler {
     return lobby;
   }
 
+  /**
+   * Joins a player to a lobby.
+   *
+   * @param id     the ID of the lobby to join
+   * @param player the player to join the lobby
+   */
   public void joinLobby(String id, ClientHandler player) {
     Optional<Lobby> lobbyOpt = findLobbyById(id, waitingLobbies);
     if (lobbyOpt.isEmpty()) {
@@ -129,6 +158,12 @@ public class LobbyHandler {
     }
   }
 
+  /**
+   * Allows a player to spectates a lobby.
+   *
+   * @param id     the ID of the lobby to spectate
+   * @param player the player to spectate the lobby
+   */
   public void spectateLobby(String id, ClientHandler player) {
     Optional<Lobby> lobbyOpt = findLobbyById(id);
     if (lobbyOpt.isEmpty()) {
@@ -142,6 +177,12 @@ public class LobbyHandler {
     }
   }
 
+  /**
+   * Removes a player or spectator from a lobby. If the lobby becomes empty, it is destroyed.
+   *
+   * @param id     the ID of the lobby
+   * @param player the client to remove
+   */
   public void leaveLobby(String id, ClientHandler player) {
     Optional<Lobby> lobbyOpt = findLobbyById(id);
     if (lobbyOpt.isEmpty()) return;
@@ -159,6 +200,11 @@ public class LobbyHandler {
     }
   }
 
+  /**
+   * Moves a lobby from the playing state to the finished state.
+   *
+   * @param id the ID of the lobby to finish
+   */
   public void finishLobby(String id) {
     Optional<Lobby> lobbyOpt = findLobbyById(id, playingLobbies);
     if (lobbyOpt.isEmpty()) {

@@ -30,7 +30,7 @@ Before running the game, you need to compile the code and build the executable .
 **Run the Application**
 Once the build is successful you can start the game via the terminal using the following syntax:
 
-java -jar build/libs/phantom-hunt.jar **mode address/address:port**
+java -jar build/libs/phantom-hunt.jar *mode* and *port / address:port*
 
 **Starting as a Server:**
 To host a server, set the mode to server and specify the port you want to open.
@@ -41,3 +41,19 @@ For example:
 To join as a client, set the mode to client and provide the IP address and port of the host server.
 For example:
 **java -jar build/libs/phantom-hunt.jar client 192.168.1.9:2222**
+
+## Running Tests and Quality Assurance
+
+To ensure the stability and correctness of the game, we use automated testing and coverage tools. Open the terminal in the root directory to run the following commands.
+
+**Execute Unit Tests:**
+To run all automated tests, execute: 
+**./gradlew test**
+Once finished, view the detailed test results by executing 
+**open build/reports/tests/test/index.html**.
+
+**Generate Code Coverage Report (JaCoCo):**
+To measure the line coverage of our test site, run: 
+**./gradlew test jacocoTestReport**
+The generated HTML report can be viewed by executing 
+**open build/reports/jacoco/test/html/index.html**.
