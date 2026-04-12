@@ -15,8 +15,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Manages all lobbies.
- * creating, joining, leaving and spectating lobbies and starting games.
+ * Manages all lobbies on the server including creating, joining, leaving,
+ * spectating lobbies, and transitioning to active games.
  */
 public class LobbyHandler {
 
@@ -45,7 +45,7 @@ public class LobbyHandler {
   }
 
   /**
-   * Returning a String with the IDs of the lobbies
+   * Returning a comma-separated string with the IDs of the lobbies across all states.
    *
    * @return a String with the IDs of the lobbies
    */
@@ -177,10 +177,10 @@ public class LobbyHandler {
   }
 
   /**
-   * Removes a player from a lobby.
+   * Removes a player or spectator from a lobby. If the lobby becomes empty, it is destroyed.
    *
-   * @param id     the ID of the lobby to remove the player from
-   * @param player the player to remove from the lobby
+   * @param id     the ID of the lobby
+   * @param player the client to remove
    */
   public void leaveLobby(String id, ClientHandler player) {
     Optional<Lobby> lobbyOpt = findLobbyById(id);
@@ -199,7 +199,7 @@ public class LobbyHandler {
   }
 
   /**
-   * Finishes a lobby.
+   * Moves a lobby from the playing state to the finished state.
    *
    * @param id the ID of the lobby to finish
    */

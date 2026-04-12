@@ -18,6 +18,11 @@ import java.util.Optional;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a lobby where players can gather before starting a game.
+ * A lobby has a unique ID, a name, a host, and a list of players and spectators.
+ * It also manages the game associated with the lobby.
+ */
 public class Lobby {
 
   private static final Logger LOGGER = LogManager.getLogger(Lobby.class);
@@ -121,7 +126,7 @@ public class Lobby {
   }
 
   /**
-   * Removes a player from the lobby
+   * Removes a player from the lobby. If the host leaves, assigns a new host.
    *
    * @param player the player to remove
    * @return true if the player was removed, false otherwise
