@@ -152,7 +152,7 @@ public class ServerHandler implements Runnable {
     Platform.runLater(() -> {
       SceneManager sceneManager = SceneManager.getInstance();
       sceneManager.showScene(SceneProtocol.LOBBY);
-      LobbyScene lobbyScene = (LobbyScene) sceneManager.scenes.get(SceneProtocol.LOBBY);
+      LobbyScene lobbyScene = (LobbyScene) sceneManager.getScene(SceneProtocol.LOBBY);
       if (lobbyScene != null) {
         lobbyScene.updateLobbyInfo(lobbyId, players);
       } else {
