@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.example.server.game.state.*;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.example.server.lobby.LobbyHandler;
+import ch.unibas.dmi.dbis.cs108.example.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -247,6 +248,10 @@ public class GameHandler {
     if (!hasNextRound()) {
       gameState.setPhase(GamePhase.MATCH_ENDED);
       lobbyHandler.finishLobby(gameState.getMatchId());
+      var playersInLobby = lobby.getPlayers().get();
+      for (ClientHandler gh : playersInLobby) {
+        lobbyHandler.leaveLobby(lobby.getId(), gh);
+      }
       lobby.broadcast(Packet.of(Command.GAME_FINISH));
       return;
     }

@@ -58,7 +58,8 @@ public class GameScene implements SceneInterface {
   private VBox createSidebar(GameModel model) {
     VBox box = new VBox(15);
     box.setPadding(new Insets(15));
-    box.setPrefWidth(250); // Fixed sidebar width
+    box.setPrefWidth(250);
+    box.setPrefHeight(720);// Fixed sidebar width
     box.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
 
     // --- 1. Game Status (Role, Round, Time) ---

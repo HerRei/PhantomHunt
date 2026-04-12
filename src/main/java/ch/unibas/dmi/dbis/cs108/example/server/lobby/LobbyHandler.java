@@ -145,9 +145,10 @@ public class LobbyHandler {
   public void leaveLobby(String id, ClientHandler player) {
     Optional<Lobby> lobbyOpt = findLobbyById(id);
     if (lobbyOpt.isEmpty()) return;
-
     Lobby lobby = lobbyOpt.get();
+    LOGGER.info("HI");
     if (lobby.removePlayer(player) || lobby.removeSpectator(player)) {
+      LOGGER.info("YEAH");
       player.setCurrentLobby(null);
       if (lobby.getPlayers().isPresent() && lobby.getPlayers().get().isEmpty() && lobby.getSpectators().isPresent() && lobby.getSpectators().get().isEmpty()) {
         waitingLobbies.remove(lobby);

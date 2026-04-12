@@ -48,16 +48,10 @@ public class EndScene implements SceneInterface {
         rankingTable.getColumns().addAll(nameCol, scoreCol);
         rankingTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Back to Hub Button
-        Button backToHubBtn = new Button("Back to Hub");
-        backToHubBtn.setPrefSize(200, 50);
-        backToHubBtn.setStyle("-fx-font-size: 16px; -fx-base: #444; -fx-text-fill: white;");
-        backToHubBtn.setOnAction(e -> {
-            EventHandlers.getInstance().resetAndBackToHub();
-        });
+
 
         // Layout
-        VBox root = new VBox(20, titleLabel, yourScoreText, finalScoreLabel, rankingTable, backToHubBtn);
+        VBox root = new VBox(20, titleLabel, yourScoreText, finalScoreLabel, rankingTable);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #222;");
 

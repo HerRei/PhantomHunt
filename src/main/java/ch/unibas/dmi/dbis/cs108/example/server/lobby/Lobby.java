@@ -21,7 +21,7 @@ public class Lobby {
   private final Vector<ClientHandler> spectators = new Vector<>();
   private final String id;
   private final String name;
-  private ClientHandler host;
+  public ClientHandler host;
   private GameHandler activeGame;
   // ---------------------------------------------------------------------------------------------
   // Constructor
