@@ -12,8 +12,7 @@ import javafx.stage.Screen; // Import for screen dimensions
 
 /**
  * Represents the map screen where the game is played.
- * This class is responsible for displaying the map and providing
- * collision detection logic.
+ * Handles the display of the map and provides pixel-based collision detection.
  */
 public class GameScene implements SceneInterface {
 
@@ -22,9 +21,7 @@ public class GameScene implements SceneInterface {
   private PixelReader pixelReader;
 
   /**
-   * Creates a new GameScene.
-   * It fetches the necessary map images from the GameModel and sets up
-   * the visual components of the scene. The map is scaled to fit the user's screen.
+   * Initializes the game scene, fetching the map images and scaling them to the screen.
    */
   public GameScene() {
     // Get the model instance

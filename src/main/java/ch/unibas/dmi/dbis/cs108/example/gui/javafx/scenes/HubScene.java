@@ -13,9 +13,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+/**
+ * The primary hub scene displaying the global chat, profile options, and lobby navigation.
+ */
 public class HubScene implements SceneInterface {
 
-    // GEÄNDERT: Von TextArea zu ListView für Property-Binding
     private ListView<String> chatDisplay;
     private TextField chatInput;
     private TextField whisperTargetInput;
@@ -28,8 +30,10 @@ public class HubScene implements SceneInterface {
         createScene();
     }
 
+    /**
+     * Constructs the UI layout for the hub.
+     */
     public void createScene() {
-        // --- LEFT SIDE: Navigation & Profile ---
         VBox leftMenu = new VBox(20);
         leftMenu.setPadding(new Insets(25));
         leftMenu.setAlignment(Pos.TOP_CENTER);

@@ -11,6 +11,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+/**
+ * Represents the lobby waiting area, displaying connected players and a lobby chat.
+ */
 public class LobbyScene implements SceneInterface {
 
   private Scene scene;
@@ -70,6 +73,12 @@ public class LobbyScene implements SceneInterface {
     });
   }
 
+  /**
+   * Updatess the UI with the latest lobby state from the server.
+   *
+   * @param lobbyId The current lobby ID.
+   * @param players Array of player names currently in the lobby.
+   */
   public void updateLobbyInfo(String lobbyId, String[] players) {
     id = lobbyId;
     lobbyIdLabel.setText("Lobby ID: " + id);

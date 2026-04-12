@@ -4,11 +4,13 @@ import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.SceneManager;
 
+/**
+ * Scene allowing the user to join an existing multiplayer lobby via ID.
+ */
 public class JoinLobbyScene extends AbstractInputScene {
   public JoinLobbyScene() {
     super();
   }
-
 
   @Override
   protected void setupTexts() {

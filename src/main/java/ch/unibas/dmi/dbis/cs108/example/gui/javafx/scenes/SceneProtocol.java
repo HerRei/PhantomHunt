@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 
 /**
- * Alle Szenen wichtig für sceneManager
+ * Enumeration of all registered scenes managed by the SceneManager
  */
 public enum SceneProtocol {
   LOADING,
