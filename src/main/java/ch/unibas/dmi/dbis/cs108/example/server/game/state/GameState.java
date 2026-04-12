@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Thread-safe central state repository for a single match.
+ * Holds all data regarding players, the map, rounds, and rules
+ */
 public class GameState {
   public static final int REQUIRED_PLAYER_COUNT = 4;
 
@@ -30,6 +34,9 @@ public class GameState {
     this.lastRoundOutcome = null;
   }
 
+  /**
+   * Retrieves a safe snapshot of a player's current state.
+   */
   public synchronized Optional<PlayerState> findPlayer(String playerId) {
     for (PlayerState player : players) {
       if (player.getPlayerId().equals(playerId)) {
@@ -39,11 +46,17 @@ public class GameState {
     return Optional.empty();
   }
 
+  /**
+   * Retrieves a safe snapshot of the current human player.
+   */
   public synchronized PlayerState getHumanPlayer() {
     ensureAtLeastOneRoundStarted();
     return players.get(roundState.getHumanIndex()).copy();
   }
 
+  /**
+   * Retrieves safe snapshots of all current phantom players.
+   */
   public synchronized List<PlayerState> getPhantomPlayers() {
     ensureAtLeastOneRoundStarted();
     List<PlayerState> phantoms = new ArrayList<>();
@@ -55,6 +68,9 @@ public class GameState {
     return phantoms;
   }
 
+  /**
+   * Retrieves the mutable player state for internal server modifications.
+   */
   public synchronized PlayerState requireMutablePlayer(String playerId) {
     for (PlayerState player : players) {
       if (player.getPlayerId().equals(playerId)) {
@@ -88,6 +104,9 @@ public class GameState {
     this.lastRoundOutcome = null;
   }
 
+  /**
+   * Returns a complete, detached copy of all players.
+   */
   public synchronized List<PlayerState> getPlayersSnapshot() {
     List<PlayerState> copy = new ArrayList<>();
     for (PlayerState player : players) {
@@ -96,6 +115,9 @@ public class GameState {
     return copy;
   }
 
+  /**
+   * Determines the winner if the match has ended.
+   */
   public synchronized Optional<PlayerState> getWinner() {
     if (phase != GamePhase.MATCH_ENDED) {
       return Optional.empty();
@@ -184,5 +206,8 @@ public class GameState {
     return copy;
   }
 
+  /**
+   * Initial data required to seed a player into the game.
+   */
   public record PlayerSeed(String playerId, String nickname) {}
 }

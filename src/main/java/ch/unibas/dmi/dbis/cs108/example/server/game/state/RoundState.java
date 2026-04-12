@@ -1,5 +1,8 @@
 package ch.unibas.dmi.dbis.cs108.example.server.game.state;
 
+/**
+ * Tracks the progression, timing, and role assignments of the active round.
+ */
 public final class RoundState {
   private int currentRound;
   private int humanIndex;

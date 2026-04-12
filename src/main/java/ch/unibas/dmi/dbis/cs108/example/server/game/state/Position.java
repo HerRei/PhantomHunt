@@ -1,5 +1,8 @@
 package ch.unibas.dmi.dbis.cs108.example.server.game.state;
 
+/**
+ * Represents a 2D spatial coordinate on the game map.
+ */
 public final class Position {
   private double x;
   private double y;
