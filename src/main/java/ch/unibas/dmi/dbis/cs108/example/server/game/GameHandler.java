@@ -16,7 +16,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * GameHandler owns the match flow and mutates the extracted game state classes.
+ * Owns the match flow and mutates the extracted game state classes safely.
+ * Acts as the authoritative controller for a running game.
  */
 public class GameHandler {
 
@@ -27,7 +28,11 @@ public class GameHandler {
     this.gameState = Objects.requireNonNull(gameState, "gameState must not be null");
     this.lobbyHandler = Objects.requireNonNull(lobbyHandler, "lobbyHandler must not be null");
   }
-
+  /**
+   * Starts the match and initializes the first round.
+   *
+   * @param nowMillis The current server time in milliseconds.
+   */
   public synchronized void startMatch(long nowMillis) {
     ensurePhase(GamePhase.WAITING_TO_START, "Match has already been started.");
     RoundState roundState = gameState.getMutableRoundState();
@@ -36,6 +41,12 @@ public class GameHandler {
     startCurrentRound(nowMillis);
   }
 
+  /**
+   * Concludes the round immediately with the human being caught.
+   *
+   * @param catcherPlayerId The ID of the phantom who caught the human.
+   * @param nowMillis       The current server time in milliseconds.
+   */
   public synchronized void endRoundHumanCaught(String catcherPlayerId, long nowMillis) {
     ensurePhase(GamePhase.ROUND_RUNNING, "Round is not running.");
 
@@ -61,6 +72,11 @@ public class GameHandler {
     finishRound(outcome);
   }
 
+  /**
+   * Concludes the round immediately with the human surviving the time limit.
+   *
+   * @param nowMillis The current server time in milliseconds.
+   */
   public synchronized void endRoundHumanSurvived(long nowMillis) {
     ensurePhase(GamePhase.ROUND_RUNNING, "Round is not running.");
 
@@ -79,6 +95,11 @@ public class GameHandler {
     finishRound(outcome);
   }
 
+  /**
+   * Aborts the entire match prematurely (e.g., due to player disconnect).
+   *
+   * @param reason The reason for the abort.
+   */
   public synchronized void abortMatch(String reason) {
     if (gameState.getPhase() == GamePhase.MATCH_ENDED || gameState.getPhase() == GamePhase.ABORTED) {
       return;
@@ -95,6 +116,11 @@ public class GameHandler {
     lobbyHandler.finishLobby(gameState.getMatchId());
   }
 
+  /**
+   * Progresses the game to the next round, or finishes the match if all rounds are played.
+   *
+   * @param nowMillis The current server time in milliseconds.
+   */
   public synchronized void advanceToNextRound(long nowMillis) {
     ensurePhase(GamePhase.ROUND_ENDED, "Can only advance after a round has ended.");
 
