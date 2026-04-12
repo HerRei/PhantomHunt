@@ -16,7 +16,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javafx.application.Platform;
 
@@ -116,6 +118,9 @@ public class ServerHandler implements Runnable {
         break;
       case LOBBY_INFO:
         handleLobbyInfo(packet);
+        break;
+      case LIST_LOBBY:
+        handleLobbyList(packet);
         break;
       case GAME_START:
         handleGameStart();
@@ -245,6 +250,38 @@ public class ServerHandler implements Runnable {
   private void handleUnicom(Packet packet) {
     LOGGER.info("Chat: {}", packet.text());
     GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
+  }
+
+  /**
+   * Handles LOBBY_LIST command.
+   * Protocol: LOBBY_LIST waiting1:waiting2;running1:running2
+   */
+  private void handleLobbyList(Packet p) {
+    if (p.args().isEmpty()) return;
+
+    String rawData = p.args().get(0);
+    List<String> waiting = new ArrayList<>();
+    List<String> running = new ArrayList<>();
+
+    // Split into waiting and running groups
+    String[] groups = rawData.split(";", -1);
+
+    // Process waiting lobbies (before ;)
+    if (groups.length > 0 && !groups[0].isBlank()) {
+      waiting = Arrays.asList(groups[0].split(":"));
+    }
+
+    // Process running lobbies (after ;)
+    if (groups.length > 1 && !groups[1].isBlank()) {
+      running = Arrays.asList(groups[1].split(":"));
+    }
+
+    // Update model on FX thread
+    final List<String> finalWaiting = waiting;
+    final List<String> finalRunning = running;
+    Platform.runLater(() ->
+            GameModel.getInstance().updateLobbyList(finalRunning, finalWaiting)
+    );
   }
 
   /**

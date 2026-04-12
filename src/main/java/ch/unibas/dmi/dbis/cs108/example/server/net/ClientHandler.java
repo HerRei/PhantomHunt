@@ -184,6 +184,10 @@ public class ClientHandler implements Runnable {
     registry.broadcast(this, Packet.of(Command.UNICOM, getName() + ": " + msg));
   }
 
+  private void handleLobbyList(){
+    sendMessage(Packet.of(Command.LIST_LOBBY, lobbyHandler.getLobbies()));
+  }
+
   /**
    * Creates a new lobby with the given name.
    *
@@ -392,6 +396,7 @@ public class ClientHandler implements Runnable {
             case NICK -> handleNickChange(p);
             case WHISPER -> handleWhisper(p);
             case CHECKIN -> handleCheckin(p);
+            case LIST_LOBBY -> handleLobbyList();
             case YAP -> handleYap(p);
             case MKL -> handleMkl(p);
             case SPEC -> handleSpec(p);

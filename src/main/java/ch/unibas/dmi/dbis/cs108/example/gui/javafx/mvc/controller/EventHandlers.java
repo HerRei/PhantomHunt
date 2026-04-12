@@ -100,4 +100,8 @@ public class EventHandlers {
             LOGGER.info("Nickname is empty.");
         }
     }
+
+    public void updateLists() {
+        serverHandler.sendMessage(Packet.of(Command.LIST_LOBBY));
+    }
 }

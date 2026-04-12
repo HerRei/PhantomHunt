@@ -104,7 +104,10 @@ public class HubScene implements SceneInterface {
         //--- Actions ---
         btnSend.setOnAction(e -> handleSendMessage());
         btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
-        btnJoin.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.JOINLOBBY));
+        btnJoin.setOnAction(e -> {
+            EventHandlers.getInstance().updateLists();
+            SceneManager.getInstance().showScene(SceneProtocol.JOINLOBBY);
+        });
         btnCreate.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.CREATELOBBY));
         chatInput.setOnAction(e -> handleSendMessage());
 

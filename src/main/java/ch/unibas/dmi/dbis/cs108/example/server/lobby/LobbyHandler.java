@@ -32,24 +32,15 @@ public class LobbyHandler {
     return Optional.ofNullable(waitingLobbies);
   }
 
-  public Optional<Vector<Lobby>> getPlayingLobbies() {
-    return Optional.ofNullable(playingLobbies);
-  }
-
-  public Optional<Vector<Lobby>> getFinishedLobbies() {
-    return Optional.ofNullable(finishedLobbies);
-  }
 
   public String getLobbies() {
     StringBuilder sb = new StringBuilder();
     for (Lobby lobby : waitingLobbies) {
-      sb.append(lobby.getId()).append(", ");
+      sb.append(lobby.getName()).append(":");
     }
+    sb.append(";");
     for (Lobby lobby : playingLobbies) {
-      sb.append(lobby.getId()).append(", ");
-    }
-    for (Lobby lobby : finishedLobbies) {
-      sb.append(lobby.getId()).append(", ");
+      sb.append(lobby.getName()).append(":");
     }
     // Remove the trailing comma and space if the list is not empty
     if (sb.length() > 0) {
@@ -105,14 +96,18 @@ public class LobbyHandler {
   }
 
   public Lobby createLobby(String name, ClientHandler host) {
-    String id = "lobby" + lobbyCounter.getAndIncrement();
+    name = name.replace(":", "");
+    name = name.replace(" ", "");
+    while (findLobbyById(name).isPresent()) {
+      name += "1";
+    }
 
-    Lobby lobby = new Lobby(id, name, host);
+    Lobby lobby = new Lobby(name, name, host);
     waitingLobbies.add(lobby);
     host.setCurrentLobby(lobby);
     lobby.broadcastLobbyInfo();
 
-    LOGGER.info("Lobby {} ({}) created by {}", name, id, host.getName());
+    LOGGER.info("Lobby {} created by {}", name, host.getName());
     return lobby;
   }
 
