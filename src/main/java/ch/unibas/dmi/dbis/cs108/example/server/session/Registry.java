@@ -56,7 +56,7 @@ public final class Registry {
   }
 
   public String names() {
-    return byName.keySet().toString(); // this should return all the people that are in the registry
+    return String.join(" ", byName.keySet()); // this should return all the people that are in the registry
   }
 
   /**
@@ -84,6 +84,7 @@ public final class Registry {
    */
   public void unregister(ClientHandler h) {
     sessions.remove(h);
+    byName.remove(h.getName());
     log.info("Client unregistered. size: {}", sessions.size());
   }
 

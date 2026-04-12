@@ -145,6 +145,7 @@ public class ClientHandler implements Runnable {
     }
     registry.broadcast(this, Packet.of(Command.INFO,  getName() + ": left the Server"));
     LOGGER.info("Client {} disconnected.", name);
+    sendPlayers();
   }
 
   /**
@@ -169,7 +170,7 @@ public class ClientHandler implements Runnable {
    */
   private void handlePong() {
     lastSeen = System.currentTimeMillis();
-    LOGGER.debug("Received pong from {}", name);
+    LOGGER.trace("Received pong from {}", name);
   }
 
   /**
@@ -235,6 +236,10 @@ public class ClientHandler implements Runnable {
     LOGGER.info("Logging out {}.", name);
     sendMessage(Packet.of(Command.UNICOM, "Okay, Bye."));
     disconnect();
+  }
+
+  private void sendPlayers(){
+    registry.broadcast(this, Packet.of(Command.PLAYERS, registry.names()));
   }
 
   private void handleLobbyLogout(Packet p){
@@ -340,6 +345,7 @@ public class ClientHandler implements Runnable {
     else {
       registry.broadcast(this, Packet.of(Command.INFO,  "Welcome to the Server: " + this.name));
     }
+    sendPlayers();
   }
 
   private void handleStart(Packet p) {
@@ -376,7 +382,6 @@ public class ClientHandler implements Runnable {
       registry.register(this);
       LOGGER.info("New client connected: {}", name);
       startPinging();
-
       String line;
       while ((line = in.readLine()) != null) {
         try {

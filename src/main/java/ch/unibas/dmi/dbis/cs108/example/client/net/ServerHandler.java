@@ -110,11 +110,17 @@ public class ServerHandler implements Runnable {
       case INFO:
         handleInfo(packet);
         break;
+      case PLAYERS:
+        handlePlayers(packet);
+        break;
       case LOBBY_INFO:
         handleLobbyInfo(packet);
         break;
       case GAME_START:
         handleGameStart();
+        break;
+      case YAP:
+        handleYap(packet);
         break;
       case GSU:
         handleGameStateUpdate(packet);
@@ -123,6 +129,20 @@ public class ServerHandler implements Runnable {
         handleUnknown(packet);
         break;
     }
+  }
+
+  private void handlePlayers(Packet packet) {
+    LOGGER.info(packet.args());
+    if (packet.args() == null) return;
+    Platform.runLater(() -> {
+      String[] names = packet.args().get(0).split(" ");
+      GameModel.getInstance().players.setAll(names);
+    });
+  }
+
+  private void handleYap(Packet packet) {
+    LOGGER.info("Yap: {}", packet.text());
+    GameModel.getInstance().addChatMessage(packet.text()); //adds message to chat
   }
 
   private void handleGameStart() {
@@ -186,7 +206,7 @@ public class ServerHandler implements Runnable {
    */
   private void handlePing() {
     sendMessage(Packet.of(Command.PONG));
-    LOGGER.info("Received Ping {}", System.currentTimeMillis());
+    LOGGER.trace("Received Ping {}", System.currentTimeMillis());
   }
 
   /**
@@ -205,7 +225,7 @@ public class ServerHandler implements Runnable {
    */
   private void handleInfo(Packet packet) {
     LOGGER.info("Info: {}", packet.text());
-    GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
+    GameModel.getInstance().addChatMessage(packet.text()); //adds message to chat
   }
 
   /**

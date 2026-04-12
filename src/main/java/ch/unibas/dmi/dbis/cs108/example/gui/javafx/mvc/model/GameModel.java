@@ -20,8 +20,10 @@ import org.apache.logging.log4j.Logger;
 public class GameModel {
   private static final Logger LOGGER = LogManager.getLogger(GameModel.class);
   private static GameModel instance;
-  private final ObservableList<Player> players = FXCollections.observableArrayList();
+  private final ObservableList<Player> lobbyPlayers = FXCollections.observableArrayList();
+  public final ObservableList<String> players = FXCollections.observableArrayList();
   private final StringProperty playerName = new SimpleStringProperty();
+  private final IntegerProperty playerScore = new SimpleIntegerProperty();
   private final ObservableList<String> chatMessages = FXCollections.observableArrayList();
 
   // Map properties
@@ -30,6 +32,7 @@ public class GameModel {
 
   private GameModel() { // NOSONAR
     loadMaps();
+    playerScore.set(0);
   }
 
   /**
@@ -69,6 +72,9 @@ public class GameModel {
       double x = Double.parseDouble(data[2]);
       double y = Double.parseDouble(data[3]);
       int score = Integer.parseInt(data[4]);
+      if (name == playerName.get()){
+        playerScore.set(score);
+      }
 
       // 3. Find existing player in our list or create a new one
       updateOrAddPlayer(name, role, x, y, score);
@@ -77,7 +83,7 @@ public class GameModel {
 
   private void updateOrAddPlayer(String name, String role, double x, double y, int score) {
     // Search for player by nickname
-    Player player = players.stream()
+    Player player = lobbyPlayers.stream()
             .filter(p -> p.nameProperty().get().equals(name))
             .findFirst()
             .orElse(null);
@@ -88,7 +94,7 @@ public class GameModel {
       player.setScore(score);
       // Note: You could also add a roleProperty to the Player class
     } else {
-      players.add(new Player(name, role, score, (int) x, (int) y));
+      lobbyPlayers.add(new Player(name, role, score, (int) x, (int) y));
     }
   }
   private void loadMaps() {
@@ -107,7 +113,7 @@ public class GameModel {
    * @return The list of all players in the game.
    */
   public ObservableList<Player> getPlayers() {
-    return players;
+    return lobbyPlayers;
   }
 
   /**
@@ -137,6 +143,10 @@ public class GameModel {
 
   public StringProperty getName() {
     return playerName;
+  }
+
+  public IntegerProperty getScore() {
+    return playerScore;
   }
 
   public Image getGameMap() {

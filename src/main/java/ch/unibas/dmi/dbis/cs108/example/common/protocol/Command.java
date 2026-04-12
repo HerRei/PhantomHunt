@@ -20,6 +20,7 @@ public enum Command {
   WHISPER, // WHISPER <recipient> <text...>
   YAP, // YAP <text>
   LOGOUT, // LOGOUT
+  PLAYERS, //sends all the players to the client
   NICK, // NICK <name>
   INFO, //INFO <msg>
 

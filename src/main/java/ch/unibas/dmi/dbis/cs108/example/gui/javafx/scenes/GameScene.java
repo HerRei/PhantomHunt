@@ -1,195 +1,169 @@
 package ch.unibas.dmi.dbis.cs108.example.gui.javafx.scenes;
 
-import ch.unibas.dmi.dbis.cs108.example.client.net.ServerHandler;
+import ch.unibas.dmi.dbis.cs108.example.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.GameModel;
 import ch.unibas.dmi.dbis.cs108.example.gui.javafx.mvc.model.Player;
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Screen; // Import for screen dimensions
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Represents the map screen where the game is played.
- * This class is responsible for displaying the map and providing
- * collision detection logic.
- */
 public class GameScene implements SceneInterface {
-
-  private static final Logger LOGGER = LogManager.getLogger(GameScene.class);
-  private Scene scene;
-  private Image collisionMap;
-  private final Pane gamePane;
-  private PixelReader pixelReader;
-  private static final int TILE_SIZE = 32;
+  private final Scene scene;
+  private final Pane gamePane = new Pane();
   private final Map<Player, Rectangle> playerShapes = new HashMap<>();
+  private final TextArea chatArea = new TextArea();
+  private final TextField chatInput = new TextField();
   private boolean w, a, s, d;
+  private static final int TILE_SIZE = 32;
 
-  /**
-   * Creates a new GameScene.
-   * It fetches the necessary map images from the GameModel and sets up
-   * the visual components of the scene. The map is scaled to fit the user's screen.
-   */
   public GameScene() {
-    // Get the model instance
     GameModel model = GameModel.getInstance();
+    ImageView mapView = new ImageView(model.getGameMap());
+    mapView.setPreserveRatio(true);
+    mapView.setFitHeight(720);
 
-    // Get the map images from the model
-    Image mapImage = model.getGameMap();
-    ImageView mapView = new ImageView(mapImage);
-    gamePane = new Pane();
+    StackPane gameStack = new StackPane(mapView, gamePane);
+    gameStack.setStyle("-fx-background-color: black;");
 
-    // --- Scale the map based on screen size ---
-    Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-    double screenWidth = primaryScreenBounds.getWidth();
-    double screenHeight = primaryScreenBounds.getHeight();
+    // Sidebar erstellen
+    VBox sidebar = createSidebar(model);
 
-    double mapOriginalWidth = mapImage.getWidth();
-    double mapOriginalHeight = mapImage.getHeight();
+    BorderPane root = new BorderPane();
+    root.setCenter(gameStack);
+    root.setRight(sidebar);
 
-    // Calculate scale factors for width and height
-    double scaleFactorWidth = screenWidth / mapOriginalWidth;
-    double scaleFactorHeight = screenHeight / mapOriginalHeight;
-
-    // Use the smaller scale factor to ensure the entire map fits on screen
-    double scaleFactor = Math.min(scaleFactorWidth, scaleFactorHeight);
-
-    double scaledWidth = mapOriginalWidth * scaleFactor * 0.95; // reduce dimensions to
-    double scaledHeight = mapOriginalHeight * scaleFactor * 0.95; // account for taskbar
-
-    mapView.setFitWidth(scaledWidth);
-    mapView.setFitHeight(scaledHeight);
-    mapView.setPreserveRatio(true); // Maintain aspect ratio
-
-    // Get the collision map from the model
-    collisionMap = model.getCollisionMap();
-    pixelReader = collisionMap.getPixelReader();
-
-    // Create a layout and add the visual map
-    StackPane root = new StackPane();
-    root.getChildren().addAll(mapView, gamePane);
-
-    // Set the background of the root pane to black
-    root.setStyle("-fx-background-color: black;");
-
-    // Create the scene with the scaled dimensions
-    this.scene = new Scene(root, scaledWidth, scaledHeight);
-
+    this.scene = new Scene(root);
     setupControls();
     setupPlayerTracking();
+    setupChatBinding(); // Chat-Bindung initialisieren
+  }
+
+  private VBox createSidebar(GameModel model) {
+    VBox box = new VBox(15); // Etwas mehr Abstand zwischen den Elementen
+    box.setPadding(new Insets(15));
+    box.setPrefWidth(250);
+    box.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
+
+    // 1. Dein Score (Ganz oben)
+    Label yourScoreTitle = new Label("Your Score:");
+    yourScoreTitle.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+
+    Label scoreLabel = new Label("0");
+    scoreLabel.setStyle("-fx-text-fill: #00FF00; -fx-font-size: 24px; -fx-font-weight: bold;");
+
+    // Bindet den Score des lokalen Spielers (angenommen model.getLocalPlayer() existiert)
+    scoreLabel.textProperty().bind(GameModel.getInstance().getScore().asString());
+
+    VBox scoreContainer = new VBox(5, yourScoreTitle, scoreLabel);
+    scoreContainer.setPadding(new Insets(0, 0, 10, 0));
+
+    // 2. Scoreboard (Alle Spieler)
+    Label tableLabel = new Label("Players");
+    tableLabel.setStyle("-fx-text-fill: white;");
+
+    TableView<Player> table = new TableView<>(model.getPlayers());
+    table.setPrefHeight(200);
+
+    TableColumn<Player, String> nameCol = new TableColumn<>("Name");
+    nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+    TableColumn<Player, Integer> scoreCol = new TableColumn<>("Score");
+    scoreCol.setCellValueFactory(new PropertyValueFactory<>("score"));
+
+    table.getColumns().addAll(nameCol, scoreCol);
+    table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+    // 3. Chat (Ganz unten)
+    Label chatLabel = new Label("Chat");
+    chatLabel.setStyle("-fx-text-fill: white;");
+
+    chatArea.setEditable(false);
+    chatArea.setWrapText(true);
+    chatArea.setPrefHeight(300);
+
+    chatInput.setPromptText("Type a message...");
+    chatInput.setOnAction(e -> sendMessage());
+
+    // Alles zur Sidebar hinzufügen
+    box.getChildren().addAll(scoreContainer, tableLabel, table, chatLabel, chatArea, chatInput);
+
+    // Damit der Chat-Bereich den restlichen Platz einnimmt, falls nötig
+    VBox.setVgrow(chatArea, Priority.ALWAYS);
+
+    return box;
   }
 
   /**
-   * Checks if a specific coordinate on the map is walkable.
-   * It does this by checking the color of the pixel on the collision map.
-   * Black pixels are considered walls (not walkable).
-   *
-   * @param x The x-coordinate to check.
-   * @param y The y-coordinate to check.
-   * @return true if the coordinate is walkable, false otherwise.
+   * Bindet das TextArea an die Chat-Liste im Model.
+   * Jedes Mal, wenn eine neue Nachricht kommt, wird der Text aktualisiert.
    */
-  public boolean isWalkable(int x, int y) {
-    // Ensure the coordinates are within the map boundaries
-    if (x < 0 || x >= collisionMap.getWidth() || y < 0 || y >= collisionMap.getHeight()) {
-      return false; // Out of bounds is not walkable
-    }
-
-    // Get the color of the pixel at the given coordinates from the collision map
-    Color color = pixelReader.getColor(x, y);
-
-    // Assume black pixels are walls and anything else is walkable.
-    return !Color.BLACK.equals(color);
+  private void setupChatBinding() {
+    GameModel.getInstance().chatMessagesProperty().addListener((ListChangeListener<String>) c -> {
+      StringBuilder sb = new StringBuilder();
+      for (String msg : GameModel.getInstance().chatMessagesProperty()) {
+        sb.append(msg).append("\n");
+      }
+      chatArea.setText(sb.toString());
+      chatArea.setScrollTop(Double.MAX_VALUE); // Auto-Scroll nach unten
+    });
   }
 
-  /**
-   * Registers key listeners for WASD movement.
-   */
+  private void sendMessage() {
+    String msg = chatInput.getText().trim();
+    if (msg.isEmpty()) return;
+    EventHandlers.getInstance().sendMessage(Command.YAP, msg);
+    chatInput.clear();
+  }
+
   private void setupControls() {
-    scene.setOnKeyPressed(e -> handleKeyEvent(e.getCode(), true));
-    scene.setOnKeyReleased(e -> handleKeyEvent(e.getCode(), false));
+    scene.setOnKeyPressed(e -> handleKey(e.getCode(), true));
+    scene.setOnKeyReleased(e -> handleKey(e.getCode(), false));
   }
 
-  private void handleKeyEvent(javafx.scene.input.KeyCode code, boolean pressed) {
+  private void handleKey(javafx.scene.input.KeyCode code, boolean pressed) {
+    if (chatInput.isFocused()) return;
     boolean changed = false;
     switch (code) {
       case W -> { if (w != pressed) { w = pressed; changed = true; } }
-      case A -> { if (a != pressed) { a = pressed; changed = true; } }
       case S -> { if (s != pressed) { s = pressed; changed = true; } }
+      case A -> { if (a != pressed) { a = pressed; changed = true; } }
       case D -> { if (d != pressed) { d = pressed; changed = true; } }
-      default -> {}
     }
-    // Only send to server if the state actually changed to save bandwidth
-    if (changed) {
-      EventHandlers.getInstance().sendInputs(w, s, a, d);
-    }
+    if (changed) EventHandlers.getInstance().sendInputs(w, s, a, d);
   }
-  /**
-   * Observes the player list and creates/removes rectangles accordingly.
-   */
+
   private void setupPlayerTracking() {
-    GameModel model = GameModel.getInstance();
-    model.getPlayers().addListener((ListChangeListener<Player>) change -> {
-      while (change.next()) {
-        if (change.wasAdded()) {
-          for (Player p : change.getAddedSubList()) {
-            addPlayerShape(p);
-          }
-        }
-        if (change.wasRemoved()) {
-          for (Player p : change.getRemoved()) {
-            removePlayerShape(p);
-          }
-        }
+    GameModel.getInstance().getPlayers().addListener((ListChangeListener<Player>) c -> {
+      while (c.next()) {
+        if (c.wasAdded()) c.getAddedSubList().forEach(this::addPlayer);
+        if (c.wasRemoved()) c.getRemoved().forEach(this::removePlayer);
       }
     });
-
-    // Add initially existing players
-    for (Player p : model.getPlayers()) {
-      addPlayerShape(p);
-    }
+    GameModel.getInstance().getPlayers().forEach(this::addPlayer);
   }
 
-  /**
-   * Creates a rectangle for a player and binds its position.
-   */
-  private void addPlayerShape(Player player) {
-    Rectangle rect = new Rectangle(20, 20); // Width and Height of the player
-
-    // Choose color based on role (skin property)
-    // Assume "HUMAN" = Red, others (Phantoms) = White
-    if ("HUMAN".equalsIgnoreCase(player.skinProperty().get())) {
-      rect.setFill(Color.RED);
-    } else {
-      rect.setFill(Color.WHITE);
-    }
-    rect.layoutXProperty().bind(player.xPosition().multiply(TILE_SIZE));
-    rect.layoutYProperty().bind(player.yPosition().multiply(TILE_SIZE));
-
-    playerShapes.put(player, rect);
-    gamePane.getChildren().add(rect);
+  private void addPlayer(Player p) {
+    Rectangle r = new Rectangle(20, 20);
+    r.setFill("HUMAN".equalsIgnoreCase(p.skinProperty().get()) ? Color.RED : Color.WHITE);
+    r.layoutXProperty().bind(p.xPosition().multiply(TILE_SIZE));
+    r.layoutYProperty().bind(p.yPosition().multiply(TILE_SIZE));
+    playerShapes.put(p, r);
+    gamePane.getChildren().add(r);
   }
 
-  private void removePlayerShape(Player player) {
-    Rectangle rect = playerShapes.remove(player);
-    if (rect != null) {
-      gamePane.getChildren().remove(rect);
-    }
+  private void removePlayer(Player p) {
+    Rectangle r = playerShapes.remove(p);
+    if (r != null) gamePane.getChildren().remove(r);
   }
 
-  @Override
-  public Scene getScene() {
-    return scene;
-  }
+  @Override public Scene getScene() { return scene; }
 }
