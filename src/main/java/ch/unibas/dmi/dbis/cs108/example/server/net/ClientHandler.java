@@ -20,16 +20,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-//---------------------------------------------------------------------------------------------
-//Attention - 29.3.26
-// Please refrain form putting anymore GameLogic into this Class
-// Should mainly do: Socket reading, Packet sending, and sending
-//---------------------------------------------------------------------------------------------
-
-
 /**
  * Handles the connection to a single client on the server. Listens for incoming packets, processes
  * them, and can send packets back.
+ * <p>
+ * <b>Attention:</b> Please refrain from putting any GameLogic into this class.
+ * It should mainly handle Socket reading, Packet decoding, and sending.
  */
 public class ClientHandler implements Runnable {
 
@@ -239,6 +235,9 @@ public class ClientHandler implements Runnable {
   }
 
   private void handleLobbyLogout(Packet p) {
+    if (p.argc() < 1) {
+      return;
+    }
     String lobbyId = p.args().get(0);
     lobbyHandler.leaveLobby(lobbyId, this);
   }
@@ -286,7 +285,8 @@ public class ClientHandler implements Runnable {
    * @param p packet containing the requested nickname
    */
   private void handleNickChange(Packet p) {
-    String newNick = String.join(" ", p.args());
+    String newNick = String.join(" ", p.args()).replaceAll("\\s+", "_");
+
     if (newNick.isBlank()) {
       sendMessage(Packet.of(Command.REJECT, "Nickname cannot be blank."));
       return;
