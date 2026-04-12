@@ -119,6 +119,9 @@ public class ServerHandler implements Runnable {
       case GAME_START:
         handleGameStart();
         break;
+      case GAME_FINISH:
+        handleGameFinish();
+        break;
       case YAP:
         handleYap(packet);
         break;
@@ -129,6 +132,12 @@ public class ServerHandler implements Runnable {
         handleUnknown(packet);
         break;
     }
+  }
+
+  private void handleGameFinish() {
+    Platform.runLater(() -> {
+      SceneManager.getInstance().showScene(SceneProtocol.END);
+    });
   }
 
   private void handlePlayers(Packet packet) {
@@ -182,9 +191,8 @@ public class ServerHandler implements Runnable {
         GameModel.getInstance().setName(this.name);
       });
     } catch (Exception e) {
-      LOGGER.info("JavaFX nicht vorhanden");
+      LOGGER.info("JavaFX not available");
     }
-
   }
 
   private void handleGameStateUpdate(Packet p) {
@@ -208,6 +216,8 @@ public class ServerHandler implements Runnable {
     sendMessage(Packet.of(Command.PONG));
     LOGGER.trace("Received Ping {}", System.currentTimeMillis());
   }
+
+  private void handle
 
   /**
    * Stores the nickname confirmed by the server.

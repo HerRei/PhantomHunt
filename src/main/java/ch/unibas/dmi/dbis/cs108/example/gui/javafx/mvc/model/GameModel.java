@@ -177,4 +177,10 @@ public class GameModel {
   public void setCollisionMap(Image collisionMap) {
     this.collisionMap.set(collisionMap);
   }
+
+  public void resetModel() {
+    this.players.clear();
+    this.playerScore.set(0);
+    this.clearChat();
+  }
 }

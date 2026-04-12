@@ -38,6 +38,7 @@ public class GUI extends Application {
     manager.addScene(SceneProtocol.JOINLOBBY, new JoinLobbyScene());
     manager.addScene(SceneProtocol.GAME, new GameScene());
     manager.addScene(SceneProtocol.LOBBY, new LobbyScene());
+    manager.addScene(SceneProtocol.END, new EndScene());
 
 
     // Configure Window and Launch

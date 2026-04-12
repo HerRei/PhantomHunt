@@ -53,6 +53,11 @@ public class EventHandlers {
 
 
     //Handle-methods (eventFunctions)
+    public void resetAndBackToHub() {
+        GameModel.getInstance().resetModel();
+        SceneManager.getInstance().showScene(SceneProtocol.HOME);
+    }
+
     public void handleStartGame() {
         SceneManager.getInstance().showScene(SceneProtocol.GAME);
     }

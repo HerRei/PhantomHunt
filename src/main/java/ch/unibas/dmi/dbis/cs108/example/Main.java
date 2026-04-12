@@ -18,8 +18,8 @@ public class Main {
   public static int targetPort;
 
   public static void main(String[] args) {
-    // [0] = server/client [1] = port / host:port
-    if (args.length == 2) {
+    // [0] = server/client [1] = port / host:port [2] username
+    if (args.length >= 2) {
       switch (args[0]) {
         case "client" -> {
 
@@ -31,7 +31,6 @@ public class Main {
             // Make parameters ready for GUI
             targetHost = host;
             targetPort = port;
-
             connect(host, port, args);
 
           } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
@@ -81,7 +80,6 @@ public class Main {
    */
   public static void connect(String host, int port, String[] args) {
     LOGGER.info("Connecting to {}:{}...", host, port);
-    // TcpClient deleted, since it should only start in GUI.
     Application.launch(GUI.class, args);
   }
 }
