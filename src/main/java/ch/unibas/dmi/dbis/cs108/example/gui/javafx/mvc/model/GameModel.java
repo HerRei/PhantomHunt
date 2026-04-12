@@ -11,8 +11,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * Holds all the important data for the game.
  * This includes the player list, chat messages, and game maps.
- * It's a Singleton, meaning there is only one instance of this class
- * for the entire application.
+ * Operates as a Singleton
  */
 @SuppressWarnings("java:S6548")
 public class GameModel {
@@ -33,11 +32,9 @@ public class GameModel {
 
   /**
    * Gets the single instance of the GameModel.
-   * This is used by other classes to access the game's data.
    *
    * @return The one and only instance of GameModel.
    */
-  // The Singleton pattern is used intentionally here.
   public static synchronized GameModel getInstance() { // NOSONAR
     if (instance == null) {
       instance = new GameModel();

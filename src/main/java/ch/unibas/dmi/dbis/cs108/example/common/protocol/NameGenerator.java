@@ -23,7 +23,8 @@ public class NameGenerator {
   private static final Logger LOGGER = LogManager.getLogger(NameGenerator.class);
 
   /**
-   * Generates and returns a random name.
+   * Generates and returns a random, multi-syllable name.
+   *
    * @return A randomly generated name string.
    */
   public static String randomName() {
@@ -47,8 +48,6 @@ public class NameGenerator {
     }
 
     String fullName = pre + con.toString() + suf;
-
-    // Put in Logger-Object from before
     LOGGER.debug("Generated random name: {}", fullName);
 
     return fullName;
@@ -56,6 +55,7 @@ public class NameGenerator {
 
   /**
    * Helper method to pick a random element from a String array.
+   *
    * @param array The array to pick from.
    * @return A random element from the array.
    */
