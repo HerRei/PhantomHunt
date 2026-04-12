@@ -33,9 +33,9 @@ public class GameScene implements SceneInterface {
   private Image collisionMap;
   private final Pane gamePane;
   private PixelReader pixelReader;
-  private static final int TILE_SIZE = 32;
   private final Map<Player, Rectangle> playerShapes = new HashMap<>();
   private boolean w, a, s, d;
+  private final double scaleFactor;
 
   /**
    * Creates a new GameScene.
@@ -64,10 +64,10 @@ public class GameScene implements SceneInterface {
     double scaleFactorHeight = screenHeight / mapOriginalHeight;
 
     // Use the smaller scale factor to ensure the entire map fits on screen
-    double scaleFactor = Math.min(scaleFactorWidth, scaleFactorHeight);
+    this.scaleFactor = Math.min(scaleFactorWidth, scaleFactorHeight) * 0.95;
 
-    double scaledWidth = mapOriginalWidth * scaleFactor * 0.95; // reduce dimensions to
-    double scaledHeight = mapOriginalHeight * scaleFactor * 0.95; // account for taskbar
+    double scaledWidth = mapOriginalWidth * scaleFactor; 
+    double scaledHeight = mapOriginalHeight * scaleFactor;
 
     mapView.setFitWidth(scaledWidth);
     mapView.setFitHeight(scaledHeight);
@@ -174,8 +174,8 @@ public class GameScene implements SceneInterface {
     } else {
       rect.setFill(Color.WHITE);
     }
-    rect.layoutXProperty().bind(player.xPosition().multiply(TILE_SIZE));
-    rect.layoutYProperty().bind(player.yPosition().multiply(TILE_SIZE));
+    rect.layoutXProperty().bind(player.xPosition().multiply(scaleFactor));
+    rect.layoutYProperty().bind(player.yPosition().multiply(scaleFactor));
 
     playerShapes.put(player, rect);
     gamePane.getChildren().add(rect);
