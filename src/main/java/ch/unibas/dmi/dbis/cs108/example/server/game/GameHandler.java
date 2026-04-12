@@ -88,10 +88,11 @@ public class GameHandler {
   private void updatePlayerPositions(double deltaTime) {
     double speed = gameState.getRules().moveSpeedPerSecond();
     double playerRadius = gameState.getRules().playerRadius();
+    double movementRadius = MapCollision.movementRadius(playerRadius);
 
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState ps = gameState.getMutablePlayerAt(i);
-      InputState input = ps.getInputState(); // This is the state updated by your new INPUT command
+      InputState input = ps.getInputState(); 
       Position pos = ps.getPosition();
 
       double moveX = 0;
@@ -103,11 +104,11 @@ public class GameHandler {
       if (input.isRight()) moveX += speed * deltaTime;
 
       // Check X direction
-      if (!isCollidingWithWall(pos.getX() + moveX, pos.getY(), playerRadius)) {
+      if (!isCollidingWithWall(pos.getX() + moveX, pos.getY(), movementRadius)) {
         pos.setX(pos.getX() + moveX);
       }
       // Check Y direction
-      if (!isCollidingWithWall(pos.getX(), pos.getY() + moveY, playerRadius)) {
+      if (!isCollidingWithWall(pos.getX(), pos.getY() + moveY, movementRadius)) {
         pos.setY(pos.getY() + moveY);
       }
 

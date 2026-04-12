@@ -92,8 +92,8 @@ Befehle für die textbasierte Kommunikation zwischen Spielern.
 -   **Payload:** Die Chat-Nachricht.
 -   **Beispiel:** YAP Let's start the game!
 
-## 5. Lobby-Befehle
-Befehle zur Verwaltung von Spiellobbys.
+## 5. Lobby- und Spielbefehle
+Befehle zur Verwaltung von Spiellobbys und dem Spielablauf.
 ### MKL
 -   **Richtung:** Client -> Server
 -   **Beschreibung:** Erstellt eine neue Lobby.
@@ -106,5 +106,21 @@ Befehle zur Verwaltung von Spiellobbys.
 -   **Beispiel:** SPEC 12345
 ### START
 -   **Richtung:** Client -> Server
--   **Beschreibung:** Startet das Spiel in der aktuellen Lobby.
--   **Beispiel:** START
+-   **Beschreibung:** Startet das Spiel in der aktuellen Lobby. Der Befehl kann nur vom Host der Lobby ausgeführt werden.
+-   **Payload:** Die ID der Lobby.
+-   **Beispiel:** START lobby1
+### LOBBY_INFO
+-   **Richtung:** Server -> Client
+-   **Beschreibung:** Sendet Informationen über eine Lobby an den Client, einschließlich der Lobby-ID und der Liste der Spieler.
+-   **Payload:** <LobbyId> <Player1> <Player2> ...
+-   **Beispiel:** LOBBY_INFO lobby1 Player1 Player2 Player3
+### GAME_START
+-   **Richtung:** Server -> Client
+-   **Beschreibung:** Signalisiert dem Client, dass das Spiel gestartet wurde und er zur Spielszene wechseln soll.
+-   **Beispiel:** GAME_START
+### GSU (Game State Update)
+-   **Richtung:** Server -> Client
+-   **Beschreibung:** Sendet den aktuellen Spielzustand an die Clients. Dies beinhaltet die aktuelle Runde, die verbleibende Zeit und die Zustände der Spieler.
+-   **Payload:** <currentRound> <timeRemaining> <playerData>
+-   **playerData Format:** <Name>:<Role>:<X>:<Y>:<Score>;<Name>:<Role>:<X>:<Y>:<Score>;...
+-   **Beispiel:** GSU 1 25 Name1:HUMAN:10.5:20.2:100;Name2:PHANTOM:30.1:40.3:50

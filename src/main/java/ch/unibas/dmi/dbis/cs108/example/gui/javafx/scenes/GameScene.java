@@ -23,12 +23,16 @@ public class GameScene implements SceneInterface {
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
   private boolean w, a, s, d;
+  private final double mapScale; // New field for map scale
 
   public GameScene() {
     GameModel model = GameModel.getInstance();
     ImageView mapView = new ImageView(model.getGameMap());
     mapView.setPreserveRatio(true);
-    mapView.setFitHeight(720);
+    mapView.setFitHeight(720); // Map displayed height
+
+    // Calculate map scale based on displayed height and original height (512x512)
+    this.mapScale = 720.0 / 512.0;
 
     StackPane gameStack = new StackPane(mapView, gamePane);
     gameStack.setStyle("-fx-background-color: black;");
@@ -151,10 +155,30 @@ public class GameScene implements SceneInterface {
   }
 
   private void addPlayer(Player p) {
-    Rectangle r = new Rectangle(20, 20);
-    r.setFill("HUMAN".equalsIgnoreCase(p.skinProperty().get()) ? Color.RED : Color.WHITE);
-    r.layoutXProperty().bind(p.xPosition());
-    r.layoutYProperty().bind(p.yPosition());
+    Rectangle r = new Rectangle(20, 20); // Player visual size
+    double playerHalfWidth = r.getWidth() / 2;
+    double playerHalfHeight = r.getHeight() / 2;
+
+    // Listen for changes in the skin property and update the color accordingly
+    p.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+        if ("HUMAN".equalsIgnoreCase(newSkin)) {
+            r.setFill(Color.RED);
+        } else {
+            r.setFill(Color.WHITE);
+        }
+    });
+
+    // Set initial color
+    if ("HUMAN".equalsIgnoreCase(p.skinProperty().get())) {
+        r.setFill(Color.RED);
+    } else {
+        r.setFill(Color.WHITE);
+    }
+
+    // Bind player position, applying map scale and centering the rectangle
+    r.layoutXProperty().bind(p.xPosition().multiply(mapScale).subtract(playerHalfWidth));
+    r.layoutYProperty().bind(p.yPosition().multiply(mapScale).subtract(playerHalfHeight));
+
     playerShapes.put(p, r);
     gamePane.getChildren().add(r);
   }

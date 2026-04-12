@@ -92,7 +92,7 @@ public class GameModel {
       player.xPosition().set(x);
       player.yPosition().set(y);
       player.setScore(score);
-      // Note: You could also add a roleProperty to the Player class
+      player.setSkin(role);
     } else {
       lobbyPlayers.add(new Player(name, role, score, x, y));
     }
@@ -179,7 +179,7 @@ public class GameModel {
   }
 
   public void resetModel() {
-    this.players.clear();
+    this.lobbyPlayers.clear();
     this.playerScore.set(0);
     this.clearChat();
   }
