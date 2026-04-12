@@ -124,3 +124,9 @@ Befehle zur Verwaltung von Spiellobbys und dem Spielablauf.
 -   **Payload:** <currentRound> <timeRemaining> <playerData>
 -   **playerData Format:** <Name>:<Role>:<X>:<Y>:<Score>;<Name>:<Role>:<X>:<Y>:<Score>;...
 -   **Beispiel:** GSU 1 25 Name1:HUMAN:10.5:20.2:100;Name2:PHANTOM:30.1:40.3:50
+### LIST_LOBBY
+-   **Richtung:** Server <-> Client
+-   **Beschreibung:** Sendet die aktuellen Lobbies an den client und Client schickt Anfrage dafür.
+-   **Payload:** <waitingLobbies>:<playingLobbies>
+-   **playerData Format:** <waitingLobbies>;<runningLobbies>
+-   **Beispiel:** LIST_LOBBY lobby1:lobby2;lobby3

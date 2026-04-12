@@ -268,7 +268,12 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - Struktur verbessert, damit der Aufbau logischer ist.
 - Javadoc überarbeitet und allgemeines Housekeeping im Code durchgeführt (Kommentare verbessert, kleinere Unsauberkeiten behoben).
 
-
+## 2026-04-13 — Silas & Hermes##
+**Dauer:** ~14h(pro Person)
+**Ziel:** GUI implementierung und erstellen prototyps
+**Was gemacht:**
+- Alle Schnittstellen wurden vereint und ein funktionierender prototyp erstellt.
+- Gui Wurde komplett neu erstellt so das man Spiel versteht.
 
 
 
