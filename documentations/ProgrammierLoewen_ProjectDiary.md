@@ -165,6 +165,13 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Die GUI and diese Funktionen anbinden.
 - Weitere Tests die danne erggeben, ob die Mehrdeutigkeit wirklich behoben wurde. evt. erstellen von Unit-tests und Äquivalenzklassenf um all das auf nicht Ambiguative Art zu testen. 
 
+## 2026-03-28 - Ismail
+**Dauer:** ~0.5h
+**Ziel:** Build-Prozess anpassen.
+**Was gemacht:**
+build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separaten Dateien zu bauen.
+
+
 ## 2026-03-29 — Vera ##
 **Dauer:** ~6h
 **Ziel:** Einarbeitung in die bestehende Code-Basis.
@@ -175,6 +182,7 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 
 **Nächstes:**
 - Konkrete Schwachstellen in der Fehlerbehandlung und beim Threadin gim Client beheben.
+
 
 ## 2026-03-28 - 2026-03-29 - Jan ##
 **Dauer:** ~1d 
@@ -204,6 +212,17 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Die neuen Funktionen für den Zuschauer-Modus (Spectator) an die GUI anbinden.
 - Prüfen, ob die Logik für Leerzeichen in Usernamen bei allen Befehlen (Whisper, MKL) einwandfrei funktioniert.
 
+## 2026-04-05 - Ismail 
+**dauer:** ~11h
+**Ziel:** Spielkarte implementieren und anzeigen.
+**Was gemacht:**
+- Die Blöcke für die Map gezeichnet und diese in eine Map angeordnet.
+- Kollisionskarte gezeichnet.
+- GameScene implementiert, um die Karte visuell anzuzeigen.
+- Map-Loading im GameModel zentralisiert (lädt ab sofort die visuelle Karte und die Kollisionskarte).
+- isWalkable()-Methode für zukünftige Bewegungsabfragen via Kollisionskarte in der GameScene bereitgestellt.
+- Skalierung der Karte hinzugefügt, damit sie sich an die Bildschirmgröße der User anpasst.
+
 ## 2026-04-8 bis 2026-04-09 — Vera ##
 **Dauer:** ~7h
 **Ziel:** Grundlage für das QA-Konzept erarbeiten und erste Ausformulierung erstellen.
@@ -215,6 +234,21 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 
 **Nächstes:**
 - Das Konzept weiter vertiefen und zusätzliche Aspekte ergänzen.
+
+## 2026-04-10 - Ismail
+**Dauer:** ~10h
+**Ziel:**
+- Serverseitiges Laden der Karte vorbereiten.
+- Lobby-System für Client und Server implementieren.
+**Was gemacht:**
+- Utility-Klasse MapLoader hinzugefügt, um das Map-Bild einzulesen.
+- Konvertierung des Map-Bildes in ein 2D-Array auf der Serverseite umgesetzt.
+- Funktionierendes Lobby-System erstellt (Lobbys erstellen, beitreten, Teilnehmer-Updates anzeigen).
+- LOBBY_INFO Command in Command.java hinzugefügt, damit der Server Lobby-Updates broadcasten kann.
+- Neue JavaFX Szene LobbyScene als Warteraum erstellt (Start-Button ist nur für den Host sichtbar).
+- CreateLobbyScene (sendet Command.MKL) und JoinLobbyScene (sendet Command.CHECKIN) angebunden.
+- broadcastLobbyInfo() in Lobby.java und LobbyHandler integriert, um alle Clients bei Änderungen zu informieren.
+- handleLobbyInfo im ServerHandler implementiert, um eingehende Updates auf Client-Seite zu verarbeiten.
 
 ## 2026-04-11 — Vera ##
 **Dauer:** ~2.5h
@@ -233,3 +267,11 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Das komplette QA-Konzept überarbeitet und verständlicher formuliert.
 - Struktur verbessert, damit der Aufbau logischer ist.
 - Javadoc überarbeitet und allgemeines Housekeeping im Code durchgeführt (Kommentare verbessert, kleinere Unsauberkeiten behoben).
+
+
+
+
+
+
+
+
