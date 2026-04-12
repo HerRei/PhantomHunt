@@ -167,13 +167,22 @@ public class GameScene implements SceneInterface {
   private void addPlayerShape(Player player) {
     Rectangle rect = new Rectangle(20, 20); // Width and Height of the player
 
-    // Choose color based on role (skin property)
-    // Assume "HUMAN" = Red, others (Phantoms) = White
+    // Listen for changes in the skin property and update the color accordingly
+    player.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+        if ("HUMAN".equalsIgnoreCase(newSkin)) {
+            rect.setFill(Color.RED);
+        } else {
+            rect.setFill(Color.WHITE);
+        }
+    });
+
+    // Set initial color
     if ("HUMAN".equalsIgnoreCase(player.skinProperty().get())) {
-      rect.setFill(Color.RED);
+        rect.setFill(Color.RED);
     } else {
-      rect.setFill(Color.WHITE);
+        rect.setFill(Color.WHITE);
     }
+
     rect.layoutXProperty().bind(player.xPosition().multiply(scaleFactor));
     rect.layoutYProperty().bind(player.yPosition().multiply(scaleFactor));
 
