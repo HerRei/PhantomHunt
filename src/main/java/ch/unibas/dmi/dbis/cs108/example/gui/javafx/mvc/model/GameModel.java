@@ -85,7 +85,7 @@ public class GameModel {
     if (player != null) {
       player.setPosition(x, y);
       player.setScore(score);
-      // Note: You could also add a roleProperty to the Player class
+      player.setSkin(role);
     } else {
       players.add(new Player(name, role, score, x, y));
     }
