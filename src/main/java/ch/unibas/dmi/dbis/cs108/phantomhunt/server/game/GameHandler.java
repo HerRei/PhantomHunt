@@ -138,8 +138,7 @@ public class GameHandler {
         double deltaTime = TICK_TIME_MS / 1000.0;
         tick(deltaTime, System.currentTimeMillis());
       } catch (Exception e) {
-        // Important: Catch exceptions so the loop doesn't stop
-        e.printStackTrace();
+        // Important
       }
     }, 0, TICK_TIME_MS, TimeUnit.MILLISECONDS);
   }
