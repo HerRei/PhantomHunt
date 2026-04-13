@@ -19,7 +19,7 @@ ext {
 }
 
 application {
-    mainClass = 'ch.unibas.dmi.dbis.cs108.example.Main'
+    mainClass = 'ch.unibas.dmi.dbis.cs108.phantomhunt.Main'
 }
 
 repositories {
@@ -63,7 +63,7 @@ tasks.named('jar') {
     archiveFileName = 'phantom-hunt.jar'
 
     manifest {
-        attributes 'Main-Class': 'ch.unibas.dmi.dbis.cs108.example.Main'
+        attributes 'Main-Class': 'ch.unibas.dmi.dbis.cs108.phantomhunt.Main'
     }
 
     // make sure runtimeClasspath is resolved before we try to zipTree it
