@@ -193,6 +193,13 @@ public class ClientHandler implements Runnable {
       return;
     }
     String lobbyName = String.join(" ", p.args());
+    lobbyName = lobbyName.trim();
+    lobbyName = lobbyName.replace(" ","");
+    lobbyName = lobbyName.replace(":","");
+    lobbyName = lobbyName.replace(";","");
+    if (lobbyName.isBlank()){
+      return;
+    }
     LOGGER.info("MKL from {}: {}", name, lobbyName);
     lobbyHandler.createLobby(lobbyName, this);
   }
