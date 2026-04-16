@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.*;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
@@ -20,20 +21,25 @@ import java.util.concurrent.TimeUnit;
  */
 public class GameHandler {
 
+  private static GameHandler instance;
   private final GameState gameState;
   private final LobbyHandler lobbyHandler;
   private final Lobby lobby;
+  private InputState realInput;
   private ScheduledExecutorService gameLoopExecutor;
   private static final int TICKS_PER_SECOND = 20;
   private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
   private static final long ROUND_END_WAIT_MS = 3000;
 
-  public GameHandler(GameState gameState, LobbyHandler lobbyHandler, Lobby lobby) {
+  public GameHandler(GameState gs, Lobby lobby) {
     this.lobby = lobby;
-    this.gameState = Objects.requireNonNull(gameState, "gameState must not be null");
-    this.lobbyHandler = Objects.requireNonNull(lobbyHandler, "lobbyHandler must not be null");
+    this.gameState = Objects.requireNonNull(gs, "gameState must not be null");
+    this.lobbyHandler = Objects.requireNonNull(LobbyHandler.getInstance(), "lobbyHandler must not be null");
+    instance = this;
   }
-
+  public static synchronized GameHandler getInstance() {
+    return instance;
+  }
   /**
    * Broadcasts current positions and roles to all clients in the lobby.
    */
@@ -80,37 +86,20 @@ public class GameHandler {
     broadcastGameState();
   }
 
-  /**
-   * Calculates new position based on input and map collisions.
-   */
   private void updatePlayerPositions(double deltaTime) {
     double speed = gameState.getRules().moveSpeedPerSecond();
-    double playerRadius = gameState.getRules().playerRadius();
-    double movementRadius = MapCollision.movementRadius(playerRadius);
+    Map map = Map.getInstance();
 
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState ps = gameState.getMutablePlayerAt(i);
-      InputState input = ps.getInputState(); 
       Position pos = ps.getPosition();
+      InputState currentMovement = ps.getRealInput();
 
-      double moveX = 0;
-      double moveY = 0;
-
-      if (input.isUp())    moveY -= speed * deltaTime;
-      if (input.isDown())  moveY += speed * deltaTime;
-      if (input.isLeft())  moveX -= speed * deltaTime;
-      if (input.isRight()) moveX += speed * deltaTime;
-
-      // Check X direction
-      if (!isCollidingWithWall(pos.getX() + moveX, pos.getY(), movementRadius)) {
-        pos.setX(pos.getX() + moveX);
+      pos.updatePosition(currentMovement, speed, deltaTime, map);
+      InputState nextRequest = ps.getInputState();
+      if (pos.checkValidInput(nextRequest, map)) {
+        ps.setRealInput(nextRequest);
       }
-      // Check Y direction
-      if (!isCollidingWithWall(pos.getX(), pos.getY() + moveY, movementRadius)) {
-        pos.setY(pos.getY() + moveY);
-      }
-
-      ps.setPosition(pos);
     }
   }
 
@@ -305,9 +294,9 @@ public class GameHandler {
   }
 
   public synchronized void updateInput(
-      String playerId, boolean up, boolean down, boolean left, boolean right) {
+      String playerId, int vertical, int horizontal) {
     PlayerState player = gameState.requireMutablePlayer(playerId);
-    player.setInputState(new InputState(up, down, left, right));
+    player.setInputState(new InputState(vertical, horizontal));
   }
 
   public synchronized Optional<PlayerState> findPlayer(String playerId) {
@@ -415,7 +404,7 @@ public class GameHandler {
   private void resetAllInputs() {
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
-      player.setInputState(new InputState(false, false, false, false));
+      player.setInputState(new InputState(0, 0));
     }
   }
 

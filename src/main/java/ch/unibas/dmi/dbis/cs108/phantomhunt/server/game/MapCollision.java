@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.TileType;
 
 public final class MapCollision {
     private static final double MOVEMENT_COLLISION_RADIUS_SCALE = 0.4;
@@ -12,7 +11,7 @@ public final class MapCollision {
         return Math.max(MIN_MOVEMENT_COLLISION_RADIUS, playerRadius * MOVEMENT_COLLISION_RADIUS_SCALE);
     }
 
-    public static boolean collidesWithWall(TileType[][] map, double x, double y, double radius) {
+    public static boolean collidesWithWall(Boolean[][] map, double x, double y, double radius) {
         int height = map.length;
         int width = map[0].length;
 
@@ -22,20 +21,18 @@ public final class MapCollision {
         for (double angle : angles) {
             double checkX = x + radius * Math.cos(angle);
             double checkY = y + radius * Math.sin(angle);
-            if (isWallAt(map, width, height, checkX, checkY)) {
-                return true;
-            }
+            return isWallAt(map, width, height, checkX, checkY);
         }
         return isWallAt(map, width, height, x, y); // Also check center
     }
 
-    private static boolean isWallAt(TileType[][] map, int width, int height, double x, double y) {
+    private static boolean isWallAt(Boolean[][] map, int width, int height, double x, double y) {
         int tileX = (int) Math.floor(x);
         int tileY = (int) Math.floor(y);
         return tileX < 0
                 || tileX >= width
                 || tileY < 0
                 || tileY >= height
-                || map[tileY][tileX] == TileType.WALL;
+                || !(map[tileY][tileX]);
     }
 }

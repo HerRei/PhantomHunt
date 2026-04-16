@@ -12,6 +12,7 @@ public final class PlayerState {
   private PlayerRole role;
   private Position position;
   private InputState inputState;
+  private InputState realInput;
   private int score;
   private boolean connected;
   private boolean caughtThisRound;

@@ -33,16 +33,16 @@ public class EventHandlers {
 
   /**
    * Sends the current movement input state to the server.
-   * Format: "INPUT u d l r", where 1 is pressed and 0 is released.
+   * Format: "INPUT vertical horizontal", where 1 is pressed and 0 is released.
    */
-  public void sendInputs(boolean up, boolean down, boolean left, boolean right) {
+  public void sendInputs(int vertical, int horizontal) {
     if (serverHandler == null) {
       LOGGER.warn("Cannot send inputs: Not connected to server.");
       return;
     }
 
-    String payload = String.format("%d %d %d %d",
-        up ? 1 : 0, down ? 1 : 0, left ? 1 : 0, right ? 1 : 0);
+    String payload = String.format("%d %d",
+        vertical, horizontal);
 
     serverHandler.sendMessage(Packet.of(Command.INPUT, payload));
   }

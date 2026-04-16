@@ -312,16 +312,14 @@ public class ClientHandler implements Runnable {
         return;
       }
       String[] inputs = p.args().get(0).split("\\s+");
-      if (inputs.length < 4) {
+      if (inputs.length < 2) {
         sendMessage(Packet.of(Command.REJECT, "Invalid input packet."));
         return;
       }
-      boolean u = inputs[0].equals("1");
-      boolean d = inputs[1].equals("1");
-      boolean l = inputs[2].equals("1");
-      boolean r = inputs[3].equals("1");
+      int vertical = Integer.parseInt(inputs[0]);
+      int horizontal = Integer.parseInt(inputs[1]);
 
-      gameHandler.updateInput(getName(), u, d, l, r);
+      gameHandler.updateInput(getName(), vertical, horizontal);
 
     } catch (Exception e) {
       LOGGER.error("Error parsing input for player {}: {}", name, p.args());

@@ -4,24 +4,18 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
  * Represents the current movement intentions of a player based on their client input.
  */
 public final class InputState {
-  private final boolean up;
-  private final boolean down;
-  private final boolean left;
-  private final boolean right;
+  private final int vertical;
+  private final int horizontal;
 
   /**
    * Constructs a new InputState with the specified directional intentions.
    *
-   * @param up    True if player moves upwards, false otherwise.
-   * @param down  True if player moves downwards, false otherwise.
-   * @param left  True if player moves left, false otherwise.
-   * @param right True if player moves right, false otherwise.
+   * @param vertical    -1 if player moves upwards, 1 upwards, 0 otherwise.
+   * @param horizontal  -1 if player moves to the left, 1 to the right, 0 otherwise.
    */
-  public InputState(boolean up, boolean down, boolean left, boolean right) {
-    this.up = up;
-    this.down = down;
-    this.left = left;
-    this.right = right;
+  public InputState(int vertical, int horizontal) {
+    this.vertical = vertical;
+    this.horizontal = horizontal;
   }
 
   /**
@@ -30,27 +24,27 @@ public final class InputState {
    * @return A new InputState object with the same values.
    */
   public InputState copy() {
-    return new InputState(up, down, left, right);
+    return new InputState(vertical, horizontal);
   }
 
   public boolean isUp() {
-    return up;
+    return vertical == -1;
   }
 
   public boolean isDown() {
-    return down;
+    return vertical == 1;
   }
 
   public boolean isLeft() {
-    return left;
+    return horizontal == -1;
   }
 
   public boolean isRight() {
-    return right;
+    return horizontal == 1;
   }
 
   @Override
   public String toString() {
-    return "InputState{up=" + up + ", down=" + down + ", left=" + left + ", right=" + right + "}";
+    return "InputState{vertical=" + vertical + ", horizontal=" + horizontal +"}";
   }
 }

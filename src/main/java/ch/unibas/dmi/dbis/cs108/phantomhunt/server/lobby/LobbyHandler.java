@@ -5,8 +5,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameFactory;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.TileType;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLoader;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,12 +20,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LobbyHandler {
 
   private static final Logger LOGGER = LogManager.getLogger(LobbyHandler.class);
+  private static LobbyHandler instance;
 
   private final Vector<Lobby> waitingLobbies = new Vector<>();
   private final Vector<Lobby> playingLobbies = new Vector<>();
   private final Vector<Lobby> finishedLobbies = new Vector<>();
   private final AtomicInteger lobbyCounter = new AtomicInteger(1);
   private final GameFactory gameFactory = new GameFactory();
+
+  /**
+   * Retrieves the singleton instance of LobbyHandler.
+   *
+   * @return the singleton instance
+   */
+  public static synchronized LobbyHandler getInstance() {
+    if (instance == null) {
+      instance = new LobbyHandler();
+    }
+    return instance;
+  }
 
   // ---------------------------------------------------------------------------------------------
   // Getters & Setters
@@ -98,9 +110,9 @@ public class LobbyHandler {
       seeds.add(new GameState.PlayerSeed(player.getName(), player.getName()));
     }
 
-    TileType[][] map = MapLoader.loadMapFromImage("/assets/map_collision_concept.png");
-    GameState gameState = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
-    GameHandler gameHandler = new GameHandler(gameState, this, lobby);
+    Map map = new Map();
+    GameState gs = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
+    GameHandler gameHandler = new GameHandler(gs, lobby);
 
     lobby.attachGame(gameHandler);
     waitingLobbies.remove(lobby);

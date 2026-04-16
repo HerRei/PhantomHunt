@@ -7,7 +7,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.InputState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerRole;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.Position;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.TileType;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +17,7 @@ import java.util.Objects;
  * Builds a fresh game state and owns the setup/validation logic for match creation.
  */
 public final class GameFactory {
-
-
+  private static GameState instance;
   /**
    * Creates a game with the provided rules and map.
    *
@@ -26,13 +25,19 @@ public final class GameFactory {
    * @param playerSeeds Initial configuration data for players.
    * @param rules The specific game rules to apply.
    * @param map The collision map for the game.
-   * @return A newly initialized GameState.
    */
   public GameState create(
-          String matchId, List<PlayerSeed> playerSeeds, GameRules rules, TileType[][] map) {
-    TileType[][] validatedMap = deepCopyAndValidateMap(map);
+          String matchId, List<PlayerSeed> playerSeeds, GameRules rules, Map map) {
+    Boolean[][] validatedMap = deepCopyAndValidateMap(map.getMap());
     List<PlayerState> players = createPlayers(playerSeeds, validatedMap);
     return new GameState(matchId, rules, validatedMap, players);
+  }
+
+  public static GameState getInstance(){
+    if(instance == null){
+      return null;
+    }
+    return instance;
   }
 
   /**
@@ -44,14 +49,14 @@ public final class GameFactory {
    * @return A newly initialized GameState.
    */
   public GameState createWithDefaultRules(
-          String matchId, List<PlayerSeed> playerSeeds, TileType[][] map) {
+          String matchId, List<PlayerSeed> playerSeeds, Map map) {
     if (map == null) { //fallback for no Map
       return create(matchId, playerSeeds, GameRules.defaultRules(), map);
     }
     return create(matchId, playerSeeds, GameRules.defaultRules(), map);
   }
 
-  private static List<PlayerState> createPlayers(List<PlayerSeed> playerSeeds, TileType[][] map) {
+  private static List<PlayerState> createPlayers(List<PlayerSeed> playerSeeds, Boolean[][] map) {
     Objects.requireNonNull(playerSeeds, "playerSeeds must not be null");
 
     if (playerSeeds.size() != GameState.REQUIRED_PLAYER_COUNT) {
@@ -71,7 +76,7 @@ public final class GameFactory {
                       requireNonBlank(seed.nickname(), "nickname must not be blank"),
                       PlayerRole.PHANTOM,
                       defaultSpawns.get(i).copy(),
-                      new InputState(false, false, false, false),
+                      new InputState(0, 0),
                       0,
                       true,
                       false));
@@ -80,7 +85,7 @@ public final class GameFactory {
     return result;
   }
 
-  private static TileType[][] deepCopyAndValidateMap(TileType[][] source) {
+  private static Boolean[][] deepCopyAndValidateMap(Boolean[][] source) {
     Objects.requireNonNull(source, "map must not be null");
 
     if (source.length == 0 || source[0].length == 0) {
@@ -88,7 +93,7 @@ public final class GameFactory {
     }
     int width = source[0].length;
 
-    TileType[][] copy = new TileType[source.length][];
+    Boolean[][] copy = new Boolean[source.length][];
 
     for (int y = 0; y < source.length; y++) {
       Objects.requireNonNull(source[y], "map row must not be null");
@@ -97,7 +102,7 @@ public final class GameFactory {
         throw new IllegalArgumentException("All rows must have the same width.");
       }
 
-      copy[y] = new TileType[source[y].length];
+      copy[y] = new Boolean[source[y].length];
       for (int x = 0; x < source[y].length; x++) {
         if (source[y][x] == null) {
           throw new IllegalArgumentException("Map tile must not be null.");
@@ -112,10 +117,10 @@ public final class GameFactory {
   static List<Position> createDefaultSpawnPositions(int mapHeight, int mapWidth) {
     List<Position> spawns = new ArrayList<>(4);
 
-    spawns.add(new Position(245.5, 194.5));
-    spawns.add(new Position(341.5, 242.5));
-    spawns.add(new Position(109.5, 369.5));
-    spawns.add(new Position(403.5, 369.5));
+    //4 random spawnpoints
+    for (int i = 0; i < 4; i++) {
+      spawns.add(new Position(Map.getInstance().useRandomSpawnPoint(), Map.getInstance()));
+    }
 
     return spawns;
   }

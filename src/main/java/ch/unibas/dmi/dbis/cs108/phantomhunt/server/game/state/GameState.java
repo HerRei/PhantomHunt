@@ -15,7 +15,7 @@ public class GameState {
 
   private final String matchId;
   private final GameRules rules;
-  private final TileType[][] map;
+  private final Boolean[][] map;
   private final List<PlayerState> players;
   private GamePhase phase;
   private final RoundState roundState;
@@ -29,7 +29,7 @@ public class GameState {
    * @param map     2D array representing the map.
    * @param players A list representing the players.
    */
-  public GameState(String matchId, GameRules rules, TileType[][] map, List<PlayerState> players) {
+  public GameState(String matchId, GameRules rules, Boolean[][] map, List<PlayerState> players) {
     this.matchId = requireNonBlank(matchId, "Must not be blank");
     this.rules = Objects.requireNonNull(rules, "Rules must not be null (stp)");
     this.map = copyMap(Objects.requireNonNull(map, "map must not be null"));
@@ -61,7 +61,7 @@ public class GameState {
 
     for (int ty = startY; ty <= endY; ty++) {
       for (int tx = startX; tx <= endX; tx++) {
-        if (map[ty][tx] == TileType.WALL) {
+        if (!(map[ty][tx])) {
           return true;
         }
       }
@@ -200,7 +200,7 @@ public class GameState {
     return rules;
   }
 
-  public synchronized TileType[][] getMapSnapshot() {
+  public synchronized Boolean[][] getMapSnapshot() {
     return copyMap(map);
   }
 
@@ -257,10 +257,10 @@ public class GameState {
     }
   }
 
-  private static TileType[][] copyMap(TileType[][] source) {
-    TileType[][] copy = new TileType[source.length][];
+  private static Boolean[][] copyMap(Boolean[][] source) {
+    Boolean[][] copy = new Boolean[source.length][];
     for (int y = 0; y < source.length; y++) {
-      copy[y] = new TileType[source[y].length];
+      copy[y] = new Boolean[source[y].length];
       System.arraycopy(source[y], 0, copy[y], 0, source[y].length);
     }
     return copy;

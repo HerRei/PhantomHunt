@@ -17,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -38,8 +39,6 @@ public class GameScene implements SceneInterface {
   private final Map<Player, Rectangle> playerShapes = new HashMap<>();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
-  private final Image collisionMap;
-  private final PixelReader pixelReader;
   private boolean w;
   private boolean a;
   private boolean s;
@@ -57,8 +56,6 @@ public class GameScene implements SceneInterface {
     mapView.setFitHeight(720);
 
     this.mapScale = 720.0 / mapImage.getHeight();
-    this.collisionMap = model.getCollisionMap();
-    this.pixelReader = collisionMap.getPixelReader();
 
     StackPane gameStack = new StackPane(mapView, gamePane);
     gameStack.setStyle("-fx-background-color: black;");
@@ -158,37 +155,57 @@ public class GameScene implements SceneInterface {
   }
 
   private void setupControls() {
-    scene.setOnKeyPressed(e -> handleKey(e.getCode(), true));
-    scene.setOnKeyReleased(e -> handleKey(e.getCode(), false));
+    scene.setOnKeyPressed(e -> handleKey(e.getCode()));
   }
 
-  private void handleKey(javafx.scene.input.KeyCode code, boolean pressed) {
+  private void handleKey(KeyCode code) {
     if (chatInput.isFocused()) {
       return;
     }
+    int horizontal = 0, vertical = 0;
     boolean changed = false;
     switch (code) {
       case W -> {
-        if (w != pressed) {
-          w = pressed;
+        if (w != true) {
+          w = true;
+          a = false;
+          s = false;
+          d = false;
+          horizontal = 0;
+          vertical = 1;
           changed = true;
         }
       }
       case S -> {
-        if (s != pressed) {
-          s = pressed;
+        if (s != true) {
+          w = false;
+          a = false;
+          s = true;
+          d = false;
+          horizontal = 0;
+          vertical = 1;
           changed = true;
         }
       }
       case A -> {
-        if (a != pressed) {
-          a = pressed;
+        if (a != true) {
+          w = false;
+          a = false;
+          s = false;
+          d = false;
+          horizontal = -1;
+          vertical = 0;
           changed = true;
         }
       }
       case D -> {
-        if (d != pressed) {
-          d = pressed;
+        if (d != true) {
+          w = false;
+          a = false;
+          s = false;
+          d = true;
+          horizontal = 1;
+          vertical = 0;
           changed = true;
         }
       }
@@ -196,7 +213,7 @@ public class GameScene implements SceneInterface {
       }
     }
     if (changed) {
-      EventHandlers.getInstance().sendInputs(w, s, a, d);
+      EventHandlers.getInstance().sendInputs(vertical, horizontal);
     }
   }
 
@@ -242,22 +259,6 @@ public class GameScene implements SceneInterface {
     if (shape != null) {
       gamePane.getChildren().remove(shape);
     }
-  }
-
-  /**
-   * Checks if a specific coordinate on the map is walkable.
-   *
-   * @param x the x-coordinate to check
-   * @param y the y-coordinate to check
-   * @return true if the coordinate is walkable, false otherwise
-   */
-  public boolean isWalkable(int x, int y) {
-    if (x < 0 || x >= collisionMap.getWidth() || y < 0 || y >= collisionMap.getHeight()) {
-      return false;
-    }
-
-    Color color = pixelReader.getColor(x, y);
-    return !Color.BLACK.equals(color);
   }
 
   @Override
