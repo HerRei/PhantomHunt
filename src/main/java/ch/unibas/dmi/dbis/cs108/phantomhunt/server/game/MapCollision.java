@@ -1,10 +1,12 @@
+/*
+
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.TileType;
 
 public final class MapCollision {
     private static final double MOVEMENT_COLLISION_RADIUS_SCALE = 0.4;
-    private static final double MIN_MOVEMENT_COLLISION_RADIUS = 3.0;
+    private static final double MIN_MOVEMENT_COLLISION_RADIUS = 0.5;
 
     private MapCollision() {}
 
@@ -39,3 +41,4 @@ public final class MapCollision {
                 || map[tileY][tileX] == TileType.WALL;
     }
 }
+*/

@@ -112,10 +112,10 @@ public final class GameFactory {
   static List<Position> createDefaultSpawnPositions(int mapHeight, int mapWidth) {
     List<Position> spawns = new ArrayList<>(4);
 
-    spawns.add(new Position(245.5, 194.5));
-    spawns.add(new Position(341.5, 242.5));
-    spawns.add(new Position(109.5, 369.5));
-    spawns.add(new Position(403.5, 369.5));
+    spawns.add(new Position(0.5, 0.5));
+    spawns.add(new Position(16.5, 0.5));
+    spawns.add(new Position(0.5, 17.5));
+    spawns.add(new Position(16.5, 17.5));
 
     return spawns;
   }

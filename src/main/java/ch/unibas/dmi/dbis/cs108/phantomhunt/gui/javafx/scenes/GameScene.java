@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.CollisionMap;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
@@ -16,7 +17,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -38,8 +38,7 @@ public class GameScene implements SceneInterface {
   private final Map<Player, Rectangle> playerShapes = new HashMap<>();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
-  private final Image collisionMap;
-  private final PixelReader pixelReader;
+
   private boolean w;
   private boolean a;
   private boolean s;
@@ -56,9 +55,7 @@ public class GameScene implements SceneInterface {
     mapView.setPreserveRatio(true);
     mapView.setFitHeight(720);
 
-    this.mapScale = 720.0 / mapImage.getHeight();
-    this.collisionMap = model.getCollisionMap();
-    this.pixelReader = collisionMap.getPixelReader();
+    this.mapScale = 720.0 / CollisionMap.ColGrid.length;
 
     StackPane gameStack = new StackPane(mapView, gamePane);
     gameStack.setStyle("-fx-background-color: black;");
@@ -252,12 +249,7 @@ public class GameScene implements SceneInterface {
    * @return true if the coordinate is walkable, false otherwise
    */
   public boolean isWalkable(int x, int y) {
-    if (x < 0 || x >= collisionMap.getWidth() || y < 0 || y >= collisionMap.getHeight()) {
-      return false;
-    }
-
-    Color color = pixelReader.getColor(x, y);
-    return !Color.BLACK.equals(color);
+    return CollisionMap.isWalkable(x, y);
   }
 
   @Override

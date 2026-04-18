@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.CollisionMap;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.*;
@@ -85,12 +86,10 @@ public class GameHandler {
    */
   private void updatePlayerPositions(double deltaTime) {
     double speed = gameState.getRules().moveSpeedPerSecond();
-    double playerRadius = gameState.getRules().playerRadius();
-    double movementRadius = MapCollision.movementRadius(playerRadius);
 
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState ps = gameState.getMutablePlayerAt(i);
-      InputState input = ps.getInputState(); 
+      InputState input = ps.getInputState();
       Position pos = ps.getPosition();
 
       double moveX = 0;
@@ -101,26 +100,24 @@ public class GameHandler {
       if (input.isLeft())  moveX -= speed * deltaTime;
       if (input.isRight()) moveX += speed * deltaTime;
 
+      double nextX = pos.getX() + moveX;
+      double nextY = pos.getY() + moveY;
+
       // Check X direction
-      if (!isCollidingWithWall(pos.getX() + moveX, pos.getY(), movementRadius)) {
-        pos.setX(pos.getX() + moveX);
-      }
-      // Check Y direction
-      if (!isCollidingWithWall(pos.getX(), pos.getY() + moveY, movementRadius)) {
-        pos.setY(pos.getY() + moveY);
+      if (CollisionMap.isWalkable((int) Math.floor(nextX), (int) Math.floor(pos.getY()))) {
+        pos.setX(nextX);
       }
 
+      // Check Y direction
+      if (CollisionMap.isWalkable((int) Math.floor(pos.getX()), (int) Math.floor(nextY))) {
+        pos.setY(nextY);
+      }
       ps.setPosition(pos);
     }
   }
 
   private double calculateDistance(Position p1, Position p2) {
     return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
-  }
-
-
-  private boolean isCollidingWithWall(double x, double y, double radius) {
-    return MapCollision.collidesWithWall(gameState.getMapSnapshot(), x, y, radius);
   }
 
   /**

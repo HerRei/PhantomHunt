@@ -33,7 +33,6 @@ public class GameModel {
 
   // Map properties
   private final ObjectProperty<Image> gameMap = new SimpleObjectProperty<>();
-  private final ObjectProperty<Image> collisionMap = new SimpleObjectProperty<>();
 
   private GameModel() { // NOSONAR
     loadMaps();
@@ -115,8 +114,6 @@ public class GameModel {
     try {
       Image gameMapImage = new Image(getClass().getResourceAsStream("/assets/map_concept.png"));
       setGameMap(gameMapImage);
-      Image collisionMapImage = new Image(getClass().getResourceAsStream("/assets/map_collision_concept.png"));
-      setCollisionMap(collisionMapImage);
       LOGGER.info("Maps loaded successfully.");
     } catch (Exception e) {
       LOGGER.error("Failed to load maps.", e);
@@ -215,14 +212,6 @@ public class GameModel {
     return gameMap;
   }
 
-  public Image getCollisionMap() {
-    return collisionMap.get();
-  }
-
-  public ObjectProperty<Image> collisionMapProperty() {
-    return collisionMap;
-  }
-
   // ---SETTERS---
   public void setName(String name) {
     playerName.set(name);
@@ -230,10 +219,6 @@ public class GameModel {
 
   public void setGameMap(Image gameMap) {
     this.gameMap.set(gameMap);
-  }
-
-  public void setCollisionMap(Image collisionMap) {
-    this.collisionMap.set(collisionMap);
   }
 
   public void resetModel() {

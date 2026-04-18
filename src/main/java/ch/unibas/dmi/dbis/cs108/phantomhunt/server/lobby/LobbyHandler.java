@@ -1,12 +1,12 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.CollisionMap;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameFactory;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.TileType;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLoader;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,7 +98,7 @@ public class LobbyHandler {
       seeds.add(new GameState.PlayerSeed(player.getName(), player.getName()));
     }
 
-    TileType[][] map = MapLoader.loadMapFromImage("/assets/map_collision_concept.png");
+    TileType[][] map = createTileMap();
     GameState gameState = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
     GameHandler gameHandler = new GameHandler(gameState, this, lobby);
 
@@ -236,4 +236,23 @@ public class LobbyHandler {
     }
     return Optional.empty();
   }
+
+  private TileType[][] createTileMap() {
+    String[] grid = CollisionMap.ColGrid;
+    int height = grid.length;
+    int width = grid[0].length();
+    TileType[][] map = new TileType[height][width];
+
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        if (grid[y].charAt(x) == ' ') {
+          map[y][x] = TileType.FLOOR;
+        } else {
+          map[y][x] = TileType.WALL;
+        }
+      }
+    }
+    return map;
+  }
 }
+
