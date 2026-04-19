@@ -113,7 +113,6 @@ public class LobbyHandler {
     Map map = new Map(generateExampleMap());
     GameState gs = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
     GameHandler gameHandler = new GameHandler(gs, lobby);
-    System.out.println(Map.getInstance().getMap().toString());
 
     lobby.attachGame(gameHandler);
     waitingLobbies.remove(lobby);

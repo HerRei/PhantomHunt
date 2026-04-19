@@ -143,6 +143,7 @@ public class ServerHandler implements Runnable {
     Platform.runLater(() -> {
       SceneManager.getInstance().showScene(SceneProtocol.END);
     });
+
   }
 
   private void handlePlayers(Packet packet) {

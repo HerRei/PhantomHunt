@@ -5,11 +5,7 @@ import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
