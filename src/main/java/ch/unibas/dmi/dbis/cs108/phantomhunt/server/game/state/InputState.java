@@ -43,6 +43,14 @@ public final class InputState {
     return horizontal == 1;
   }
 
+  public int getHorizontal(){return horizontal;}
+
+  public int getVertical(){return vertical;}
+
+  public boolean isMoving(){
+      return !(horizontal == 0) || !(vertical == 0);
+  }
+
   @Override
   public String toString() {
     return "InputState{vertical=" + vertical + ", horizontal=" + horizontal +"}";

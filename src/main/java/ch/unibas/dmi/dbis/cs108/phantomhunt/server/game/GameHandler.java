@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.client.net.ServerHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.*;
@@ -7,6 +8,8 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class GameHandler {
 
+  private static final Logger LOGGER = LogManager.getLogger(ServerHandler.class);
   private static GameHandler instance;
   private final GameState gameState;
   private final LobbyHandler lobbyHandler;
@@ -96,10 +100,11 @@ public class GameHandler {
       InputState currentMovement = ps.getRealInput();
 
       pos.updatePosition(currentMovement, speed, deltaTime, map);
-      InputState nextRequest = ps.getInputState();
-      if (pos.checkValidInput(nextRequest, map)) {
+      InputState nextRequest = ps.getInputState();;
+      if (pos.checkValidInput(currentMovement, nextRequest, map) && nextRequest.isMoving()) {
         ps.setRealInput(nextRequest);
       }
+      else {pos.checkValidInput(currentMovement, currentMovement, map);}
     }
   }
 

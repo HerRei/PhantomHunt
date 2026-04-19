@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util;
 
 
+import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,7 +20,7 @@ public final class Map {
 
   private static final Logger LOGGER = LogManager.getLogger(Map.class);
   private static Map instance;
-  private static final String tileImage = "path to image"; //path to tileImg
+  private static final String tileImage = "/assets/floor-test.png"; //path to tileImg
   private int tileSize;
   private ArrayList<int[]> possibleSpawnPoints;
   private Boolean[][] walkingMap;
@@ -28,9 +29,8 @@ public final class Map {
     this.walkingMap = loadMapFromString(map);
     this.possibleSpawnPoints = getSpawnPoints(map);
     try{// 1. Load the image file
-      File imageFile = new File(tileImage);
-      BufferedImage image = ImageIO.read(imageFile);
-      this.tileSize = image.getHeight();
+      Image imageFile = new Image(getClass().getResourceAsStream(tileImage));
+      this.tileSize =  (int) imageFile.getHeight();
       instance = this;}
     catch (Exception e) {
       LOGGER.error("Couldn't read the TileImage");
@@ -114,7 +114,9 @@ public final class Map {
   public double calcDistance(int[] tile, double xPosition, double yPosition){
     double targetX = tileToPixelPosition(tile[1], tile[0])[1];
     double targetY = tileToPixelPosition(tile[1], tile[0])[0];
-    return Math.sqrt(Math.pow(targetX- xPosition, 2) + Math.pow(targetY- yPosition, 2));
+    double distance = Math.sqrt(Math.pow(targetX- xPosition, 2) + Math.pow(targetY- yPosition, 2));
+    LOGGER.info(distance);
+    return distance;
   }
 
   public double[] tileToPixelPosition(int xTile, int yTile){
@@ -132,6 +134,8 @@ public final class Map {
   public int getPixelWidth(String[][] mapImage){return mapImage[0].length * tileSize;}
 
   public int getPixelHeight(String[][] mapImage){ return mapImage[0].length * tileSize;}
+
+  public int getTileSize() { return tileSize; }
 
   public Boolean[][] getMap() {
     return walkingMap;

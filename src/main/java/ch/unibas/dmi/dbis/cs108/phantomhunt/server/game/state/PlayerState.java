@@ -34,6 +34,30 @@ public final class PlayerState {
     this.role = Objects.requireNonNull(role, "role must not be null");
     this.position = Objects.requireNonNull(position, "position must not be null");
     this.inputState = Objects.requireNonNull(inputState, "inputState must not be null");
+    this.realInput = Objects.requireNonNull(inputState);
+    this.score = score;
+    this.connected = connected;
+    this.caughtThisRound = caughtThisRound;
+  }
+  /**
+   * Creates an independent copy of this player's state.
+   */
+  public PlayerState(
+          String playerId,
+          String nickname,
+          PlayerRole role,
+          Position position,
+          InputState inputState,
+          InputState realInput,
+          int score,
+          boolean connected,
+          boolean caughtThisRound) {
+    this.playerId = Objects.requireNonNull(playerId, "playerId must not be null");
+    this.nickname = Objects.requireNonNull(nickname, "nickname must not be null");
+    this.role = Objects.requireNonNull(role, "role must not be null");
+    this.position = Objects.requireNonNull(position, "position must not be null");
+    this.inputState = Objects.requireNonNull(inputState, "inputState must not be null");
+    this.realInput = Objects.requireNonNull(realInput);
     this.score = score;
     this.connected = connected;
     this.caughtThisRound = caughtThisRound;
@@ -51,6 +75,7 @@ public final class PlayerState {
             role,
             position.copy(),
             inputState.copy(),
+            realInput.copy(),
             score,
             connected,
             caughtThisRound);
@@ -69,12 +94,14 @@ public final class PlayerState {
   }
 
   public Position getPosition() {
-    return position.copy();
+    return position;
   }
 
   public InputState getInputState() {
-    return inputState.copy();
+    return inputState;
   }
+
+  public InputState getRealInput() { return realInput; }
 
   public int getScore() {
     return score;
@@ -98,6 +125,10 @@ public final class PlayerState {
 
   public void setInputState(InputState inputState) {
     this.inputState = Objects.requireNonNull(inputState, "inputState must not be null");
+  }
+
+  public void setRealInput(InputState inputState) {
+    this.realInput = Objects.requireNonNull(inputState, "inputState must not be null");
   }
 
   public void setConnected(boolean connected) {

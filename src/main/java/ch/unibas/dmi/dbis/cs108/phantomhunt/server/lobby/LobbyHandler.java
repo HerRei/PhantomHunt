@@ -110,9 +110,10 @@ public class LobbyHandler {
       seeds.add(new GameState.PlayerSeed(player.getName(), player.getName()));
     }
 
-    Map map = new Map();
+    Map map = new Map(generateExampleMap());
     GameState gs = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
     GameHandler gameHandler = new GameHandler(gs, lobby);
+    System.out.println(Map.getInstance().getMap().toString());
 
     lobby.attachGame(gameHandler);
     waitingLobbies.remove(lobby);
@@ -194,9 +195,7 @@ public class LobbyHandler {
     Optional<Lobby> lobbyOpt = findLobbyById(id);
     if (lobbyOpt.isEmpty()) return;
     Lobby lobby = lobbyOpt.get();
-    LOGGER.info("HI");
     if (lobby.removePlayer(player) || lobby.removeSpectator(player)) {
-      LOGGER.info("YEAH");
       player.setCurrentLobby(null);
       if (lobby.getPlayers().isPresent() && lobby.getPlayers().get().isEmpty() && lobby.getSpectators().isPresent() && lobby.getSpectators().get().isEmpty()) {
         waitingLobbies.remove(lobby);
@@ -247,5 +246,29 @@ public class LobbyHandler {
       }
     }
     return Optional.empty();
+  }
+  /**
+   * Generates an example 16x16 map string array.
+   * 'X' represents a wall, and ' ' represents a walkable path.
+   */
+  public static String[][] generateExampleMap() {
+    return new String[][] {
+            {"X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"},
+            {"X", " ", " ", " ", "X", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "X"},
+            {"X", " ", "X", " ", "X", " ", "X", "X", "X", "X", "X", " ", "X", "X", " ", "X"},
+            {"X", " ", "X", " ", " ", " ", " ", " ", " ", " ", "X", " ", " ", "X", " ", "X"},
+            {"X", " ", "X", "X", "X", "X", "X", " ", "X", " ", "X", "X", " ", "X", " ", "X"},
+            {"X", " ", " ", " ", " ", " ", "X", " ", "X", " ", " ", " ", " ", "X", " ", "X"},
+            {"X", "X", "X", " ", "X", " ", "X", " ", "X", "X", "X", "X", " ", "X", " ", "X"},
+            {"X", " ", " ", " ", "X", " ", " ", " ", " ", " ", " ", "X", " ", " ", " ", "X"},
+            {"X", " ", "X", "X", "X", "X", "X", "X", "X", "X", " ", "X", "X", "X", " ", "X"},
+            {"X", " ", " ", " ", " ", " ", " ", " ", " ", "X", " ", " ", " ", "X", " ", "X"},
+            {"X", " ", "X", "X", "X", " ", "X", "X", " ", "X", "X", "X", " ", "X", " ", "X"},
+            {"X", " ", "X", " ", " ", " ", "X", " ", " ", " ", " ", "X", " ", " ", " ", "X"},
+            {"X", " ", "X", " ", "X", "X", "X", " ", "X", "X", " ", "X", "X", "X", "X", "X"},
+            {"X", " ", " ", " ", "X", " ", " ", " ", "X", " ", " ", " ", " ", " ", " ", "X"},
+            {"X", " ", "X", " ", " ", " ", "X", " ", " ", " ", "X", " ", "X", "X", " ", "X"},
+            {"X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"}
+    };
   }
 }
