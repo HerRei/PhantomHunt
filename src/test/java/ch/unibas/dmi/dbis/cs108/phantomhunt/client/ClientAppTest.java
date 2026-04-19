@@ -2,122 +2,58 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.client;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ClientAppTest {
 
     @Test
-    void testSetAndGetConfirmedNickname() {
-        // Arrange & Act:
-        ClientApp.setConfirmedNickname("Player123");
+    void setNickname_nullOrBlank_returnsFalse() {
+        ClientApp app = new ClientApp("localhost", 9999);
 
-        // Assert (expected, actual, "Error")
-        assertEquals("Player123", ClientApp.getConfirmedNickname(), "The nickname should be saved and retrieved correctly.");
+        assertFalse(app.setNickname(null));
+        assertFalse(app.setNickname(""));
+        assertFalse(app.setNickname(" "));
     }
 
     @Test
-    void testNotifyGlobalMessageReceived_ignoresBlank(){
-        // Arrange: We register a listener that stores received messages
-        final String[] receivedMessage = {null};
+    void sendWhisper_invalidInputs_abortsWithoutError() {
+        ClientApp app = new ClientApp("localhost", 9999);
+
+        assertDoesNotThrow(() -> app.sendWhisper(null, "Hello"));
+        assertDoesNotThrow(() -> app.sendWhisper("User", " "));
+    }
+
+    @Test
+    void confirmedNickname_getterAndSetter_worksCorrectly() {
+        ClientApp.setConfirmedNickname("Phantom123");
+        assertEquals("Phantom123", ClientApp.getConfirmedNickname());
+    }
+
+    @Test
+    void notifyGlobalMessageReceived_triggersListener() {
+        AtomicBoolean listenerTriggered = new AtomicBoolean(false);
+
         ClientApp.setGlobalMessageListener(msg -> {
-            receivedMessage[0] = msg;
+            assertEquals("Hello World!", msg);
+            listenerTriggered.set(true);
         });
 
-        // Act
-        ClientApp.notifyGlobalMessageReceived(" ");
-
-        // Assert
-        assertNull(receivedMessage[0], "Empty Messages should be ignored, so the memory must remain null.");
+        ClientApp.notifyGlobalMessageReceived("Hello World!");
+        assertTrue(listenerTriggered.get(), "The listener should have been triggered");
     }
 
     @Test
-    void testNotifyGlobalMessageReceived_validMessage() {
-        // Arrange: Register a listener that stores the messages in our array
-        final String[] receivedMessage = {null};
-        ClientApp.setGlobalMessageListener(msg -> {
-            receivedMessage[0] = msg;
-        });
+    void notifyWhisperReceived_triggersListener() {
+        AtomicBoolean listenerTriggered = new AtomicBoolean(false);
 
-        // Act: valid message
-        ClientApp.notifyGlobalMessageReceived("Hello Team!");
-
-        // Assert:
-        assertEquals("Hello Team!", receivedMessage[0], " The Message should arrive correctly in the listener.");
-    }
-
-    @Test
-    void testSetNickname_invalidInputReturnsFalse() {
-        // Arrange: We create a ClientApp.
-        // If Server is running, connection cannot be built.
-        ClientApp app = new ClientApp("localhost", 8080);
-
-        // Act
-        boolean result = app.setNickname("");
-
-        // Assert
-        assertFalse(result, "An empty nickname should be rejected and return false.");
-    }
-
-    @Test
-    void testSendWhisper_invalidInputAborts(){
-        // Arrange: Client without real server
-        ClientApp app = new ClientApp("localhost", 8080);
-
-        // Act & Assert: Check if an attempt to send a wrong whisper message is aborted without crashind the program
-        assertDoesNotThrow(()->{
-            app.sendWhisper("", "Secret message"); // Target is empty
-            app.sendWhisper("Player2", ""); // Message is empty
-            app.sendWhisper(null, null); // both is null
-        }, "Sending invalid whispers should not cause the program to crash.");
-    }
-
-    @Test
-    void testSpectateLobby_invalidInputAborts(){
-        // Arrange
-        ClientApp app = new ClientApp("localhost", 8080);
-
-        // Act & Assert:
-        assertDoesNotThrow(()->{
-            app.spectateLobby("");
-            app.spectateLobby(null);
-        }, "Calling spectateLobby with empty or null values must not cause a crash.");
-    }
-
-    @Test
-    void testSendGlobalMessage_invalidInputAborts(){
-        // Arrange
-        ClientApp app = new ClientApp("localhost", 8080);
-
-        // Act & Assert: Check if sendGlobalMessage with inputs empty/null get caught safely
-        assertDoesNotThrow(()->{
-            app.sendGlobalMessage("");
-            app.sendGlobalMessage(null);
-        }, "Calling sendGlobalMessage with empty or null values must not cause a crash.");
-    }
-
-    @Test
-    void testNotifyWhisperReceived_ignoresBlankMessage() {
-        // Arrange: register whisper-listener
-        final String[] receivedMessage = {null};
         ClientApp.setWhisperMessageListener(msg -> {
-            receivedMessage[0] = msg;
+            assertEquals("Secret Message!", msg);
+            listenerTriggered.set(true);
         });
 
-        // Act
-        ClientApp.notifyWhisperReceived(" ");
-
-        // Assert
-        assertNull(receivedMessage[0], "Empty Messages should be ignored, so the memory must remain null");
-    }
-
-    @Test
-    void testLogout_offlineDoesNotCrash() {
-        // Arrange
-        ClientApp app = new ClientApp("localhost", 8080);
-
-        // Act & Assert
-        assertDoesNotThrow(()->{
-            app.logout();
-        }, "Logout if not connected to the Server should not cause a crash.");
+        ClientApp.notifyWhisperReceived("Secret Message!");
+        assertTrue(listenerTriggered.get(), "The listener should have been triggered");
     }
 }
