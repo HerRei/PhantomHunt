@@ -111,9 +111,11 @@ public class GameModel {
       player.setScore(score);
       player.setSkin(role);
     } else {
-      lobbyPlayers.add(new Player(name, role, score, x, y));
+      int playerNumber = lobbyPlayers.size() + 1;
+      lobbyPlayers.add(new Player(name, role, score, x, y, playerNumber));
     }
   }
+
   private void loadMaps() {
     try {
       Image gameMapImage = new Image(getClass().getResourceAsStream("/assets/map_concept.png"));

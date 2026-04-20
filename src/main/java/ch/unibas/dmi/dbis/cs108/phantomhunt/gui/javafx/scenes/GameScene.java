@@ -24,9 +24,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,20 +35,40 @@ import java.util.Map;
 public class GameScene implements SceneInterface {
 
   private static final int TILE_SIZE = 32;
-  private static final String TILE_IMAGE_PATH = "/assets/floor-test.png";
 
   private final Scene scene;
   private final Pane gamePane = new Pane();
-  private final Map<Player, Rectangle> playerShapes = new HashMap<>();
+  private final Map<Player, ImageView> playerSprites = new HashMap<>();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
   private boolean w, a, s, d, q; //INPUTS
   private final double mapScale;
+  private final Map<String, Image> floorImageMap = new HashMap<>();
+
+  private final Map<String, Image[]> humanSprites = new HashMap<>();
+  private final Map<String, Image> phantomSprites = new HashMap<>();
 
   /**
    * Initializes the game scene, building the map from tiles and scaling to fit the screen.
    */
   public GameScene() {
+    // Load floor tiles
+    floorImageMap.put("Q", new Image(getClass().getResourceAsStream("/assets/floors/quadra.png")));
+    floorImageMap.put("L", new Image(getClass().getResourceAsStream("/assets/floors/top_left.png")));
+    floorImageMap.put("V", new Image(getClass().getResourceAsStream("/assets/floors/vertical.png")));
+    floorImageMap.put("D", new Image(getClass().getResourceAsStream("/assets/floors/down_left.png")));
+    floorImageMap.put("R", new Image(getClass().getResourceAsStream("/assets/floors/top_right.png")));
+    floorImageMap.put("A", new Image(getClass().getResourceAsStream("/assets/floors/down_right.png")));
+    floorImageMap.put("H", new Image(getClass().getResourceAsStream("/assets/floors/horizontal.png")));
+    floorImageMap.put("T", new Image(getClass().getResourceAsStream("/assets/floors/triple_top.png")));
+    floorImageMap.put("B", new Image(getClass().getResourceAsStream("/assets/floors/triple_down.png")));
+    floorImageMap.put("C", new Image(getClass().getResourceAsStream("/assets/floors/triple_left.png")));
+    floorImageMap.put("E", new Image(getClass().getResourceAsStream("/assets/floors/triple_right.png")));
+
+    // Load player images
+    loadSprites();
+
+
     GameModel model = GameModel.getInstance();
     String[][] mapData = LobbyHandler.generateExampleMap(); // see note below
 
@@ -62,7 +79,7 @@ public class GameScene implements SceneInterface {
     double mapPixelHeight = mapRows * TILE_SIZE;
     double mapPixelWidth  = mapCols * TILE_SIZE;
 
-    this.mapScale = 512.0 / mapPixelHeight;
+    this.mapScale = 640.0 / mapPixelHeight;
 
     // Build the tile layer
     Pane tilePane = buildTilePane(mapData);
@@ -96,18 +113,44 @@ public class GameScene implements SceneInterface {
     setupChatBinding();
   }
 
+
+  private void loadSprites() {
+    // Load human sprites (4 players, 4 directions, 2 frames each)
+    String[] directions = {"front", "back", "left", "right"};
+    for (int i = 1; i <= 4; i++) {
+      for (String direction : directions) {
+        String key = "p" + i + "_" + direction;
+        Image[] frames = new Image[2];
+        frames[0] = new Image(getClass().getResourceAsStream("/assets/humans/" + key + "1.png"));
+        frames[1] = new Image(getClass().getResourceAsStream("/assets/humans/" + key + "2.png"));
+        humanSprites.put(key, frames);
+      }
+    }
+
+    // Load ghost sprites (4 players, 4 directions)
+    String[] phantomColors = {"b", "g", "r", "v"};
+    String[] phantomDirections = {"d", "u", "l", "r"};
+    for (String color : phantomColors) {
+      for (String direction : phantomDirections) {
+        String key = color + direction + "_ghost";
+        phantomSprites.put(key, new Image(getClass().getResourceAsStream("/assets/ghosts/" + key + ".png")));
+      }
+    }
+  }
+
   /**
    * Builds a Pane populated with 32×32 tile ImageViews.
    * Walls ("X") are left as transparent (black background shows through).
-   * Walkable tiles (" ") get the floor image.
+   * Others are walkable tiles
    */
   private Pane buildTilePane(String[][] mapData) {
     Pane pane = new Pane();
-    Image floorImage = new Image(getClass().getResourceAsStream(TILE_IMAGE_PATH));
 
     for (int row = 0; row < mapData.length; row++) {
       for (int col = 0; col < mapData[row].length; col++) {
-        if (" ".equals(mapData[row][col])) {
+        String tileType = mapData[row][col];
+        if (!"X".equals(tileType) && floorImageMap.containsKey(tileType)) {
+          Image floorImage = this.floorImageMap.get(tileType);
           ImageView tile = new ImageView(floorImage);
           tile.setFitWidth(TILE_SIZE);
           tile.setFitHeight(TILE_SIZE);
@@ -258,25 +301,33 @@ public class GameScene implements SceneInterface {
   }
 
   private void addPlayer(Player player) {
-    Rectangle shape = new Rectangle(32, 32);
+    double size = TILE_SIZE * mapScale;
+    ImageView sprite = new ImageView();
+    sprite.setFitWidth(size);
+    sprite.setFitHeight(size);
 
-    player.skinProperty().addListener((obs, oldSkin, newSkin) -> updatePlayerColor(shape, newSkin));
-    updatePlayerColor(shape, player.skinProperty().get());
+    player.skinProperty().addListener((obs, oldSkin, newSkin) -> updatePlayerSprite(player, sprite, newSkin));
+    updatePlayerSprite(player, sprite, player.skinProperty().get());
 
-    shape.layoutXProperty().bind(player.xPosition().multiply(mapScale));
-    shape.layoutYProperty().bind(player.yPosition().multiply(mapScale));
+    sprite.layoutXProperty().bind(player.xPosition().multiply(mapScale));
+    sprite.layoutYProperty().bind(player.yPosition().multiply(mapScale));
 
-    playerShapes.put(player, shape);
-    gamePane.getChildren().add(shape);
+    playerSprites.put(player, sprite);
+    gamePane.getChildren().add(sprite);
   }
 
-  private void updatePlayerColor(Rectangle shape, String skin) {
-    shape.setFill("HUMAN".equalsIgnoreCase(skin) ? Color.RED : Color.WHITE);
+  private void updatePlayerSprite(Player player, ImageView sprite, String skin) {
+    String[] phantomColors = {"b", "g", "r", "v"};
+    if ("HUMAN".equals(skin)) {
+      sprite.setImage(humanSprites.get("p" + player.getPlayerNumber() + "_front")[0]);
+    } else {
+      sprite.setImage(phantomSprites.get(phantomColors[player.getPlayerNumber() - 1] + "d_ghost"));
+    }
   }
 
   private void removePlayer(Player player) {
-    Rectangle shape = playerShapes.remove(player);
-    if (shape != null) gamePane.getChildren().remove(shape);
+    ImageView sprite = playerSprites.remove(player);
+    if (sprite != null) gamePane.getChildren().remove(sprite);
   }
 
   @Override
