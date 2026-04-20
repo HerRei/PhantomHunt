@@ -59,7 +59,7 @@ public final class GameFactory {
     }
 
     List<PlayerState> result = new ArrayList<>();
-    List<Position> defaultSpawns = createDefaultSpawnPositions(map.length, map[0].length);
+    List<Position> defaultSpawns = createDefaultSpawnPositions();
 
     for (int i = 0; i < playerSeeds.size(); i++) {
       PlayerSeed seed = Objects.requireNonNull(playerSeeds.get(i), "player seed must not be null");
@@ -109,14 +109,9 @@ public final class GameFactory {
     return copy;
   }
 
-  static List<Position> createDefaultSpawnPositions(int mapHeight, int mapWidth) {
-    List<Position> spawns = new ArrayList<>(4);
-
-    //4 random spawnpoints
-    for (int i = 0; i < 4; i++) {
-      spawns.add(new Position(Map.getInstance().useRandomSpawnPoint(), Map.getInstance()));
-    }
-
+  static List<Position> createDefaultSpawnPositions() {
+    List<Position> spawns = new ArrayList<Position>();
+    spawns = Map.getInstance().getRandomSpawns(GameState.REQUIRED_PLAYER_COUNT, spawns, GameState.REQUIRED_PLAYER_COUNT);
     return spawns;
   }
 

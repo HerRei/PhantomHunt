@@ -13,11 +13,11 @@ public class Position {
   private double x;
   private double y;
   private int[] goal_tile; //[y_tile, x_tile]
-  private int[] spawnpoint;
+  private int[] lastSpawn;
 
 
   public Position(int[] tile, Map map) {
-    this.spawnpoint = tile;
+    this.lastSpawn = tile;
     this.goal_tile = tile;
     this.y = map.tileToPixelPosition(tile[1], tile[0])[0];
     this.x = map.tileToPixelPosition(tile[1], tile[0])[1];
@@ -124,7 +124,7 @@ public class Position {
     return y;
   }
 
-  public int[] getSpawnpoint(){ return spawnpoint;}
+  public int[] getLastSpawn(){ return lastSpawn;}
 
   public void setX(double x) {
     this.x = x;

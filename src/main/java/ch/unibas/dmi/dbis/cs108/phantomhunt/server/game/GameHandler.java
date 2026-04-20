@@ -89,7 +89,11 @@ public class GameHandler {
 
     // 4. Inform all clients about the new state
     broadcastGameState();
+
+    //5. Check if there are still 4 players inside
+    checkPlayerSize();
   }
+
 
   private void updatePlayerPositions(double deltaTime) {
     double speed = gameState.getRules().moveSpeedPerSecond();
@@ -162,7 +166,7 @@ public class GameHandler {
       if (dist < (radius * 2)) {
         if (state){
           human.addScore(gameState.getHumanCatchBonus());
-          phantom.setPosition(new Position(Map.getInstance().setRandomSpawnPosition(phantom.getPosition().getSpawnpoint(), gameState.getPlayers(), 5), Map.getInstance()));
+          phantom.setPosition(new Position(Map.getInstance().setRandomPosition(phantom.getPosition().getLastSpawn(), gameState.getPlayers(), GameState.SPAWN_DISTANCE), Map.getInstance()));
         }
         else{
           endRoundHumanCaught(phantom.getPlayerId(), now);
@@ -239,6 +243,10 @@ public class GameHandler {
     finishRound(outcome);
   }
 
+  private void checkPlayerSize() {
+    if(gameState.getPlayers().size() != GameState.REQUIRED_PLAYER_COUNT) abortMatch("The Lobby has not the right amount of Players.");
+  }
+
   /**
    * Aborts the entire match prematurely (e.g., due to player disconnect).
    *
@@ -257,6 +265,7 @@ public class GameHandler {
             Optional.empty(),
             System.currentTimeMillis(),
             reason));
+    lobby.broadcast(Packet.of(Command.INFO, reason));
     lobbyHandler.finishLobby(gameState.getMatchId());
   }
 
@@ -410,8 +419,9 @@ public class GameHandler {
   }
 
   private void resetPlayersForNewRound() {
+    Map.getInstance().resetSpawnPoints();
     List<Position> spawns =
-        GameFactory.createDefaultSpawnPositions(gameState.getMapHeight(), gameState.getMapWidth());
+        GameFactory.createDefaultSpawnPositions();
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
       player.setPosition(spawns.get(i).copy());
@@ -422,6 +432,7 @@ public class GameHandler {
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
       player.setRealInput(new InputState(0,0));
+      player.setInputState(new InputState(0,0));
     }
   }
 

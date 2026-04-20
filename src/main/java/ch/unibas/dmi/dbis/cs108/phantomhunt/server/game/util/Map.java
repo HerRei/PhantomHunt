@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util;
 
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.Position;
 import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +26,8 @@ public final class Map {
 
   public Map(String[][] map) {
     this.walkingMap = loadMapFromString(map);
-    this.possibleSpawnPoints = getSpawnPoints(map);
+    this.possibleSpawnPoints = new ArrayList<>();
+    resetSpawnPoints();
     try{// 1. Load the image file
       Image imageFile = new Image(getClass().getResourceAsStream(tileImage));
       this.tileSize =  (int) imageFile.getHeight();
@@ -44,23 +46,16 @@ public final class Map {
 
   /**
    * Identifies all walkable spawn points (represented by spaces).
-   * @param mapImage The 2D map source.
    * @return Array of coordinates [row, col] for each spawn point.
    */
-  public static ArrayList<int[]> getSpawnPoints(String[][] mapImage) {
-    if (mapImage == null) return null;
-
-    ArrayList<int[]> points = new ArrayList<>();
-
-    for (int r = 0; r < mapImage.length; r++) {
-      for (int c = 0; c < mapImage[r].length; c++) {
-        if (" ".equals(mapImage[r][c])) {
-          points.add(new int[]{r, c});
+  public void resetSpawnPoints() {
+    for (int r = 0; r < walkingMap.length; r++) {
+      for (int c = 0; c < walkingMap[r].length; c++) {
+        if (walkingMap[r][c]) {
+          possibleSpawnPoints.add(new int[]{r, c});
         }
       }
     }
-
-    return points;
   }
 
   /**
@@ -128,15 +123,37 @@ public final class Map {
    * @param distance
    * @return
    */
-  public int[] setRandomSpawnPosition(int[] oldPoint, List<PlayerState> players, double distance){
-    possibleSpawnPoints.add(oldPoint);
+  public int[] setRandomPosition(int[] oldPoint, List<PlayerState> players, double distance){
+    if(!(oldPoint == null))possibleSpawnPoints.add(oldPoint);
     int[] possibleSpawnPoint = useRandomSpawnPoint();
     for(PlayerState player : players){
       if(calcDistance(possibleSpawnPoint, player.getPosition().getX(), player.getPosition().getY()) < distance){
-        possibleSpawnPoint = setRandomSpawnPosition(possibleSpawnPoint, players, distance);
+        possibleSpawnPoint = setRandomPosition(possibleSpawnPoint, players, distance);
       }
     }
     return possibleSpawnPoint;
+  }
+
+  /**
+   * creates Spawnpoints and makes sure that they are @distance of entitys apart.
+   * @param len
+   * @param spawns
+   * @param distance
+   * @return
+   */
+  public List<Position> getRandomSpawns(int len,List<Position> spawns, double distance){
+    Position possiblePos = new Position(useRandomSpawnPoint(), this);
+    if (len <= 0){
+      return spawns;
+    }
+    for(Position pos : spawns){
+      if (calcDistance(pos.getLastSpawn(), possiblePos.getX(), possiblePos.getY()) < distance){
+        possibleSpawnPoints.add(possiblePos.getLastSpawn());
+        return (getRandomSpawns(len, spawns, distance));
+      }
+    }
+    spawns.add(possiblePos);
+    return getRandomSpawns(len-1, spawns, distance);
   }
 
   /**
