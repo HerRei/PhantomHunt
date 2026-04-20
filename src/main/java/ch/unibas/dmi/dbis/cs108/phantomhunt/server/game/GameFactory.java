@@ -17,7 +17,7 @@ import java.util.Objects;
  * Builds a fresh game state and owns the setup/validation logic for match creation.
  */
 public final class GameFactory {
-  private static GameState instance;
+  private static GameState gs;
   /**
    * Creates a game with the provided rules and map.
    *
@@ -30,14 +30,8 @@ public final class GameFactory {
           String matchId, List<PlayerSeed> playerSeeds, GameRules rules, Map map) {
     Boolean[][] validatedMap = deepCopyAndValidateMap(map.getMap());
     List<PlayerState> players = createPlayers(playerSeeds, validatedMap);
-    return new GameState(matchId, rules, validatedMap, players);
-  }
-
-  public static GameState getInstance(){
-    if(instance == null){
-      return null;
-    }
-    return instance;
+    gs = new GameState(matchId, rules, validatedMap, players);
+    return gs;
   }
 
   /**
@@ -77,6 +71,7 @@ public final class GameFactory {
                       PlayerRole.PHANTOM,
                       defaultSpawns.get(i).copy(),
                       new InputState(0, 0),
+                      0,
                       0,
                       true,
                       false));

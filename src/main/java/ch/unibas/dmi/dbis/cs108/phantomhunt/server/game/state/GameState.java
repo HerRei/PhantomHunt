@@ -144,6 +144,8 @@ public class GameState {
     return players.size();
   }
 
+  public int getHumanCatchBonus(){return rules.humanCatchBonus();}
+
   public synchronized List<PlayerState> getPlayers() {return this.players;}
 
   public synchronized RoundState getMutableRoundState() {

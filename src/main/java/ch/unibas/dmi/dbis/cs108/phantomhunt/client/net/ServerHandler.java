@@ -133,8 +133,25 @@ public class ServerHandler implements Runnable {
       case GSU:
         handleGameStateUpdate(packet);
         break;
+      case ABILITY:
+        handleAbility(packet);
+        break;
       default:
         handleUnknown(packet);
+        break;
+    }
+  }
+
+  private void handleAbility(Packet packet) {
+    switch(packet.args().get(0)){
+      case "START":
+        GameModel.getInstance().setAbility(true);
+        break;
+      case "END":
+        GameModel.getInstance().setAbility(false);
+        break;
+      default:
+        LOGGER.error("Wrong format for Abilitycommand");
         break;
     }
   }
@@ -217,7 +234,6 @@ public class ServerHandler implements Runnable {
     }
     String payload = p.args().get(0);
 
-    // We use Platform.runLater because this updates the UI-bound GameModel
     Platform.runLater(() -> {
       try {
         GameModel.getInstance().updatePlayersFromServer(payload);
@@ -279,12 +295,12 @@ public class ServerHandler implements Runnable {
     // Split into waiting and running groups
     String[] groups = rawData.split(";", -1);
 
-    // Process waiting lobbies (before ;)
+    // waiting lobbies
     if (groups.length > 0 && !groups[0].isBlank()) {
       waiting = Arrays.asList(groups[0].split(":"));
     }
 
-    // Process running lobbies (after ;)
+    // running lobbies
     if (groups.length > 1 && !groups[1].isBlank()) {
       running = Arrays.asList(groups[1].split(":"));
     }

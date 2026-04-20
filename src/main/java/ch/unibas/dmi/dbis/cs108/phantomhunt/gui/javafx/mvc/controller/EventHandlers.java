@@ -47,6 +47,14 @@ public class EventHandlers {
     serverHandler.sendMessage(Packet.of(Command.INPUT, payload));
   }
 
+  public void sendAbility(){
+    if (serverHandler == null) {
+      LOGGER.warn("Cannot send inputs: Not connected to server.");
+      return;
+    }
+    serverHandler.sendMessage(Packet.of(Command.ABILITY));
+  }
+
   /**
    * Sets the ServerHandler used for network communication.
    * Synchronizes the GameModel nickname if one is already set.

@@ -33,7 +33,7 @@ public class GUI extends Application {
     SceneManager manager = SceneManager.getInstance();
     manager.setStage(primaryStage);
 
-    // Register Scenes (Scenes fetch Singletons internally)
+    // Register Scenes
     manager.addScene(SceneProtocol.HOME, new HubScene());
     manager.addScene(SceneProtocol.NICKNAME, new NicknameScene());
     manager.addScene(SceneProtocol.CREATELOBBY, new CreateLobbyScene());
@@ -47,8 +47,7 @@ public class GUI extends Application {
     primaryStage.setOnCloseRequest(event -> soundManager.shutdown());
     manager.showScene(SceneProtocol.HOME);
 
-    // GUI is now completely initialized
-    // We take address form Main and start Client
+    // We take address from Main and start Client
     if (Main.getTargetHost() != null) {
       new TcpClient(Main.getTargetHost(), Main.getTargetPort());
     }

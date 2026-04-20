@@ -11,6 +11,8 @@ public record GameRules(
     int humanPointsPerSecond,
     int humanRoundWinBonus,
     int phantomCatchBonus,
+    int humanCatchBonus,
+    int humanAbilitys,
     int phantomRoundWinBonus) {
 
   public GameRules {
@@ -36,12 +38,14 @@ public record GameRules(
   public static GameRules defaultRules() {
     return new GameRules(
         4,
-        30000,
+        50000,
         6.0,
         100.0,
         1,
         50,
         10,
+        10,
+        3,
         10);
   }
 }

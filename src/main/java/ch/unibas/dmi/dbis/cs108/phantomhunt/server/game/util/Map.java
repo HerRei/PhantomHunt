@@ -1,11 +1,13 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util;
 
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
 import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -80,7 +82,6 @@ public final class Map {
 
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        // Check if the current string is a space to determine walkability
         if (" ".equals(mapImage[i][j])) {
           walkableMap[i][j] = true;
         } else {
@@ -102,25 +103,60 @@ public final class Map {
     }
 
     Random rand = new Random();
-    // Select a random index and remove the element at that position
     int index = rand.nextInt(this.possibleSpawnPoints.size());
     return this.possibleSpawnPoints.remove(index);
   }
 
+  /**
+   * calculates the distance in pixels between a tile and a x/y-coordinate
+   * @param tile
+   * @param xPosition
+   * @param yPosition
+   * @return the distance in pixels
+   */
   public double calcDistance(int[] tile, double xPosition, double yPosition){
     double targetX = tileToPixelPosition(tile[1], tile[0])[1];
     double targetY = tileToPixelPosition(tile[1], tile[0])[0];
     double distance = Math.sqrt(Math.pow(targetX- xPosition, 2) + Math.pow(targetY- yPosition, 2));
-    LOGGER.info(distance);
     return distance;
   }
 
+  /**
+   * sets a new position in tile[] for a player and makes sure that the point is @distance entitys apart from any other players.
+   * @param oldPoint
+   * @param players
+   * @param distance
+   * @return
+   */
+  public int[] setRandomSpawnPosition(int[] oldPoint, List<PlayerState> players, double distance){
+    possibleSpawnPoints.add(oldPoint);
+    int[] possibleSpawnPoint = useRandomSpawnPoint();
+    for(PlayerState player : players){
+      if(calcDistance(possibleSpawnPoint, player.getPosition().getX(), player.getPosition().getY()) < distance){
+        possibleSpawnPoint = setRandomSpawnPosition(possibleSpawnPoint, players, distance);
+      }
+    }
+    return possibleSpawnPoint;
+  }
+
+  /**
+   * calculates tile-Position to pixel-Position
+   * @param xTile
+   * @param yTile
+   * @return
+   */
   public double[] tileToPixelPosition(int xTile, int yTile){
     int y = yTile * tileSize;
     int x = xTile * tileSize;
     return new double[]{y, x};
   }
 
+  /**
+   * calculates pixel-Posistion to tile-Position
+   * @param x
+   * @param y
+   * @return
+   */
   public int[] pixelToTilePosition(double x, double y){
     int yTile = (int)y/tileSize;
     int xTile = (int)x/tileSize;

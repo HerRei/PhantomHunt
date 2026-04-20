@@ -326,6 +326,21 @@ public class ClientHandler implements Runnable {
     }
   }
 
+  private void handleAbility() {
+    Lobby lobby = this.getCurrentLobby();
+    if (lobby == null) {
+      return;
+    }
+
+    GameHandler gameHandler = lobby.getActiveGame().orElse(null);
+    if (gameHandler == null) {
+      return;
+    }
+    LOGGER.info("Ability wird gehandelt");
+
+    gameHandler.tryAbility(getName());
+  }
+
   /**
    * Applies a nickname change request and ensures the assigned nickname is unique.
    *
@@ -407,6 +422,7 @@ public class ClientHandler implements Runnable {
               return;
             }
             case INPUT -> handleInput(p);
+            case ABILITY -> handleAbility();
             case NICK -> handleNickChange(p);
             case WHISPER -> handleWhisper(p);
             case CHECKIN -> handleCheckin(p);

@@ -128,5 +128,9 @@ Befehle zur Verwaltung von Spiellobbys und dem Spielablauf.
 -   **Richtung:** Server <-> Client
 -   **Beschreibung:** Sendet die aktuellen Lobbies an den client und Client schickt Anfrage dafür.
 -   **Payload:** <waitingLobbies>:<playingLobbies>
--   **playerData Format:** <waitingLobbies>;<runningLobbies>
 -   **Beispiel:** LIST_LOBBY lobby1:lobby2;lobby3
+### ABILITY
+-   **Richtung:** Server <-> Client
+-   **Beschreibung:** Client schickt Anfrage für ability, Server sendet darauf, falls geht start und ende der Zeit.
+-   **Payload:** (start/end)
+-   **Beispiel:** ABILITY START

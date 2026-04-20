@@ -13,9 +13,11 @@ public class Position {
   private double x;
   private double y;
   private int[] goal_tile; //[y_tile, x_tile]
+  private int[] spawnpoint;
 
 
   public Position(int[] tile, Map map) {
+    this.spawnpoint = tile;
     this.goal_tile = tile;
     this.y = map.tileToPixelPosition(tile[1], tile[0])[0];
     this.x = map.tileToPixelPosition(tile[1], tile[0])[1];
@@ -62,8 +64,6 @@ public class Position {
    */
   public boolean checkValidInput(InputState old,InputState nextInput, Map map) {
     if (nextInput == null || !nextInput.isMoving()) return false;
-
-    // Determine current alignment to the goal tile center in pixels
     double[] targetPixel = map.tileToPixelPosition(goal_tile[1], goal_tile[0]);
 
     // Check if we are currently aligned with the horizontal or vertical axis of the goal
@@ -73,12 +73,12 @@ public class Position {
     int inputIsHorizontal = nextInput.getHorizontal();
     int inputIsVertical = nextInput.getVertical();
 
-    // 1. Same-axis logic: Always allow moving/reversing on the current axis of travel
+    // 1. Same-axis logic
     if ((currentlyHorizontal + inputIsHorizontal == 0) &&  (currentlyVertical + inputIsVertical == 0) && map.calcDistance(goal_tile, x, y) < (map.getTileSize())/2d) {
      return tryUpdateGoal(nextInput, map);
     }
 
-    // 2. Turn logic (Pac-Man style): Only allow 90-degree turns near the tile center
+    // 2. Turn logic
     double distance = map.calcDistance(goal_tile, x, y);
     if (distance < REACTIONNUMBER) {
       return tryUpdateGoal(nextInput, map);
@@ -91,7 +91,6 @@ public class Position {
    * Internal helper to check walkability and update the goal_tile coordinates.
    */
   private boolean tryUpdateGoal(InputState input, Map map) {
-    // Fix: Corrected indices for horizontal/vertical update
     int nextY = goal_tile[0] + input.getVertical();
     int nextX = goal_tile[1] + input.getHorizontal();
 
@@ -124,6 +123,8 @@ public class Position {
   public double getY() {
     return y;
   }
+
+  public int[] getSpawnpoint(){ return spawnpoint;}
 
   public void setX(double x) {
     this.x = x;

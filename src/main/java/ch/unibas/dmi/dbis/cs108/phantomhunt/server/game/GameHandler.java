@@ -29,8 +29,8 @@ public class GameHandler {
   private final GameState gameState;
   private final LobbyHandler lobbyHandler;
   private final Lobby lobby;
-  private InputState realInput;
   private ScheduledExecutorService gameLoopExecutor;
+  private boolean humanCatchesGhosts;
   private static final int TICKS_PER_SECOND = 20;
   private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
   private static final long ROUND_END_WAIT_MS = 3000;
@@ -39,6 +39,7 @@ public class GameHandler {
     this.lobby = lobby;
     this.gameState = Objects.requireNonNull(gs, "gameState must not be null");
     this.lobbyHandler = Objects.requireNonNull(LobbyHandler.getInstance(), "lobbyHandler must not be null");
+    this.humanCatchesGhosts = false;
     instance = this;
   }
   public static synchronized GameHandler getInstance() {
@@ -78,8 +79,8 @@ public class GameHandler {
     // 1. Update movement for all players
     updatePlayerPositions(deltaTime);
 
-    // 2. Check if phantoms caught the human
-    checkCatchCollisions(now);
+    // 2. Check if phantoms caught the human or reversed
+    checkCatchCollisions(now, humanCatchesGhosts);
 
     // 3. Check for round timeout
     if (now >= gameState.getRoundEndTimeMillis()) {
@@ -147,7 +148,7 @@ public class GameHandler {
     }
   }
 
-  private void checkCatchCollisions(long now) {
+  private void checkCatchCollisions(long now, boolean state) {
     PlayerState human = gameState.getMutablePlayerAt(gameState.getHumanIndex());
     double radius = gameState.getRules().playerRadius();
 
@@ -157,10 +158,16 @@ public class GameHandler {
       PlayerState phantom = gameState.getMutablePlayerAt(i);
       double dist = calculateDistance(human.getPosition(), phantom.getPosition());
 
-      // If circles overlap, human is caught
+      // If circles overlap, human is caught or player respawns
       if (dist < (radius * 2)) {
-        endRoundHumanCaught(phantom.getPlayerId(), now);
-        break;
+        if (state){
+          human.addScore(gameState.getHumanCatchBonus());
+          phantom.setPosition(new Position(Map.getInstance().setRandomSpawnPosition(phantom.getPosition().getSpawnpoint(), gameState.getPlayers(), 5), Map.getInstance()));
+        }
+        else{
+          endRoundHumanCaught(phantom.getPlayerId(), now);
+          break;
+        }
       }
     }
   }
@@ -392,7 +399,12 @@ public class GameHandler {
     int humanIndex = gameState.getHumanIndex();
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
-      player.setRole(i == humanIndex ? PlayerRole.HUMAN : PlayerRole.PHANTOM);
+      if (i == humanIndex) {
+        player.setRole(PlayerRole.HUMAN);
+        player.setRemainingAbility(gameState.getRules().humanAbilitys());
+      } else {
+        player.setRole(PlayerRole.PHANTOM);
+      }
       player.setCaughtThisRound(false);
     }
   }
@@ -409,7 +421,7 @@ public class GameHandler {
   private void resetAllInputs() {
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
-      player.setInputState(new InputState(0, 0));
+      player.setRealInput(new InputState(0,0));
     }
   }
 
@@ -447,6 +459,22 @@ public class GameHandler {
   private void ensurePhase(GamePhase expected, String message) {
     if (gameState.getPhase() != expected) {
       throw new IllegalStateException(message + " Current phase: " + gameState.getPhase());
+    }
+  }
+
+  public void tryAbility(String playerId) {
+    PlayerState player = gameState.requireMutablePlayer(playerId);
+    if(player.getRole() == PlayerRole.HUMAN && player.getRemainingAbility() > 0 && !humanCatchesGhosts){
+      LOGGER.info("Sollte fangen können");
+      humanCatchesGhosts = true;
+      lobby.broadcast(Packet.of(Command.ABILITY, "START"));
+      player.setRemainingAbility(player.getRemainingAbility() - 1);
+      ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+      scheduler.schedule(() -> {
+        humanCatchesGhosts = false;
+        lobby.broadcast(Packet.of(Command.ABILITY, "END"));
+        scheduler.shutdown();
+      }, 5, TimeUnit.SECONDS);
     }
   }
 }

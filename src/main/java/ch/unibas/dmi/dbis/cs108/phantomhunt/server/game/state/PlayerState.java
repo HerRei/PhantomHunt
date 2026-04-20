@@ -14,6 +14,7 @@ public final class PlayerState {
   private InputState inputState;
   private InputState realInput;
   private int score;
+  private int remainingAbility;
   private boolean connected;
   private boolean caughtThisRound;
 
@@ -27,6 +28,7 @@ public final class PlayerState {
           Position position,
           InputState inputState,
           int score,
+          int remainingAbility,
           boolean connected,
           boolean caughtThisRound) {
     this.playerId = Objects.requireNonNull(playerId, "playerId must not be null");
@@ -36,6 +38,7 @@ public final class PlayerState {
     this.inputState = Objects.requireNonNull(inputState, "inputState must not be null");
     this.realInput = Objects.requireNonNull(inputState);
     this.score = score;
+    this.remainingAbility = remainingAbility;
     this.connected = connected;
     this.caughtThisRound = caughtThisRound;
   }
@@ -49,6 +52,7 @@ public final class PlayerState {
           Position position,
           InputState inputState,
           InputState realInput,
+          int remainingAbility,
           int score,
           boolean connected,
           boolean caughtThisRound) {
@@ -76,6 +80,7 @@ public final class PlayerState {
             position.copy(),
             inputState.copy(),
             realInput.copy(),
+            remainingAbility,
             score,
             connected,
             caughtThisRound);
@@ -107,6 +112,8 @@ public final class PlayerState {
     return score;
   }
 
+  public int getRemainingAbility() {return remainingAbility;}
+
   public boolean isConnected() {
     return connected;
   }
@@ -130,6 +137,8 @@ public final class PlayerState {
   public void setRealInput(InputState inputState) {
     this.realInput = Objects.requireNonNull(inputState, "inputState must not be null");
   }
+
+  public void setRemainingAbility(int set){this.remainingAbility = set;}
 
   public void setConnected(boolean connected) {
     this.connected = connected;

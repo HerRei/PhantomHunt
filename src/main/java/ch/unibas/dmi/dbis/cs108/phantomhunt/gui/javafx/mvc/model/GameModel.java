@@ -21,6 +21,7 @@ public class GameModel {
   private static GameModel instance;
   private final ObservableList<Player> lobbyPlayers = FXCollections.observableArrayList();
   public final ObservableList<String> players = FXCollections.observableArrayList();
+  private final BooleanProperty humanAbility = new SimpleBooleanProperty();
   private final StringProperty playerName = new SimpleStringProperty();
   private final StringProperty playerRole = new SimpleStringProperty();
   private final IntegerProperty playerScore = new SimpleIntegerProperty();
@@ -37,6 +38,7 @@ public class GameModel {
 
   private GameModel() { // NOSONAR
     loadMaps();
+    humanAbility.set(false);
     playerScore.set(0);
   }
 
@@ -227,6 +229,8 @@ public class GameModel {
   public void setName(String name) {
     playerName.set(name);
   }
+
+  public void setAbility(Boolean value){ humanAbility.set(value);}
 
   public void setGameMap(Image gameMap) {
     this.gameMap.set(gameMap);

@@ -45,7 +45,7 @@ public class GameScene implements SceneInterface {
   private final Map<Player, Rectangle> playerShapes = new HashMap<>();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
-  private boolean w, a, s, d;
+  private boolean w, a, s, d, q; //INPUTS
   private final double mapScale;
 
   /**
@@ -210,10 +210,11 @@ public class GameScene implements SceneInterface {
   // ── Input ──────────────────────────────────────────────────────────────────
 
   private void setupControls() {
-    scene.setOnKeyPressed(e -> handleKey(e.getCode()));
+    scene.setOnKeyPressed(e -> handleKeyPress(e.getCode()));
+    scene.setOnKeyReleased(e -> handleKeyReleased(e.getCode()));
   }
 
-  private void handleKey(KeyCode code) {
+  private void handleKeyPress(KeyCode code) {
     if (chatInput.isFocused()) return;
 
     int horizontal = 0, vertical = 0;
@@ -224,11 +225,23 @@ public class GameScene implements SceneInterface {
       case S -> { if (!s) { w=false; a=false; s=true;  d=false; vertical= 1; changed=true; } }
       case A -> { if (!a) { w=false; a=true;  s=false; d=false; horizontal=-1; changed=true; } }
       case D -> { if (!d) { w=false; a=false; s=false; d=true;  horizontal= 1; changed=true; } }
+      case Q -> {
+        if (!q) {
+          q = true;
+          EventHandlers.getInstance().sendAbility();
+        }
+      }
       default -> {}
     }
 
     if (changed) {
       EventHandlers.getInstance().sendInputs(vertical, horizontal);
+    }
+  }
+
+  private void handleKeyReleased(KeyCode code) {
+    if (code == KeyCode.Q) {
+      q = false;
     }
   }
 

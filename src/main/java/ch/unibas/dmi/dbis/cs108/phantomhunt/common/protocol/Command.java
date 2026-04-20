@@ -78,5 +78,8 @@ public enum Command {
   GSU,
 
   /** Client movement input update. */
-  INPUT
+  INPUT,
+
+  /** Client want to use Ability*/
+  ABILITY
 }
