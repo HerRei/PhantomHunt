@@ -43,7 +43,7 @@ public final class Map {
   }
 
   /**
-   * Identifies all walkable spawn points (represented by spaces).
+   * Identifies all walkable spawn points.
    * @param mapImage The 2D map source.
    * @return Array of coordinates [row, col] for each spawn point.
    */
@@ -54,7 +54,7 @@ public final class Map {
 
     for (int r = 0; r < mapImage.length; r++) {
       for (int c = 0; c < mapImage[r].length; c++) {
-        if (" ".equals(mapImage[r][c])) {
+        if (!"X".equals(mapImage[r][c])) {
           points.add(new int[]{r, c});
         }
       }
@@ -65,7 +65,7 @@ public final class Map {
 
   /**
    * Converts a 2D String array representation of a map into a 2D Boolean array.
-   * A cell is marked as walkable (true) if it contains a space character,
+   * A cell is marked as walkable (true) if it doesn't contain a "X" character,
    * otherwise it is considered an obstacle (false).
    *
    * @param mapImage The 2D String array representing the map layout.
@@ -82,7 +82,7 @@ public final class Map {
 
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (" ".equals(mapImage[i][j])) {
+        if (!"X".equals(mapImage[i][j])) {
           walkableMap[i][j] = true;
         } else {
           walkableMap[i][j] = false;
