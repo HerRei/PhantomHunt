@@ -267,7 +267,7 @@ public class GameHandler {
    */
   public synchronized void advanceToNextRound(long nowMillis) {
     ensurePhase(GamePhase.ROUND_ENDED, "Can only advance after a round has ended.");
-
+    lobby.broadcast(Packet.of(Command.ABILITY, "END"));
     if (!hasNextRound()) {
       gameState.setPhase(GamePhase.MATCH_ENDED);
       lobbyHandler.finishLobby(gameState.getMatchId());
