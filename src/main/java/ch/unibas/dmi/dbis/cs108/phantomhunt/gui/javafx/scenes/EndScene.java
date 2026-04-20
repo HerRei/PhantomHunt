@@ -1,19 +1,25 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.Player;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+
+import java.util.Comparator;
 
 public class EndScene implements SceneInterface {
 
     private final Scene scene;
+    private Button hubButton;
 
     public EndScene() {
         GameModel model = GameModel.getInstance();
@@ -23,7 +29,16 @@ public class EndScene implements SceneInterface {
         titleLabel.setFont(new Font("Arial", 40));
         titleLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
 
-        // final score
+        // Gewinner-Verkündung ---
+        String winnerName = model.getPlayers().stream()
+                .max(Comparator.comparingInt(Player::getScore))
+                .map(Player::getName)
+                .orElse("Unknown");
+
+        Label winnerLabel = new Label("The Winner is: " + winnerName);
+        winnerLabel.setStyle("-fx-text-fill: #FFD700; -fx-font-size: 24px; -fx-font-weight: bold;");
+
+        // Final Score Anzeige
         Label yourScoreText = new Label("Your Final Score:");
         yourScoreText.setStyle("-fx-text-fill: #ccc; -fx-font-size: 18px;");
 
@@ -33,9 +48,9 @@ public class EndScene implements SceneInterface {
             finalScoreLabel.textProperty().bind(model.getScore().asString("%d"));
         }
 
-        // Table with all scores
+        // Tabelle
         TableView<Player> rankingTable = new TableView<>(model.getPlayers());
-        rankingTable.setPrefHeight(250);
+        rankingTable.setPrefHeight(200); // Etwas kleiner, um Platz für Buttons zu machen
         rankingTable.setMaxWidth(300);
 
         TableColumn<Player, String> nameCol = new TableColumn<>("Player");
@@ -46,14 +61,36 @@ public class EndScene implements SceneInterface {
         rankingTable.getColumns().addAll(nameCol, scoreCol);
         rankingTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+        // --- Knöpfe ---
+        Button lobbyButton = new Button("Lobby");
+        Button hubButton = new Button("Hub");
+        this.hubButton = hubButton;
+        hubButton.setVisible(GameModel.getInstance().isHost());
 
+        // Styling für die Buttons
+        String buttonStyle = "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 10 20;";
+        lobbyButton.setStyle(buttonStyle);
+        hubButton.setStyle(buttonStyle);
 
-        // Layout
-        VBox root = new VBox(20, titleLabel, yourScoreText, finalScoreLabel, rankingTable);
+        // Layout für die Buttons nebeneinander
+        HBox buttonBox = new HBox(20, lobbyButton, hubButton);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        // --- Layout Zusammenführung ---
+        VBox root = new VBox(15, titleLabel, winnerLabel, yourScoreText, finalScoreLabel, rankingTable, buttonBox);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #222;");
 
         this.scene = new Scene(root, 800, 600);
+
+        // Event-Handler (Logik muss hier noch mit deinem Navigator/Controller verknüpft werden)
+        lobbyButton.setOnAction(e -> EventHandlers.getInstance().backToLobby());
+        hubButton.setOnAction(e -> EventHandlers.getInstance().resetAndBackToHub());
+    }
+
+    public void updateHostControls(boolean isHost) {
+        hubButton.setVisible(isHost);
+        hubButton.setManaged(isHost);
     }
 
     @Override

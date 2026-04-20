@@ -251,11 +251,11 @@ public class ClientHandler implements Runnable {
     registry.broadcast(this, Packet.of(Command.PLAYERS, registry.names()));
   }
 
-  private void handleLobbyLogout(Packet p) {
-    if (p.argc() < 1) {
+  private void handleLobbyLogout() {
+    if (currentLobby == null) {
       return;
     }
-    String lobbyId = p.args().get(0);
+    String lobbyId = currentLobby.getId();
     lobbyHandler.leaveLobby(lobbyId, this);
   }
 
@@ -323,6 +323,18 @@ public class ClientHandler implements Runnable {
 
     } catch (Exception e) {
       LOGGER.error("Error parsing input for player {}: {}", name, p.args());
+    }
+  }
+
+  private void handleGameFinish() {
+    Lobby lobby = this.getCurrentLobby();
+    if (lobby == null) return;
+
+    GameHandler gameHandler = lobby.getActiveGame().orElse(null);
+    if (gameHandler == null) return;
+
+    if (lobby.getHost() == this) {
+      lobbyHandler.resetLobby(lobby.getId());
     }
   }
 
@@ -427,11 +439,12 @@ public class ClientHandler implements Runnable {
             case WHISPER -> handleWhisper(p);
             case CHECKIN -> handleCheckin(p);
             case LIST_LOBBY -> handleLobbyList();
+            case GAME_FINISH -> handleGameFinish();
             case YAP -> handleYap(p);
             case MKL -> handleMkl(p);
             case SPEC -> handleSpec(p);
             case START -> handleStart(p);
-            case LOGOUT_LOBBY -> handleLobbyLogout(p);
+            case LOGOUT_LOBBY -> handleLobbyLogout();
             default -> handleDefault(p);
           }
         } catch (IllegalArgumentException e) {

@@ -111,7 +111,7 @@ public final class GameFactory {
 
   static List<Position> createDefaultSpawnPositions() {
     List<Position> spawns = new ArrayList<Position>();
-    spawns = Map.getInstance().getRandomSpawns(GameState.REQUIRED_PLAYER_COUNT, spawns, GameState.REQUIRED_PLAYER_COUNT);
+    spawns = Map.getInstance().getRandomSpawns(GameState.REQUIRED_PLAYER_COUNT, spawns, GameState.SPAWN_DISTANCE);
     return spawns;
   }
 

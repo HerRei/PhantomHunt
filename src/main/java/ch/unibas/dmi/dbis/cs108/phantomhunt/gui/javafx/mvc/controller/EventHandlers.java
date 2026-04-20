@@ -69,11 +69,25 @@ public class EventHandlers {
   }
 
   /**
-   * Resets game state and switches the UI back to the hub.
+   * Resets game state and navigates back to the hub (HOME scene).
    */
   public void resetAndBackToHub() {
+    if (serverHandler == null) {
+      LOGGER.warn("resetAndBackToHub: not connected, skipping server message.");
+      GameModel.getInstance().resetModel();
+      SceneManager.getInstance().showScene(SceneProtocol.HOME);
+      return;
+    }
+    serverHandler.sendMessage(Packet.of(Command.LOGOUT_LOBBY));
+
     GameModel.getInstance().resetModel();
     SceneManager.getInstance().showScene(SceneProtocol.HOME);
+    LOGGER.info("resetAndBackToHub: left lobby, navigated to HOME.");
+  }
+
+  public void backToLobby(){
+      SceneManager.getInstance().showScene(SceneProtocol.LOBBY);
+      serverHandler.sendMessage(Packet.of(Command.GAME_FINISH));
   }
 
   /**

@@ -31,6 +31,7 @@ public class GameModel {
   private final ObservableList<String> availableLobbies = FXCollections.observableArrayList();
   private final ObservableList<String> runningLobbies = FXCollections.observableArrayList();
   private final ObservableList<String> lobbyChatMessages = FXCollections.observableArrayList();
+  private boolean host = false;
 
   // Map properties
   private final ObjectProperty<Image> gameMap = new SimpleObjectProperty<>();
@@ -196,6 +197,10 @@ public class GameModel {
   public IntegerProperty getTime() {
     return remainingTime;
   }
+
+  public boolean isHost() { return host; }
+
+  public void setHost(boolean host) { this.host = host; }
 
   public IntegerProperty getScore() {
     return playerScore;

@@ -63,7 +63,7 @@ public class GameHandler {
   /**
    * Main game loop iteration (tick).
    */
-  public void tick(double deltaTime, long now) {
+  public synchronized void tick(double deltaTime, long now) {
     if (gameState.getPhase() == GamePhase.ROUND_ENDED) {
       long timeSinceRoundEnd = now - gameState.getLastRoundOutcome().get().getEndedAtMillis();
       if (timeSinceRoundEnd >= ROUND_END_WAIT_MS) {
@@ -130,10 +130,8 @@ public class GameHandler {
 
     gameLoopExecutor = Executors.newSingleThreadScheduledExecutor();
 
-    // This runs the tick() method repeatedly
     gameLoopExecutor.scheduleAtFixedRate(() -> {
       try {
-        // Calculate deltaTime in seconds (1/30 = 0.0333)
         double deltaTime = TICK_TIME_MS / 1000.0;
         tick(deltaTime, System.currentTimeMillis());
       } catch (Exception e) {
@@ -150,6 +148,12 @@ public class GameHandler {
       gameLoopExecutor.shutdown();
       gameLoopExecutor = null;
     }
+  }
+
+  public void shutdown() {
+    stopGameLoop();
+    this.humanCatchesGhosts = false;
+    LOGGER.info("GameHandler for lobby {} shut down.", lobby.getId());
   }
 
   private void checkCatchCollisions(long now, boolean state) {
@@ -244,7 +248,14 @@ public class GameHandler {
   }
 
   private void checkPlayerSize() {
-    if(gameState.getPlayers().size() != GameState.REQUIRED_PLAYER_COUNT) abortMatch("The Lobby has not the right amount of Players.");
+    if (lobby.getPlayers().get().size() != GameState.REQUIRED_PLAYER_COUNT) {
+      if (gameState.getPhase() == GamePhase.MATCH_ENDED
+              || gameState.getPhase() == GamePhase.ABORTED) {
+        return;
+      }
+      LOGGER.warn("Not enough players in lobby {}, aborting match.", lobby.getId());
+      abortMatch("Match got aborted. Player Left.");
+    }
   }
 
   /**
@@ -253,20 +264,15 @@ public class GameHandler {
    * @param reason The reason for the abort.
    */
   public synchronized void abortMatch(String reason) {
-    if (gameState.getPhase() == GamePhase.MATCH_ENDED || gameState.getPhase() == GamePhase.ABORTED) {
+    if (gameState.getPhase() == GamePhase.MATCH_ENDED
+            || gameState.getPhase() == GamePhase.ABORTED) {
       return;
     }
     gameState.setPhase(GamePhase.ABORTED);
-    gameState.setLastRoundOutcome(
-        new RoundOutcome(
-            gameState.getCurrentRound(),
-            RoundOutcomeType.ROUND_ABORTED,
-            null,
-            Optional.empty(),
-            System.currentTimeMillis(),
-            reason));
+    stopGameLoop();
     lobby.broadcast(Packet.of(Command.INFO, reason));
-    lobbyHandler.finishLobby(gameState.getMatchId());
+    lobbyHandler.resetLobby(gameState.getMatchId());
+    lobby.broadcastLobbyInfo();
   }
 
   /**
@@ -279,15 +285,11 @@ public class GameHandler {
     lobby.broadcast(Packet.of(Command.ABILITY, "END"));
     if (!hasNextRound()) {
       gameState.setPhase(GamePhase.MATCH_ENDED);
-      lobbyHandler.finishLobby(gameState.getMatchId());
-      var playersInLobby = lobby.getPlayers().get();
-      for (ClientHandler gh : playersInLobby) {
-        lobbyHandler.leaveLobby(lobby.getId(), gh);
-      }
+      stopGameLoop(); // GameLoop stoppen!
       lobby.broadcast(Packet.of(Command.GAME_FINISH));
+      lobbyHandler.finishLobby(gameState.getMatchId());
       return;
     }
-
     RoundState roundState = gameState.getMutableRoundState();
     roundState.incrementCurrentRound();
     roundState.advanceHumanIndex(gameState.getPlayerCount());

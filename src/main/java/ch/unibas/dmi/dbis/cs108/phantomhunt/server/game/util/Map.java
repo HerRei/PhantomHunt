@@ -26,7 +26,6 @@ public final class Map {
 
   public Map(String[][] map) {
     this.walkingMap = loadMapFromString(map);
-    this.possibleSpawnPoints = new ArrayList<>();
     resetSpawnPoints();
     try{// 1. Load the image file
       Image imageFile = new Image(getClass().getResourceAsStream(tileImage));
@@ -49,6 +48,7 @@ public final class Map {
    * @return Array of coordinates [row, col] for each spawn point.
    */
   public void resetSpawnPoints() {
+    possibleSpawnPoints = new ArrayList<int[]>();
     for (int r = 0; r < walkingMap.length; r++) {
       for (int c = 0; c < walkingMap[r].length; c++) {
         if (walkingMap[r][c]) {
