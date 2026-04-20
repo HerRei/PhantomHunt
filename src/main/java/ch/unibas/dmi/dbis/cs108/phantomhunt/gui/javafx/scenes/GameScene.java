@@ -24,9 +24,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,12 +38,15 @@ public class GameScene implements SceneInterface {
 
   private final Scene scene;
   private final Pane gamePane = new Pane();
-  private final Map<Player, Rectangle> playerShapes = new HashMap<>();
+  private final Map<Player, ImageView> playerSprites = new HashMap<>();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
   private boolean w, a, s, d, q; //INPUTS
   private final double mapScale;
   private final Map<String, Image> floorImageMap = new HashMap<>();
+
+  private final Map<String, Image[]> humanSprites = new HashMap<>();
+  private final Map<String, Image> phantomSprites = new HashMap<>();
 
   /**
    * Initializes the game scene, building the map from tiles and scaling to fit the screen.
@@ -64,6 +64,9 @@ public class GameScene implements SceneInterface {
     floorImageMap.put("B", new Image(getClass().getResourceAsStream("/assets/floors/triple_down.png")));
     floorImageMap.put("C", new Image(getClass().getResourceAsStream("/assets/floors/triple_left.png")));
     floorImageMap.put("E", new Image(getClass().getResourceAsStream("/assets/floors/triple_right.png")));
+
+    // Load player images
+    loadSprites();
 
 
     GameModel model = GameModel.getInstance();
@@ -108,6 +111,31 @@ public class GameScene implements SceneInterface {
     setupControls();
     setupPlayerTracking();
     setupChatBinding();
+  }
+
+
+  private void loadSprites() {
+    // Load human sprites (4 players, 4 directions, 2 frames each)
+    String[] directions = {"front", "back", "left", "right"};
+    for (int i = 1; i <= 4; i++) {
+      for (String direction : directions) {
+        String key = "p" + i + "_" + direction;
+        Image[] frames = new Image[2];
+        frames[0] = new Image(getClass().getResourceAsStream("/assets/humans/" + key + "1.png"));
+        frames[1] = new Image(getClass().getResourceAsStream("/assets/humans/" + key + "2.png"));
+        humanSprites.put(key, frames);
+      }
+    }
+
+    // Load ghost sprites (4 players, 4 directions)
+    String[] phantomColors = {"b", "g", "r", "v"};
+    String[] phantomDirections = {"d", "u", "l", "r"};
+    for (String color : phantomColors) {
+      for (String direction : phantomDirections) {
+        String key = color + direction + "_ghost";
+        phantomSprites.put(key, new Image(getClass().getResourceAsStream("/assets/ghosts/" + key + ".png")));
+      }
+    }
   }
 
   /**
@@ -274,25 +302,32 @@ public class GameScene implements SceneInterface {
 
   private void addPlayer(Player player) {
     double size = TILE_SIZE * mapScale;
-    Rectangle shape = new Rectangle(size, size);
+    ImageView sprite = new ImageView();
+    sprite.setFitWidth(size);
+    sprite.setFitHeight(size);
 
-    player.skinProperty().addListener((obs, oldSkin, newSkin) -> updatePlayerColor(shape, newSkin));
-    updatePlayerColor(shape, player.skinProperty().get());
+    player.skinProperty().addListener((obs, oldSkin, newSkin) -> updatePlayerSprite(player, sprite, newSkin));
+    updatePlayerSprite(player, sprite, player.skinProperty().get());
 
-    shape.layoutXProperty().bind(player.xPosition().multiply(mapScale));
-    shape.layoutYProperty().bind(player.yPosition().multiply(mapScale));
+    sprite.layoutXProperty().bind(player.xPosition().multiply(mapScale));
+    sprite.layoutYProperty().bind(player.yPosition().multiply(mapScale));
 
-    playerShapes.put(player, shape);
-    gamePane.getChildren().add(shape);
+    playerSprites.put(player, sprite);
+    gamePane.getChildren().add(sprite);
   }
 
-  private void updatePlayerColor(Rectangle shape, String skin) {
-    shape.setFill("HUMAN".equalsIgnoreCase(skin) ? Color.RED : Color.WHITE);
+  private void updatePlayerSprite(Player player, ImageView sprite, String skin) {
+    String[] phantomColors = {"b", "g", "r", "v"};
+    if ("HUMAN".equals(skin)) {
+      sprite.setImage(humanSprites.get("p" + player.getPlayerNumber() + "_front")[0]);
+    } else {
+      sprite.setImage(phantomSprites.get(phantomColors[player.getPlayerNumber() - 1] + "d_ghost"));
+    }
   }
 
   private void removePlayer(Player player) {
-    Rectangle shape = playerShapes.remove(player);
-    if (shape != null) gamePane.getChildren().remove(shape);
+    ImageView sprite = playerSprites.remove(player);
+    if (sprite != null) gamePane.getChildren().remove(sprite);
   }
 
   @Override
