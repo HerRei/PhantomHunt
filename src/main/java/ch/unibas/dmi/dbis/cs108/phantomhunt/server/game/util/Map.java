@@ -45,7 +45,6 @@ public final class Map {
 
   /**
    * Identifies all walkable spawn points (represented by spaces).
-   * @return Array of coordinates [row, col] for each spawn point.
    */
   public void resetSpawnPoints() {
     possibleSpawnPoints = new ArrayList<int[]>();
