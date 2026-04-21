@@ -157,11 +157,14 @@ public class ServerHandler implements Runnable {
     }
   }
 
-  private void handleGameFinish() {
+  public void handleGameFinish() {
     Platform.runLater(() -> {
+      EndScene endScene = (EndScene) SceneManager.getInstance().getScene(SceneProtocol.END);
+      if (endScene != null) {
+        endScene.updateWinner();
+      }
       SceneManager.getInstance().showScene(SceneProtocol.END);
     });
-
   }
 
   private void handlePlayers(Packet packet) {
@@ -201,16 +204,12 @@ public class ServerHandler implements Runnable {
 
     String lobbyId = parts[0];
     String[] players = Arrays.copyOfRange(parts, 1, parts.length);
-    boolean amHost = players.length > 0
-            && players[0].equals(getName());
-    GameModel.getInstance().setHost(amHost);
-    LOGGER.debug("LOBBY_INFO received: lobby={}, amHost={}", lobbyId, amHost);
 
     Platform.runLater(() -> {
       SceneManager sceneManager = SceneManager.getInstance();
       SceneProtocol current = sceneManager.getCurrentScene();
 
-      if (current != SceneProtocol.END) {
+      if (current != SceneProtocol.GAME) {
         sceneManager.showScene(SceneProtocol.LOBBY);
       }
 
@@ -221,11 +220,9 @@ public class ServerHandler implements Runnable {
         LOGGER.error("LobbyScene is not registered in SceneManager.");
       }
 
-      if (current == SceneProtocol.END) {
-        EndScene endScene = (EndScene) sceneManager.getScene(SceneProtocol.END);
-        if (endScene != null) {
-          endScene.updateHostControls(amHost);
-        }
+      EndScene endScene = (EndScene) sceneManager.getScene(SceneProtocol.END);
+      if (endScene != null) {
+        endScene.updateLobbyInfo(lobbyId, players);
       }
     });
   }
