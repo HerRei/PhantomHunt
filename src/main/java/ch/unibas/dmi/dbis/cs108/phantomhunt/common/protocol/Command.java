@@ -81,5 +81,8 @@ public enum Command {
   INPUT,
 
   /** Client want to use Ability*/
-  ABILITY
+  ABILITY,
+
+  /** Request to show the highscore. */
+  SHOW_HIGHSCORE
 }
