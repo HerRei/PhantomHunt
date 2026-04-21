@@ -77,7 +77,7 @@ public final class Map {
 
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (" ".equals(mapImage[i][j])) {
+        if (!"X".equals(mapImage[i][j])) {
           walkableMap[i][j] = true;
         } else {
           walkableMap[i][j] = false;
