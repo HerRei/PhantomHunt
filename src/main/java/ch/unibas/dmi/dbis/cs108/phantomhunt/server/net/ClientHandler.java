@@ -333,6 +333,10 @@ public class ClientHandler implements Runnable {
     GameHandler gameHandler = lobby.getActiveGame().orElse(null);
     if (gameHandler == null) return;
 
+    // For now, this is just add a placeholder score.
+    // Silas should add the real highscores here
+    registry.addHighscore(this.name, 100);
+
     if (lobby.getHost() == this) {
       lobbyHandler.resetLobby(lobby.getId());
     }
@@ -395,6 +399,10 @@ public class ClientHandler implements Runnable {
     lobbyHandler.startGame(currentLobby.getId(), this);
   }
 
+  private void handleShowHighscore() {
+    sendMessage(Packet.of(Command.SHOW_HIGHSCORE, registry.getHighscoreBoard()));
+  }
+
   /**
    * Handles unsupported commands by informing the client that the command is rejected.
    *
@@ -445,6 +453,7 @@ public class ClientHandler implements Runnable {
             case SPEC -> handleSpec(p);
             case START -> handleStart(p);
             case LOGOUT_LOBBY -> handleLobbyLogout();
+            case SHOW_HIGHSCORE -> handleShowHighscore();
             default -> handleDefault(p);
           }
         } catch (IllegalArgumentException e) {
