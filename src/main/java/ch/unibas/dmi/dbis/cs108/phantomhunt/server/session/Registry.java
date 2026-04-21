@@ -54,8 +54,14 @@ public final class Registry {
   }
 
   public void addHighscore(String playerName, int score) {
-    highscores.add(new Highscore(playerName, score));
-    Collections.sort(highscores, Comparator.comparingInt(Highscore::getScore).reversed());
+    Highscore newHighscore = new Highscore(playerName, score);
+
+    int i = 0;
+    while (i < highscores.size() && highscores.get(i).getScore() >= score) {
+      i++;
+    }
+
+    highscores.add(i, newHighscore);
     log.info("New highscore added for {}: {}", playerName, score);
   }
 
