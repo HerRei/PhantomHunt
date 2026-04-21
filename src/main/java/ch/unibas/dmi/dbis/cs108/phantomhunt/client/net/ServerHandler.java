@@ -8,7 +8,6 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.EndScene;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.LobbyScene;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.SceneInterface;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.SceneProtocol;
 
 import java.io.BufferedReader;

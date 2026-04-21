@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Manages all lobbies on the server including creating, joining, leaving,
