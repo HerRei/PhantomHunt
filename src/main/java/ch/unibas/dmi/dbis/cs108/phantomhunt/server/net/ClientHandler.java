@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
@@ -17,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -333,9 +335,12 @@ public class ClientHandler implements Runnable {
     GameHandler gameHandler = lobby.getActiveGame().orElse(null);
     if (gameHandler == null) return;
 
-    // For now, this is just add a placeholder score.
-    // Silas should add the real highscores here
-    registry.addHighscore(this.name, 100);
+    Optional<PlayerState> playerStateOpt = gameHandler.getGameState().findPlayer(this.name);
+    if (playerStateOpt.isPresent()) {
+        registry.addHighscore(this.name, playerStateOpt.get().getScore());
+    } else {
+        LOGGER.warn("Could not find player {} in game state to record highscore.", this.name);
+    }
 
     if (lobby.getHost() == this) {
       lobbyHandler.resetLobby(lobby.getId());
