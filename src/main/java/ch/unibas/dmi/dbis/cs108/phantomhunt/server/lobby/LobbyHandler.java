@@ -250,6 +250,19 @@ public class LobbyHandler {
    * Generates an example 19x20 map string array.
    * 'X' represents a wall, and ' ' represents a walkable path.
    */
+  /*
+  "Q", quadra.
+  "L", top_left
+  "V", vertical
+  "D", down_left
+  "R", top_right
+  "A", down_right
+  "H", horizontal
+  "T", triple_top
+  "B", triple_down
+  "C", triple_left
+  "E", triple_right
+   */
   public static String[][] generateExampleMap() {
     return new String[][] {
         {"X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"},
