@@ -111,7 +111,7 @@ public class GameModel {
       player.setSkin(role);
     } else {
       int playerNumber = lobbyPlayers.size() + 1;
-      lobbyPlayers.add(new Player(name, role, score, x, y, playerNumber));
+      lobbyPlayers.add(new Player(name, role, score, x, y, playerNumber, "front"));
     }
   }
 
@@ -256,6 +256,23 @@ public class GameModel {
 
   public void setCollisionMap(Image collisionMap) {
     this.collisionMap.set(collisionMap);
+  }
+
+  /**
+   * updates direction of the player
+   *
+   * @param direction the direction to set (e.g. "front")
+   */
+  public void setMyPlayerDirection(String direction) {
+    String myPlayerName = playerName.get();
+    if (myPlayerName == null) {
+      return;
+    }
+    for (Player p : lobbyPlayers) {
+      if (p.getName().equals(myPlayerName)) {
+        p.setPlayerDirection(direction);
+      }
+    }
   }
 
   public void resetModel() {

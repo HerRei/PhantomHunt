@@ -44,9 +44,10 @@ public class GameScene implements SceneInterface {
   private boolean w, a, s, d, q; //INPUTS
   private final double mapScale;
   private final Map<String, Image> floorImageMap = new HashMap<>();
-
   private final Map<String, Image[]> humanSprites = new HashMap<>();
   private final Map<String, Image> phantomSprites = new HashMap<>();
+  private final Map<Player, Integer> frameIndex = new HashMap<>();
+  private final Map<Player, Long> lastFrameUpdate = new HashMap<>();
 
   /**
    * Initializes the game scene, building the map from tiles and scaling to fit the screen.
@@ -306,8 +307,33 @@ public class GameScene implements SceneInterface {
     sprite.setFitWidth(size);
     sprite.setFitHeight(size);
 
-    player.skinProperty().addListener((obs, oldSkin, newSkin) -> updatePlayerSprite(player, sprite, newSkin));
-    updatePlayerSprite(player, sprite, player.skinProperty().get());
+    // Listen for position changes to update direction and animation
+    player.xPosition().addListener((obs, oldX, newX) -> {
+      double deltaX = newX.doubleValue() - oldX.doubleValue();
+      if (deltaX == 0) return;
+
+      if (deltaX > 0) {
+        GameModel.getInstance().setMyPlayerDirection("right");
+      } else {
+        GameModel.getInstance().setMyPlayerDirection("left");
+      }
+      handlePositionChange(player, sprite);
+    });
+
+    player.yPosition().addListener((obs, oldY, newY) -> {
+      double deltaY = newY.doubleValue() - oldY.doubleValue();
+      if (deltaY == 0) return;
+
+      if (deltaY > 0) {
+        GameModel.getInstance().setMyPlayerDirection("front");
+      } else {
+        GameModel.getInstance().setMyPlayerDirection("back");
+      }
+      handlePositionChange(player, sprite);
+    });
+
+    player.skinProperty().addListener((obs, oldSkin, newSkin) -> updatePlayerSprite(player, sprite));
+    updatePlayerSprite(player, sprite);
 
     sprite.layoutXProperty().bind(player.xPosition().multiply(mapScale));
     sprite.layoutYProperty().bind(player.yPosition().multiply(mapScale));
@@ -316,12 +342,35 @@ public class GameScene implements SceneInterface {
     gamePane.getChildren().add(sprite);
   }
 
-  private void updatePlayerSprite(Player player, ImageView sprite, String skin) {
+  private void handlePositionChange(Player player, ImageView sprite) {
+    long now = System.currentTimeMillis();
+    long lastUpdate = lastFrameUpdate.getOrDefault(player, 0L);
+
+    // Cooldown to prevent double-update from x/y listeners for a single move
+    if (now - lastUpdate > 100) {
+      int frame = frameIndex.getOrDefault(player, 0);
+      frameIndex.put(player, 1 - frame);
+      lastFrameUpdate.put(player, now);
+    }
+    updatePlayerSprite(player, sprite);
+  }
+
+  private void updatePlayerSprite(Player player, ImageView sprite) {
+    String skin = player.getSkin();
+    String direction = player.getPlayerDirection();
     String[] phantomColors = {"b", "g", "r", "v"};
+    Map<String, String> phantomDirections = Map.of("front", "d", "back", "u", "left", "l", "right", "r");
+
     if ("HUMAN".equals(skin)) {
-      sprite.setImage(humanSprites.get("p" + player.getPlayerNumber() + "_front")[0]);
-    } else {
-      sprite.setImage(phantomSprites.get(phantomColors[player.getPlayerNumber() - 1] + "d_ghost"));
+      String key = "p" + player.getPlayerNumber() + "_" + direction;
+      Image[] frames = humanSprites.get(key);
+      if (frames == null) {
+        return;
+      }
+      int frame = frameIndex.getOrDefault(player, 0);
+      sprite.setImage(frames[frame]);
+    } else { // ghost static
+      sprite.setImage(phantomSprites.get(phantomColors[player.getPlayerNumber() - 1] + phantomDirections.get(direction) + "_ghost"));
     }
   }
 
