@@ -17,6 +17,7 @@ public class SceneManager {
   private static final Logger LOGGER = LogManager.getLogger(SceneManager.class);
   private static SceneManager instance;
   private Stage stageRef;
+  private SceneProtocol currentScene;
   private final Map<SceneProtocol, SceneInterface> scenes = new HashMap<>();
 
   private SceneManager() {
@@ -62,6 +63,7 @@ public class SceneManager {
   public void showScene(SceneProtocol type) {
     SceneInterface myScene = scenes.get(type);
     if (myScene != null) {
+      this.currentScene = type;
       Platform.runLater(() -> {
         if (stageRef != null) {
           stageRef.setScene(myScene.getScene());
@@ -76,6 +78,7 @@ public class SceneManager {
     }
   }
 
+  public SceneProtocol getCurrentScene() {return currentScene;}
   public SceneInterface getScene(SceneProtocol type) {
     return scenes.get(type);
   }

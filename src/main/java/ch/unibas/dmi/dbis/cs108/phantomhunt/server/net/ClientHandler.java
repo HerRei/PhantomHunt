@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
@@ -17,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -251,11 +253,11 @@ public class ClientHandler implements Runnable {
     registry.broadcast(this, Packet.of(Command.PLAYERS, registry.names()));
   }
 
-  private void handleLobbyLogout(Packet p) {
-    if (p.argc() < 1) {
+  private void handleLobbyLogout() {
+    if (currentLobby == null) {
       return;
     }
-    String lobbyId = p.args().get(0);
+    String lobbyId = currentLobby.getId();
     lobbyHandler.leaveLobby(lobbyId, this);
   }
 
@@ -326,6 +328,25 @@ public class ClientHandler implements Runnable {
     }
   }
 
+  private void handleGameFinish() {
+    Lobby lobby = this.getCurrentLobby();
+    if (lobby == null) return;
+
+    GameHandler gameHandler = lobby.getActiveGame().orElse(null);
+    if (gameHandler == null) return;
+
+    Optional<PlayerState> playerStateOpt = gameHandler.getGameState().findPlayer(this.name);
+    if (playerStateOpt.isPresent()) {
+        registry.addHighscore(this.name, playerStateOpt.get().getScore());
+    } else {
+        LOGGER.warn("Could not find player {} in game state to record highscore.", this.name);
+    }
+
+    if (lobby.getHost() == this) {
+      lobbyHandler.resetLobby(lobby.getId());
+    }
+  }
+
   private void handleAbility() {
     Lobby lobby = this.getCurrentLobby();
     if (lobby == null) {
@@ -383,6 +404,10 @@ public class ClientHandler implements Runnable {
     lobbyHandler.startGame(currentLobby.getId(), this);
   }
 
+  private void handleShowHighscore() {
+    sendMessage(Packet.of(Command.SHOW_HIGHSCORE, registry.getHighscoreBoard()));
+  }
+
   /**
    * Handles unsupported commands by informing the client that the command is rejected.
    *
@@ -427,11 +452,13 @@ public class ClientHandler implements Runnable {
             case WHISPER -> handleWhisper(p);
             case CHECKIN -> handleCheckin(p);
             case LIST_LOBBY -> handleLobbyList();
+            case GAME_FINISH -> handleGameFinish();
             case YAP -> handleYap(p);
             case MKL -> handleMkl(p);
             case SPEC -> handleSpec(p);
             case START -> handleStart(p);
-            case LOGOUT_LOBBY -> handleLobbyLogout(p);
+            case LOGOUT_LOBBY -> handleLobbyLogout();
+            case SHOW_HIGHSCORE -> handleShowHighscore();
             default -> handleDefault(p);
           }
         } catch (IllegalArgumentException e) {

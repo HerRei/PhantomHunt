@@ -131,10 +131,6 @@ public class Lobby {
    * @return true if the player was removed, false otherwise
    */
   public boolean removePlayer(ClientHandler player) {
-    if (hasActiveGame()) {
-      player.sendMessage(Packet.of(Command.REJECT, "Game is already running."));
-      return false;
-    }
     if (!players.contains(player)) {
       LOGGER.warn("Player {} is not in lobby {}", player.getName(), this.id);
       return false;
@@ -217,6 +213,14 @@ public class Lobby {
     // Send to spectators
     for (ClientHandler spectator : spectators) {
       spectator.sendMessage(packet);
+    }
+  }
+
+  public void resetGame() {
+    if (activeGame != null) {
+      activeGame.shutdown();
+      this.activeGame = null;
+      LOGGER.info("Game detached from lobby {}", this.id);
     }
   }
 }

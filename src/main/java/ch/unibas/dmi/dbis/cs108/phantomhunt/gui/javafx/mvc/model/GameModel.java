@@ -183,6 +183,22 @@ public class GameModel {
 
   // ---GETTERS---
 
+  public String getWinner(){
+    LOGGER.info(lobbyPlayers);
+    int max = 0;
+    String winnerName = "";
+    for(Player p: getPlayers()){
+      if(p.getScore()>max){
+        winnerName = p.getName();
+        max = p.getScore();
+      }
+      else if(p.getScore() == max){
+        winnerName += ", " + p.getName();
+      }
+    }
+    return winnerName;
+  }
+
   public StringProperty getName() {
     return playerName;
   }

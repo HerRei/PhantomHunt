@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.NameGenerator;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.EndScene;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.LobbyScene;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.SceneProtocol;
 
@@ -156,11 +157,14 @@ public class ServerHandler implements Runnable {
     }
   }
 
-  private void handleGameFinish() {
+  public void handleGameFinish() {
     Platform.runLater(() -> {
+      EndScene endScene = (EndScene) SceneManager.getInstance().getScene(SceneProtocol.END);
+      if (endScene != null) {
+        endScene.updateWinner();
+      }
       SceneManager.getInstance().showScene(SceneProtocol.END);
     });
-
   }
 
   private void handlePlayers(Packet packet) {
@@ -191,22 +195,34 @@ public class ServerHandler implements Runnable {
    * @param packet the packet containing the lobby ID and player names
    */
   private void handleLobbyInfo(Packet packet) {
+    LOGGER.debug("LOBBY_INFO raw text: '{}'", packet.text());
     String[] parts = packet.text().split(" ");
     if (parts.length < 1) {
       LOGGER.warn("Received invalid LOBBY_INFO packet");
       return;
     }
+
     String lobbyId = parts[0];
     String[] players = Arrays.copyOfRange(parts, 1, parts.length);
 
     Platform.runLater(() -> {
       SceneManager sceneManager = SceneManager.getInstance();
-      sceneManager.showScene(SceneProtocol.LOBBY);
+      SceneProtocol current = sceneManager.getCurrentScene();
+
+      if (current != SceneProtocol.GAME) {
+        sceneManager.showScene(SceneProtocol.LOBBY);
+      }
+
       LobbyScene lobbyScene = (LobbyScene) sceneManager.getScene(SceneProtocol.LOBBY);
       if (lobbyScene != null) {
         lobbyScene.updateLobbyInfo(lobbyId, players);
       } else {
         LOGGER.error("LobbyScene is not registered in SceneManager.");
+      }
+
+      EndScene endScene = (EndScene) sceneManager.getScene(SceneProtocol.END);
+      if (endScene != null) {
+        endScene.updateLobbyInfo(lobbyId, players);
       }
     });
   }

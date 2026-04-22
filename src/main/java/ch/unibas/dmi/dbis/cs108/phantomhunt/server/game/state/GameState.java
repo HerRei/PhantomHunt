@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
  */
 public class GameState {
   public static final int REQUIRED_PLAYER_COUNT = 4;
+  public static final int SPAWN_DISTANCE = 150;
 
   private final String matchId;
   private final GameRules rules;

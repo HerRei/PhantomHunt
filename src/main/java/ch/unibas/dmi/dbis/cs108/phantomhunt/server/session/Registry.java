@@ -10,6 +10,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Manages all connected clients and their nicknames.
@@ -26,6 +28,50 @@ public final class Registry {
   private final Vector<ClientHandler> sessions = new Vector<>(); //zwar O(n) for get but easier to work with than the hashMap with a dummy.
   private final ConcurrentHashMap<String, ClientHandler> byName =
           new ConcurrentHashMap<>(); // Nickname handling
+  private final Vector<Highscore> highscores = new Vector<>();
+
+  private static class Highscore {
+    private final String playerName;
+    private final int score;
+
+    public Highscore(String playerName, int score) {
+      this.playerName = playerName;
+      this.score = score;
+    }
+
+    public String getPlayerName() {
+      return playerName;
+    }
+
+    public int getScore() {
+      return score;
+    }
+
+    @Override
+    public String toString() {
+      return playerName + ": " + score;
+    }
+  }
+
+  public void addHighscore(String playerName, int score) {
+    Highscore newHighscore = new Highscore(playerName, score);
+
+    int i = 0;
+    while (i < highscores.size() && highscores.get(i).getScore() >= score) {
+      i++;
+    }
+
+    highscores.add(i, newHighscore);
+    log.info("New highscore added for {}: {}", playerName, score);
+  }
+
+  public String getHighscoreBoard() {
+    StringBuilder highscoreBoard = new StringBuilder("Highscores:\n");
+    for (int i = 0; i < highscores.size() && i < 10; i++) {
+      highscoreBoard.append(i + 1).append(". ").append(highscores.get(i)).append("\n");
+    }
+    return highscoreBoard.toString();
+  }
 
   /**
    * Assign a requested nickname to a client.

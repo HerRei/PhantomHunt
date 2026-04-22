@@ -63,7 +63,7 @@ public class GameHandler {
   /**
    * Main game loop iteration (tick).
    */
-  public void tick(double deltaTime, long now) {
+  public synchronized void tick(double deltaTime, long now) {
     if (gameState.getPhase() == GamePhase.ROUND_ENDED) {
       long timeSinceRoundEnd = now - gameState.getLastRoundOutcome().get().getEndedAtMillis();
       if (timeSinceRoundEnd >= ROUND_END_WAIT_MS) {
@@ -89,7 +89,11 @@ public class GameHandler {
 
     // 4. Inform all clients about the new state
     broadcastGameState();
+
+    //5. Check if there are still 4 players inside
+    checkPlayerSize();
   }
+
 
   private void updatePlayerPositions(double deltaTime) {
     double speed = gameState.getRules().moveSpeedPerSecond();
@@ -126,10 +130,8 @@ public class GameHandler {
 
     gameLoopExecutor = Executors.newSingleThreadScheduledExecutor();
 
-    // This runs the tick() method repeatedly
     gameLoopExecutor.scheduleAtFixedRate(() -> {
       try {
-        // Calculate deltaTime in seconds (1/30 = 0.0333)
         double deltaTime = TICK_TIME_MS / 1000.0;
         tick(deltaTime, System.currentTimeMillis());
       } catch (Exception e) {
@@ -148,6 +150,12 @@ public class GameHandler {
     }
   }
 
+  public void shutdown() {
+    stopGameLoop();
+    this.humanCatchesGhosts = false;
+    LOGGER.info("GameHandler for lobby {} shut down.", lobby.getId());
+  }
+
   private void checkCatchCollisions(long now, boolean state) {
     PlayerState human = gameState.getMutablePlayerAt(gameState.getHumanIndex());
     double radius = gameState.getRules().playerRadius();
@@ -162,7 +170,7 @@ public class GameHandler {
       if (dist < (radius * 2)) {
         if (state){
           human.addScore(gameState.getHumanCatchBonus());
-          phantom.setPosition(new Position(Map.getInstance().setRandomSpawnPosition(phantom.getPosition().getSpawnpoint(), gameState.getPlayers(), 5), Map.getInstance()));
+          phantom.setPosition(new Position(Map.getInstance().setRandomPosition(phantom.getPosition().getLastSpawn(), gameState.getPlayers(), GameState.SPAWN_DISTANCE), Map.getInstance()));
         }
         else{
           endRoundHumanCaught(phantom.getPlayerId(), now);
@@ -239,25 +247,32 @@ public class GameHandler {
     finishRound(outcome);
   }
 
+  private void checkPlayerSize() {
+    if (lobby.getPlayers().get().size() != GameState.REQUIRED_PLAYER_COUNT) {
+      if (gameState.getPhase() == GamePhase.MATCH_ENDED
+              || gameState.getPhase() == GamePhase.ABORTED) {
+        return;
+      }
+      LOGGER.warn("Not enough players in lobby {}, aborting match.", lobby.getId());
+      abortMatch("Match got aborted. Player Left.");
+    }
+  }
+
   /**
    * Aborts the entire match prematurely (e.g., due to player disconnect).
    *
    * @param reason The reason for the abort.
    */
   public synchronized void abortMatch(String reason) {
-    if (gameState.getPhase() == GamePhase.MATCH_ENDED || gameState.getPhase() == GamePhase.ABORTED) {
+    if (gameState.getPhase() == GamePhase.MATCH_ENDED
+            || gameState.getPhase() == GamePhase.ABORTED) {
       return;
     }
     gameState.setPhase(GamePhase.ABORTED);
-    gameState.setLastRoundOutcome(
-        new RoundOutcome(
-            gameState.getCurrentRound(),
-            RoundOutcomeType.ROUND_ABORTED,
-            null,
-            Optional.empty(),
-            System.currentTimeMillis(),
-            reason));
-    lobbyHandler.finishLobby(gameState.getMatchId());
+    stopGameLoop();
+    lobby.broadcast(Packet.of(Command.INFO, reason));
+    lobbyHandler.resetLobby(gameState.getMatchId());
+    lobby.broadcastLobbyInfo();
   }
 
   /**
@@ -270,15 +285,11 @@ public class GameHandler {
     lobby.broadcast(Packet.of(Command.ABILITY, "END"));
     if (!hasNextRound()) {
       gameState.setPhase(GamePhase.MATCH_ENDED);
-      lobbyHandler.finishLobby(gameState.getMatchId());
-      var playersInLobby = lobby.getPlayers().get();
-      for (ClientHandler gh : playersInLobby) {
-        lobbyHandler.leaveLobby(lobby.getId(), gh);
-      }
+      stopGameLoop(); // GameLoop stoppen!
       lobby.broadcast(Packet.of(Command.GAME_FINISH));
+      lobbyHandler.finishLobby(gameState.getMatchId());
       return;
     }
-
     RoundState roundState = gameState.getMutableRoundState();
     roundState.incrementCurrentRound();
     roundState.advanceHumanIndex(gameState.getPlayerCount());
@@ -410,8 +421,9 @@ public class GameHandler {
   }
 
   private void resetPlayersForNewRound() {
+    Map.getInstance().resetSpawnPoints();
     List<Position> spawns =
-        GameFactory.createDefaultSpawnPositions(gameState.getMapHeight(), gameState.getMapWidth());
+        GameFactory.createDefaultSpawnPositions();
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
       player.setPosition(spawns.get(i).copy());
@@ -422,6 +434,7 @@ public class GameHandler {
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
       player.setRealInput(new InputState(0,0));
+      player.setInputState(new InputState(0,0));
     }
   }
 

@@ -193,13 +193,19 @@ public class LobbyHandler {
   public void leaveLobby(String id, ClientHandler player) {
     Optional<Lobby> lobbyOpt = findLobbyById(id);
     if (lobbyOpt.isEmpty()) return;
+
     Lobby lobby = lobbyOpt.get();
     if (lobby.removePlayer(player) || lobby.removeSpectator(player)) {
       player.setCurrentLobby(null);
-      if (lobby.getPlayers().isPresent() && lobby.getPlayers().get().isEmpty() && lobby.getSpectators().isPresent() && lobby.getSpectators().get().isEmpty()) {
+
+      boolean isEmpty = lobby.getPlayers().get().isEmpty()
+              && lobby.getSpectators().get().isEmpty();
+
+      LOGGER.info("leaveLobby: isEmpty={}, waitingContains={}",
+              isEmpty, waitingLobbies.contains(lobby));
+
+      if (isEmpty && waitingLobbies.contains(lobby)) {
         waitingLobbies.remove(lobby);
-        playingLobbies.remove(lobby);
-        finishedLobbies.remove(lobby);
         LOGGER.info("Empty lobby {} removed.", id);
       }
     }
@@ -220,6 +226,34 @@ public class LobbyHandler {
     playingLobbies.remove(lobby);
     finishedLobbies.add(lobby);
     LOGGER.info("Lobby {} finished.", id);
+  }
+
+  /**
+   * Moves a lobby from the finish state to the waiting state.
+   *
+   * @param id the ID of the lobby to finish
+   */
+  public void resetLobby(String id) {
+    Optional<Lobby> lobbyOpt = findLobbyById(id, finishedLobbies);
+    if (lobbyOpt.isPresent()) {
+      finishedLobbies.remove(lobbyOpt.get());
+    } else {
+      lobbyOpt = findLobbyById(id, playingLobbies);
+      if (lobbyOpt.isPresent()) {
+        playingLobbies.remove(lobbyOpt.get());
+      }
+    }
+
+    if (lobbyOpt.isEmpty()) {
+      LOGGER.warn("Could not find lobby to reset: {}", id);
+      return;
+    }
+
+    Lobby lobby = lobbyOpt.get();
+    lobby.resetGame();
+    waitingLobbies.add(lobby);
+    lobby.broadcastLobbyInfo();
+    LOGGER.info("Lobby {} is open again.", id);
   }
 
   // ---------------------------------------------------------------------------------------------
