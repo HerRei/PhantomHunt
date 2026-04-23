@@ -11,10 +11,12 @@ public class Player {
   private final StringProperty name;
   private final IntegerProperty score;
   private final StringProperty skin;
+  private final StringProperty role;
   private final DoubleProperty xPosition;
   private final DoubleProperty yPosition;
   private final IntegerProperty playerNumber;
   private final StringProperty playerDirection;
+  private boolean moved;
 
   /**
    * Creates a new Player instance.
@@ -26,7 +28,7 @@ public class Player {
    * @param y The Y coordinate
    * @param playerNumber The player's number
    */
-  public Player(String name, String skin, int score, double x, double y, int playerNumber, String playerDirection) {
+  public Player(String name, String skin, String role, int score, double x, double y, int playerNumber, String playerDirection) {
     this.name = new SimpleStringProperty(name);
     this.skin = new SimpleStringProperty(skin);
     this.score = new SimpleIntegerProperty(score);
@@ -34,7 +36,29 @@ public class Player {
     this.yPosition = new SimpleDoubleProperty(y);
     this.playerNumber = new SimpleIntegerProperty(playerNumber);
     this.playerDirection = new SimpleStringProperty(playerDirection);
+    this.role = new SimpleStringProperty(role);
+    this.moved = false;
 
+  }
+
+  public void setMoved(Boolean didMove){
+    moved = didMove;
+  }
+
+  public boolean didMove(){
+    return moved;
+  }
+
+  public boolean getMoved(){
+    return moved;
+  }
+
+  public String getRole(){
+    return role.get();
+  }
+
+  public void setRole(String value){
+    role.set(value);
   }
 
   public String getName() {

@@ -13,13 +13,19 @@ public enum SoundEffect {
   MAN_SCREAM("/audio/man-scream.wav", false, 0.85f),
 
   /** The sound of heavy chains being dragged across the floor */
-  DRAGGING_CHAIN("/audio/dragging-chain.wav", false, 0.65f),
+  DRAGGING_CHAIN("/audio/dragging-chain.wav", true, 0.65f),
 
   /** Quick footsteps running across a wooden or stone floor. */
-  RUNNING_ON_FLOOR("/audio/running-on-floor.wav", false, 0.75f),
+  RUNNING_ON_FLOOR("/audio/running-on-floor.wav", true, 0.75f),
 
   /** A deep whooshing sound, typically used for transitions or jump scares. */
-  DESCENT_WHOOSH("/audio/descent-whoosh.wav", false, 0.85f);
+  DESCENT_WHOOSH("/audio/descent-whoosh.wav", false, 0.85f),
+
+  /** A short coin pickup sound for rewards or score events. */
+  COIN_UP("/audio/coin-up.wav", false, 0.80f),
+
+  /** A short alert sound for incoming messages or notifications. */
+  UNIVERSFIELD_MESSAGE("/audio/universfield-message.wav", false, 0.75f);
 
   private final String resourcePath;
   private final boolean loops;

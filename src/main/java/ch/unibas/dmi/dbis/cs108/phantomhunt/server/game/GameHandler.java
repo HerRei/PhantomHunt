@@ -8,6 +8,8 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundEffect;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -201,6 +203,7 @@ public class GameHandler {
    */
   public synchronized void endRoundHumanCaught(String catcherPlayerId, long nowMillis) {
     ensurePhase(GamePhase.ROUND_RUNNING, "Round is not running.");
+    SoundManager.getInstance().play(SoundEffect.MAN_SCREAM);
 
     RoundState roundState = gameState.getMutableRoundState();
     PlayerState human = gameState.getMutablePlayerAt(roundState.getHumanIndex());

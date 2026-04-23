@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundEffect;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
 import javafx.application.Platform;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
@@ -144,8 +146,10 @@ public class ServerHandler implements Runnable {
   }
 
   private void handleAbility(Packet packet) {
+
     switch(packet.args().get(0)){
       case "START":
+        SoundManager.getInstance().play(SoundEffect.COIN_UP);
         GameModel.getInstance().setAbility(true);
         break;
       case "END":
@@ -158,6 +162,7 @@ public class ServerHandler implements Runnable {
   }
 
   public void handleGameFinish() {
+    SoundManager.getInstance().play(SoundEffect.DESCENT_WHOOSH);
     Platform.runLater(() -> {
       EndScene endScene = (EndScene) SceneManager.getInstance().getScene(SceneProtocol.END);
       if (endScene != null) {
@@ -165,6 +170,7 @@ public class ServerHandler implements Runnable {
       }
       SceneManager.getInstance().showScene(SceneProtocol.END);
     });
+    SoundManager.getInstance().stopAll();
   }
 
   private void handlePlayers(Packet packet) {
@@ -182,6 +188,8 @@ public class ServerHandler implements Runnable {
    * This action is executed on the JavaFX Application Thread.
    */
   private void handleGameStart() {
+    SoundManager.getInstance().play(SoundEffect.DESCENT_WHOOSH);
+    SoundManager.getInstance().play(SoundEffect.WIND_OUTSIDE_ROOM_TONE);
     Platform.runLater(() -> {
       SceneManager.getInstance().showScene(SceneProtocol.GAME);
       GameModel.getInstance().clearChat();
@@ -335,6 +343,10 @@ public class ServerHandler implements Runnable {
    * @param packet packet containing the whisper text
    */
   private void handleWhisper(Packet packet) {
+    String text = packet.text()
+    if (text.startsWith("[Whisper from ")) { //if this hardedcoded logic isnt gonna break soemthing down the line...
+      SoundManager.getInstance().play(SoundEffect.UNIVERSFIELD_MESSAGE);
+    }
     LOGGER.info("Whisper: {}", packet.text());
     GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
   }

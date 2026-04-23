@@ -1,5 +1,9 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerRole;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundEffect;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -65,6 +69,12 @@ public class GameModel {
     int currentRound = Integer.parseInt(sections[0]);
     int timeRemaining = Integer.parseInt(sections[1]);
     remainingTime.set(timeRemaining/1000);
+    int previousRound = round.get();
+    if (previousRound != 0 && currentRound != previousRound) {
+      SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
+      SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
+    }
+
     round.set(currentRound);
     String playersData = sections[2];
     String[] playerEntries = playersData.split(";");
@@ -105,13 +115,38 @@ public class GameModel {
             .orElse(null);
 
     if (player != null) {
+
+      //sound logic - this should not be here - but i dont see why this becoems an issue...
+      boolean wasMoving = player.getMoved();
+      boolean moved = Double.compare(player.getXPosition(), x) != 0 || Double.compare(player.getYPosition(), y) != 0;
+      boolean isLocalPlayer = name.equals(playerName.get());
+
+      if (isLocalPlayer) {
+        PlayerRole currentRole = PlayerRole.valueOf(role);
+        if (moved && !wasMoving) {
+          if (currentRole == PlayerRole.HUMAN) {
+            SoundManager.getInstance().play(SoundEffect.RUNNING_ON_FLOOR);
+          } else if (currentRole == PlayerRole.PHANTOM) {
+            SoundManager.getInstance().play(SoundEffect.DRAGGING_CHAIN);
+          }
+        } else if (!moved && wasMoving) {
+          if (currentRole == PlayerRole.HUMAN) {
+            SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
+          } else if (currentRole == PlayerRole.PHANTOM) {
+            SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
+          }
+        }
+      }
+
       player.xPosition().set(x);
       player.yPosition().set(y);
       player.setScore(score);
+      player.setRole(role);
       player.setSkin(role);
+      player.setMoved(moved);
     } else {
       int playerNumber = lobbyPlayers.size() + 1;
-      lobbyPlayers.add(new Player(name, role, score, x, y, playerNumber, "front"));
+      lobbyPlayers.add(new Player(name, role, role, score, x, y, playerNumber, "front"));
     }
   }
 
