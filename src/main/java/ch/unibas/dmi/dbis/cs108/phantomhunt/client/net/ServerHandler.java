@@ -291,8 +291,17 @@ public class ServerHandler implements Runnable {
    * @param packet the info packet containing the server message
    */
   private void handleInfo(Packet packet) {
-    LOGGER.info("Info: {}", packet.text());
-    GameModel.getInstance().addChatMessage(packet.text()); //adds message to chat
+    String text = packet.text();
+
+    if ("__HUMAN_CAUGHT__".equals(text)) {
+      SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
+      SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
+      SoundManager.getInstance().play(SoundEffect.MAN_SCREAM);
+      return;
+    }
+
+    LOGGER.info("Info: {}", text);
+    GameModel.getInstance().addChatMessage(text); //adds message to chat
   }
 
   /**
