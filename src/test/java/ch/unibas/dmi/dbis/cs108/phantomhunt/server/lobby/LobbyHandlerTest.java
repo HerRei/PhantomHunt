@@ -117,4 +117,18 @@ class LobbyHandlerTest {
         assertTrue(((Vector<Lobby>) finishedField.get(handler)).contains(lobby));
     }
 
+    @Test
+    void utilityMethods_generateMapAndFormatLobbyString() throws Exception {
+        // Tests static map-generator
+        String[][] map = LobbyHandler.generateExampleMap();
+        assertNotNull(map);
+        assertEquals(16, map.length, "Map should be 16 rows high");
+
+        // tests lobby-string builder
+        FakeClientHandler host = new FakeClientHandler("H1");
+        handler.createLobby("SuperLobby", host);
+
+        String lobbiesString = handler.getLobbies();
+        assertTrue(lobbiesString.contains("SuperLobby"), "Should format the generated lobby");
+    }
 }

@@ -66,4 +66,22 @@ class ClientHandlerTest {
 
         assertTrue(socket.getSentData().contains("REJECT"));
     }
+
+    @Test
+    void run_handlesGameAndLobbyCommands() {
+        // we put all the missing commands in one simulated data-stream
+        String commands = "PONG\nLIST_LOBBY\nCHECKIN 123\nLOGOUT_LOBBY 123\nSTART\nINPUT 1 0\nABILITY START\nLOGOUT\n";
+        FakeSocket socket = new FakeSocket(commands);
+        ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+
+        handler.run();
+
+        String sentData = socket.getSentData();
+
+        // did he react to LIST_LOBBY and sent us a LIST_LOBBY packet back?
+        assertTrue(sentData.contains("LIST_LOBBY"));
+
+        // since Lobby "123" doesn't exist, CHECKIN must be handled with REJECT
+        assertTrue(sentData.contains("REJECT Lobby not found"));
+    }
 }

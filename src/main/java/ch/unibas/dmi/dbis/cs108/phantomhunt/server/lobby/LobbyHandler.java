@@ -52,22 +52,23 @@ public class LobbyHandler {
   /**
    * Returning a comma-separated string with the IDs of the lobbies across all states.
    *
-   * @return a String with the IDs of the lobbies
+   * @return a String with the formatted lobbies
    */
   public String getLobbies() {
-    StringBuilder sb = new StringBuilder();
+    // Collect all names of waiting lobbies
+    List<String> waitingNames = new ArrayList<>();
     for (Lobby lobby : waitingLobbies) {
-      sb.append(lobby.getName()).append(":");
+      waitingNames.add(lobby.getName());
     }
-    sb.append(";");
+
+    // Collect all names of playing lobbies
+    List<String> playingNames = new ArrayList<>();
     for (Lobby lobby : playingLobbies) {
-      sb.append(lobby.getName()).append(":");
+      playingNames.add(lobby.getName());
     }
-    // Remove the trailing comma and space if the list is not empty
-    if (sb.length() > 0) {
-      sb.setLength(sb.length() - 2);
-    }
-    return sb.toString();
+
+    // put together
+    return String.join(":", waitingNames) + ";"  + String.join(":", playingNames);
   }
 
   // ---------------------------------------------------------------------------------------------
