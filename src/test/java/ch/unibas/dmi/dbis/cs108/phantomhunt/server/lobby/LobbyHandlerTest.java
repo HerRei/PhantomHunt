@@ -124,11 +124,18 @@ class LobbyHandlerTest {
         assertNotNull(map);
         assertEquals(16, map.length, "Map should be 16 rows high");
 
+        // security reset
+        clearVectorField("waitingLobbies");
+        clearVectorField("playingLobbies");
+        clearVectorField("finishedLobbies");
+
         // tests lobby-string builder
         FakeClientHandler host = new FakeClientHandler("H1");
         handler.createLobby("SuperLobby", host);
 
         String lobbiesString = handler.getLobbies();
-        assertTrue(lobbiesString.contains("SuperLobby"), "Should format the generated lobby");
+
+        // if this fails, gitlab logs string
+        assertEquals("SuperLobby;", lobbiesString, "Invalid lobby string from getLobbies()");
     }
 }
