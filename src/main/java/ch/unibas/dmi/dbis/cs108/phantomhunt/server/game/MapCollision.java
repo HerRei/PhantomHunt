@@ -21,7 +21,9 @@ public final class MapCollision {
         for (double angle : angles) {
             double checkX = x + radius * Math.cos(angle);
             double checkY = y + radius * Math.sin(angle);
-            return isWallAt(map, width, height, checkX, checkY);
+            if (isWallAt(map, width, height, checkX, checkY)) {
+                return true;
+            };
         }
         return isWallAt(map, width, height, x, y); // Also check center
     }

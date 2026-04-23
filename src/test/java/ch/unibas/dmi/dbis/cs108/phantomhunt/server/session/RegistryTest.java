@@ -152,4 +152,20 @@ class RegistryTest {
         assertEquals(1, sender.receivedPackets.size());
         assertTrue(outsider.receivedPackets.isEmpty(), "Outsider cannot get messages");
     }
+
+    @Test
+    void highscores_sortAndFormatCorrectly() {
+        // we add random players
+        registry.addHighscore("Alice", 50);
+        registry.addHighscore("Bob", 200);
+        registry.addHighscore("Charlie", 150);
+
+        // We take board
+        String board = registry.getHighscoreBoard();
+
+        // board must be sorted
+        assertTrue(board.contains("1. Bob: 200"), "Bob has the most points and must be in first place");
+        assertTrue(board.contains("2. Charlie: 150"), "Charlie must be in second place");
+        assertTrue(board.contains("3. Alice: 50"), "Alice must be in third place");
+    }
 }
