@@ -343,7 +343,7 @@ public class ServerHandler implements Runnable {
    * @param packet packet containing the whisper text
    */
   private void handleWhisper(Packet packet) {
-    String text = packet.text()
+    String text = packet.text();
     if (text.startsWith("[Whisper from ")) { //if this hardedcoded logic isnt gonna break soemthing down the line...
       SoundManager.getInstance().play(SoundEffect.UNIVERSFIELD_MESSAGE);
     }
