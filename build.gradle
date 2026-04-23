@@ -59,7 +59,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    jvmArgs("-Dnet.bytebuddy.experimental=true")
+    jvmArgs("-ea", "-Dnet.bytebuddy.experimental=true")
     finalizedBy jacocoTestReport
 }
 
