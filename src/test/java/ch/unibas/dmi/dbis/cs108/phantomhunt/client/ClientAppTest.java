@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.client.net.ServerHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.client.net.TcpClient;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.util.FakeServerHandler;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -60,22 +61,6 @@ public class ClientAppTest {
 
         ClientApp.notifyWhisperReceived("Secret Message!");
         assertTrue(listenerTriggered.get(), "The listener should have been triggered");
-    }
-
-    // simple dummy-handler. no real connection. saves last packet, that should get sent.
-    static class FakeServerHandler extends ServerHandler {
-        public Packet lastSentPacket = null;
-
-        public FakeServerHandler() {
-            // we give him a dead socket, thread crashes, but object exists.
-            super(new java.net.Socket());
-        }
-
-        @Override
-        public synchronized void sendMessage(Packet p) {
-            // instead of sending it to the internet, we catch it here
-            this.lastSentPacket = p;
-        }
     }
 
     // smuggles fake-handler with reflection in clientapp
