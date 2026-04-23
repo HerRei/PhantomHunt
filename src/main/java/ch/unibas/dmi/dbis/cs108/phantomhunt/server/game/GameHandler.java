@@ -203,6 +203,8 @@ public class GameHandler {
    */
   public synchronized void endRoundHumanCaught(String catcherPlayerId, long nowMillis) {
     ensurePhase(GamePhase.ROUND_RUNNING, "Round is not running.");
+    SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
+    SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
     SoundManager.getInstance().play(SoundEffect.MAN_SCREAM);
 
     RoundState roundState = gameState.getMutableRoundState();
