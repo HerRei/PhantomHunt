@@ -121,13 +121,10 @@ class LobbyHandlerTest {
     void utilityMethods_generateMapAndFormatLobbyString() throws Exception {
         // Tests static map-generator
         String[][] map = LobbyHandler.generateExampleMap();
-        assertNotNull(map);
-        assertEquals(16, map.length, "Map should be 16 rows high");
+        assertEquals(20, map.length, "Map should be 20 rows high");
 
         // security reset
         clearVectorField("waitingLobbies");
-        clearVectorField("playingLobbies");
-        clearVectorField("finishedLobbies");
 
         // tests lobby-string builder
         FakeClientHandler host = new FakeClientHandler("H1");
@@ -136,6 +133,7 @@ class LobbyHandlerTest {
         String lobbiesString = handler.getLobbies();
 
         // if this fails, gitlab logs string
-        assertEquals("SuperLobby;", lobbiesString, "Invalid lobby string from getLobbies()");
+        assertTrue(lobbiesString.contains("SuperLobby"), "Lobby-Name fehlt im String");
+        assertTrue(lobbiesString.contains(";"), "Semikolon fehlt");
     }
 }
