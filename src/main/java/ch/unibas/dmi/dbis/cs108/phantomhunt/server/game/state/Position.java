@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +16,7 @@ public class Position {
   private int[] lastSpawn;
 
 
-  public Position(int[] tile, Map map) {
+  public Position(int[] tile, MapLogic map) {
     this.lastSpawn = tile;
     this.goal_tile = tile;
     this.y = map.tileToPixelPosition(tile[1], tile[0])[0];
@@ -26,7 +26,7 @@ public class Position {
   /**
    * Updates position towards the goal tile.
    */
-  public void updatePosition(InputState input, double speed, double deltaTime, Map map) {
+  public void updatePosition(InputState input, double speed, double deltaTime, MapLogic map) {
     double[] targetPixel = map.tileToPixelPosition(goal_tile[1], goal_tile[0]);
     double targetY = targetPixel[0];
     double targetX = targetPixel[1];
@@ -62,7 +62,7 @@ public class Position {
    * @param map The game map for collision checking.
    * @return true if the goal tile was updated to a new walkable neighbor.
    */
-  public boolean checkValidInput(InputState old,InputState nextInput, Map map) {
+  public boolean checkValidInput(InputState old,InputState nextInput, MapLogic map) {
     if (nextInput == null || !nextInput.isMoving()) return false;
     double[] targetPixel = map.tileToPixelPosition(goal_tile[1], goal_tile[0]);
 
@@ -90,7 +90,7 @@ public class Position {
   /**
    * Internal helper to check walkability and update the goal_tile coordinates.
    */
-  private boolean tryUpdateGoal(InputState input, Map map) {
+  private boolean tryUpdateGoal(InputState input, MapLogic map) {
     int nextY = goal_tile[0] + input.getVertical();
     int nextX = goal_tile[1] + input.getHorizontal();
 
@@ -113,7 +113,7 @@ public class Position {
    * @return A new Position object with the same values.
    */
   public Position copy() {
-    return new Position(new int[]{goal_tile[0], goal_tile[1]}, Map.getInstance());
+    return new Position(new int[]{goal_tile[0], goal_tile[1]}, MapLogic.getInstance());
   }
 
   public double getX() {

@@ -17,9 +17,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundEffect;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
@@ -139,6 +137,9 @@ public class ServerHandler implements Runnable {
       case ABILITY:
         handleAbility(packet);
         break;
+      case SHOW_HIGHSCORE:
+        handleShowHighscore(packet);
+        break;
       default:
         handleUnknown(packet);
         break;
@@ -159,6 +160,25 @@ public class ServerHandler implements Runnable {
         LOGGER.error("Wrong format for Abilitycommand");
         break;
     }
+  }
+
+  public void handleShowHighscore(Packet p) {
+    if (p.argc() < 1) {
+      GameModel.getInstance().setHighscores(new LinkedHashMap<>());
+      return;
+    }
+
+    String text = p.text();
+    Map<String, Integer> highscores = new LinkedHashMap<>();
+    String[] lines = text.split("\\|");
+
+    for (String line : lines) {
+      if (line.isEmpty()) continue;
+      String entry = line.split("\\.\\s*", 2)[1].trim();
+      String[] parts = entry.split(":\\s*", 2);
+      highscores.put(parts[0].trim(), Integer.parseInt(parts[1].trim()));
+    }
+    GameModel.getInstance().setHighscores(highscores);
   }
 
   public void handleGameFinish() {

@@ -1,11 +1,9 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameFactory;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,7 +12,7 @@ class GameStateTest {
 
     @Test
     void serializedPlayers_formatsCorrectly() {
-        Map map = new Map(LobbyHandler.generateExampleMap());
+        MapLogic map = new MapLogic(MapLogic.generateExampleMap());
         GameFactory factory = new GameFactory();
         List<GameState.PlayerSeed> seeds = List.of(
                 new GameState.PlayerSeed("id1", "Alice"),
@@ -40,7 +38,7 @@ class GameStateTest {
 
     @Test
     void requireMutablePlayer_unknownId_throwsException() {
-        Map map = new Map(LobbyHandler.generateExampleMap());
+        MapLogic map = new MapLogic(MapLogic.generateExampleMap());
         GameFactory factory = new GameFactory();
         List<GameState.PlayerSeed> seeds = List.of(
                 new GameState.PlayerSeed("id1", "Alice"),
@@ -60,7 +58,7 @@ class GameStateTest {
 
     @Test
     void isColliding_detectsMapBoundsAndWalls() {
-        Map map = new Map(LobbyHandler.generateExampleMap());
+        MapLogic map = new MapLogic(MapLogic.generateExampleMap());
         GameFactory factory = new GameFactory();
         List<GameState.PlayerSeed> seeds = List.of(
                 new GameState.PlayerSeed("1", "A"),
@@ -83,7 +81,7 @@ class GameStateTest {
 
     @Test
     void getWinner_calculatesCorrectly() {
-        Map map = new Map(LobbyHandler.generateExampleMap());
+        MapLogic map = new MapLogic(MapLogic.generateExampleMap());
         GameFactory factory = new GameFactory();
         List<GameState.PlayerSeed> seeds = List.of(
                 new GameState.PlayerSeed("1", "A"),

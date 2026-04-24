@@ -335,13 +335,6 @@ public class ClientHandler implements Runnable {
     GameHandler gameHandler = lobby.getActiveGame().orElse(null);
     if (gameHandler == null) return;
 
-    Optional<PlayerState> playerStateOpt = gameHandler.getGameState().findPlayer(this.name);
-    if (playerStateOpt.isPresent()) {
-        registry.addHighscore(this.name, playerStateOpt.get().getScore());
-    } else {
-        LOGGER.warn("Could not find player {} in game state to record highscore.", this.name);
-    }
-
     if (lobby.getHost() == this) {
       lobbyHandler.resetLobby(lobby.getId());
     }

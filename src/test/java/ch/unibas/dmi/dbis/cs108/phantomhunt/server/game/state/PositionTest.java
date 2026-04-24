@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,7 +10,7 @@ class PositionTest {
     @Test
     void checkValidInput_allowsMovementToFreeTile() {
         // map with 2 free tiles next to each other
-        Map map = new Map(new String[][] {{" ", " "}});
+        MapLogic map = new MapLogic(new String[][] {{" ", " "}});
 
         // start on tile [0, 0]
         Position pos = new Position(new int[]{0, 0}, map);
@@ -25,7 +25,7 @@ class PositionTest {
     @Test
     void checkValidInput_blocksMovementToWall() {
         // map with 2 tiles, on the right side is a wall
-        Map map = new Map(new String[][] {{" ", "X"}});
+        MapLogic map = new MapLogic(new String[][] {{" ", "X"}});
         Position pos = new Position(new int[]{0, 0}, map);
 
         InputState oldInput = new InputState(0, 0);
@@ -37,7 +37,7 @@ class PositionTest {
 
     @Test
     void updatePosition_movesCoordinatesCorrectly() {
-        Map map = new Map(new String[][] {{" ", " "}});
+        MapLogic map = new MapLogic(new String[][] {{" ", " "}});
         Position pos = new Position(new int[]{0, 0}, map);
 
         // the right tile is the goal

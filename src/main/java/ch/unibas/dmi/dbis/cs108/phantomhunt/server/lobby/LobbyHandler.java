@@ -5,7 +5,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameFactory;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,7 +111,7 @@ public class LobbyHandler {
       seeds.add(new GameState.PlayerSeed(player.getName(), player.getName()));
     }
 
-    Map map = new Map(generateExampleMap());
+    MapLogic map = new MapLogic(MapLogic.generateExampleMap());
     GameState gs = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
     GameHandler gameHandler = new GameHandler(gs, lobby);
 
@@ -280,46 +280,5 @@ public class LobbyHandler {
       }
     }
     return Optional.empty();
-  }
-  /**
-   * Generates an example 19x20 map string array.
-   * 'X' represents a wall, and ' ' represents a walkable path.
-   */
-  /*
-  "Q", quadra.
-  "L", top_left
-  "V", vertical
-  "D", down_left
-  "R", top_right
-  "A", down_right
-  "H", horizontal
-  "T", triple_top
-  "B", triple_down
-  "C", triple_left
-  "E", triple_right
-   */
-  public static String[][] generateExampleMap() {
-    return new String[][] {
-        {"X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"},
-        {"X", "L", "H", "H", "T", "H", "H", "H", "R", "X", "L", "H", "H", "H", "T", "H", "H", "R", "X"},
-        {"X", "V", "X", "X", "V", "X", "X", "X", "V", "X", "V", "X", "X", "X", "V", "X", "X", "V", "X"},
-        {"X", "C", "H", "H", "Q", "H", "T", "H", "B", "H", "B", "H", "T", "H", "Q", "H", "H", "E", "X"},
-        {"X", "V", "X", "X", "V", "X", "V", "X", "X", "X", "X", "X", "V", "X", "V", "X", "X", "V", "X"},
-        {"X", "D", "H", "H", "E", "X", "D", "H", "R", "X", "L", "H", "A", "X", "C", "H", "H", "A", "X"},
-        {"X", "X", "X", "X", "V", "X", "X", "X", "V", "X", "V", "X", "X", "X", "V", "X", "X", "X", "X"},
-        {"X", "L", "H", "H", "E", "X", "L", "H", "B", "T", "B", "H", "R", "X", "C", "H", "H", "R", "X"},
-        {"X", "V", "X", "X", "C", "H", "E", "X", "X", "V", "X", "X", "C", "H", "E", "X", "X", "V", "X"},
-        {"X", "D", "R", "X", "V", "X", "V", "X", "X", "V", "X", "X", "V", "X", "V", "X", "L", "A", "X"},
-        {"X", "X", "V", "X", "V", "X", "C", "H", "H", "Q", "H", "H", "E", "X", "V", "X", "V", "X", "X"},
-        {"X", "L", "B", "H", "E", "X", "V", "X", "X", "V", "X", "X", "V", "X", "C", "H", "B", "R", "X"},
-        {"X", "V", "X", "X", "C", "H", "B", "H", "T", "B", "T", "H", "B", "H", "E", "X", "X", "V", "X"},
-        {"X", "D", "R", "X", "V", "X", "X", "X", "V", "X", "V", "X", "X", "X", "V", "X", "L", "A", "X"},
-        {"X", "X", "V", "X", "V", "X", "L", "H", "B", "H", "B", "H", "R", "X", "V", "X", "V", "X", "X"},
-        {"X", "L", "B", "H", "A", "X", "V", "X", "X", "X", "X", "X", "V", "X", "D", "H", "B", "R", "X"},
-        {"X", "V", "X", "X", "X", "X", "D", "H", "R", "X", "L", "H", "A", "X", "X", "X", "X", "V", "X"},
-        {"X", "V", "X", "X", "X", "X", "X", "X", "V", "X", "V", "X", "X", "X", "X", "X", "X", "V", "X"},
-        {"X", "D", "H", "H", "H", "H", "H", "H", "B", "H", "B", "H", "H", "H", "H", "H", "H", "A", "X"},
-        {"X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"}
-    };
   }
 }

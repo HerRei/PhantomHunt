@@ -1,11 +1,9 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,7 +13,7 @@ class GameFactoryTest {
     @Test
     void createWithDefaultRules_generatesValidGameState(){
         // we must use the real map here, that spawn_distance gets fulfilled without endless loop
-        Map map = new Map(LobbyHandler.generateExampleMap());
+        MapLogic map = new MapLogic(MapLogic.generateExampleMap());
 
         GameFactory factory = new GameFactory();
 
@@ -41,7 +39,7 @@ class GameFactoryTest {
 
     @Test
     void create_rejectsWrongPlayerCount(){
-        Map map = new Map(LobbyHandler.generateExampleMap());
+        MapLogic map = new MapLogic(MapLogic.generateExampleMap());
         GameFactory factory = new GameFactory();
 
         // only 2 players -> factory must throw IllegalArgumentException

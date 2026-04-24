@@ -148,4 +148,7 @@ public class EventHandlers {
   public void updateLists() {
     serverHandler.sendMessage(Packet.of(Command.LIST_LOBBY));
   }
+  public void updateHighscore() {
+    serverHandler.sendMessage(Packet.of(Command.SHOW_HIGHSCORE));
+  }
 }

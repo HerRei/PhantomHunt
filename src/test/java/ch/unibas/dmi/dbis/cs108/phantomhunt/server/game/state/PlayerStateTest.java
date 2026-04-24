@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,7 +10,7 @@ class PlayerStateTest {
     @Test
     void playerState_copy_createsIndependentInstance() {
         // mini-dummy-map for position
-        Map dummyMap = new Map(new String[][] {{" "}});
+        MapLogic dummyMap = new MapLogic(new String[][] {{" "}});
         Position pos = new Position(new int[]{0,0}, dummyMap);
         InputState input = new InputState(0, 0);
 
@@ -32,7 +32,7 @@ class PlayerStateTest {
 
     @Test
     void addScore_increasesScore() {
-        Map dummyMap = new Map(new String[][] {{" "}});
+        MapLogic dummyMap = new MapLogic(new String[][] {{" "}});
         PlayerState player = new PlayerState("id", "Bob", PlayerRole.PHANTOM,
                 new Position(new int[]{0, 0}, dummyMap), new InputState(0, 0), 0, 0, true, false);
 

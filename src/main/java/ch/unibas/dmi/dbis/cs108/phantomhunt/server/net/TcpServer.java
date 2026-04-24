@@ -48,7 +48,7 @@ public class TcpServer {
         readyLatch.countDown();
       }
 
-      Registry registry = new Registry();
+      Registry registry = Registry.getInstance();
       LobbyHandler lobbyHandler = new LobbyHandler();
 
       while (true) {

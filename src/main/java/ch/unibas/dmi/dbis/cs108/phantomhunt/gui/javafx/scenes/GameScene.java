@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.Player;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -71,7 +72,7 @@ public class GameScene implements SceneInterface {
 
 
     GameModel model = GameModel.getInstance();
-    String[][] mapData = LobbyHandler.generateExampleMap(); // see note below
+    String[][] mapData = MapLogic.generateExampleMap(); // see note below
 
     int mapRows = mapData.length;
     int mapCols = mapData[0].length;

@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerRole;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundEffect;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
@@ -12,7 +11,9 @@ import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Holds all the important data for the game.
@@ -23,6 +24,7 @@ import java.util.List;
 public class GameModel {
   private static final Logger LOGGER = LogManager.getLogger(GameModel.class);
   private static GameModel instance;
+  private Map<String, Integer> highscores = new LinkedHashMap<>();
   private final ObservableList<Player> lobbyPlayers = FXCollections.observableArrayList();
   public final ObservableList<String> players = FXCollections.observableArrayList();
   private final BooleanProperty humanAbility = new SimpleBooleanProperty();
@@ -278,6 +280,8 @@ public class GameModel {
     return collisionMap;
   }
 
+  public Map<String, Integer> getHighscores() {return highscores;}
+
   // ---SETTERS---
   public void setName(String name) {
     playerName.set(name);
@@ -292,6 +296,8 @@ public class GameModel {
   public void setCollisionMap(Image collisionMap) {
     this.collisionMap.set(collisionMap);
   }
+  
+  public void setHighscores(Map<String, Integer> highscores) {this.highscores = highscores;}
 
   /**
    * updates direction of the player

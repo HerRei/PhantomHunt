@@ -57,14 +57,17 @@ public class HubScene implements SceneInterface {
         Button btnNickname = new Button("Change Nickname");
         Button btnJoin = new Button("Join Lobby");
         Button btnCreate = new Button("Create Lobby");
+        Button btnHighscore = new Button("Show Highscores");
 
         btnJoin.setMaxWidth(Double.MAX_VALUE);
         btnNickname.setMaxWidth(Double.MAX_VALUE);
         btnCreate.setMaxWidth(Double.MAX_VALUE);
+        btnHighscore.setMaxWidth(Double.MAX_VALUE);
         btnJoin.setPrefHeight(40);
         btnCreate.setPrefHeight(40);
+        btnHighscore.setPrefHeight(40);
 
-        // NEW: Player List Section (replacing Volume)
+        // Player List Section (replacing Volume)
         Label onlineLabel = new Label("Players Online:");
         onlineLabel.setStyle("-fx-font-weight: bold;");
 
@@ -73,7 +76,7 @@ public class HubScene implements SceneInterface {
         playerListDisplay.setItems(model.players);
         VBox.setVgrow(playerListDisplay, Priority.ALWAYS); // Let the list take up remaining space
 
-        leftMenu.getChildren().addAll(profileBox, btnNickname, new Separator(), btnJoin, btnCreate, new Separator(), onlineLabel, playerListDisplay);
+        leftMenu.getChildren().addAll(profileBox, btnNickname, new Separator(), btnJoin, btnCreate, btnHighscore, new Separator(), onlineLabel, playerListDisplay);
 
         // --- RIGHT SIDE: Chat System ---
         VBox chatBox = new VBox(10);
@@ -109,6 +112,10 @@ public class HubScene implements SceneInterface {
 
         //--- Actions ---
         btnSend.setOnAction(e -> handleSendMessage());
+        btnHighscore.setOnAction(e -> {
+            SceneManager.getInstance().showScene(SceneProtocol.HIGHSCORE);
+            EventHandlers.getInstance().updateHighscore();
+        });
         btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
         btnJoin.setOnAction(e -> {
             EventHandlers.getInstance().updateLists();

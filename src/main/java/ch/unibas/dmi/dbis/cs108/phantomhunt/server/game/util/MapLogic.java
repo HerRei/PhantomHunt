@@ -15,16 +15,16 @@ import java.util.Random;
  * Utility class responsible for translating a visual map image (PNG/JPG)
  * into a 2D array of logical TileTypes for collision detection.
  */
-public final class Map {
+public final class MapLogic {
 
-  private static final Logger LOGGER = LogManager.getLogger(Map.class);
-  private static Map instance;
+  private static final Logger LOGGER = LogManager.getLogger(MapLogic.class);
+  private static MapLogic instance;
   private static final String tileImage = "/assets/floor-test.png"; //path to tileImg
   private int tileSize;
   private ArrayList<int[]> possibleSpawnPoints;
   private Boolean[][] walkingMap;
 
-  public Map(String[][] map) {
+  public MapLogic(String[][] map) {
     this.walkingMap = loadMapFromString(map);
     resetSpawnPoints();
     try{// 1. Load the image file
@@ -36,7 +36,7 @@ public final class Map {
     }
   }
 
-  public static Map getInstance() {
+  public static MapLogic getInstance() {
     if(instance == null){
       return null;
     }
@@ -187,6 +187,48 @@ public final class Map {
 
   public Boolean[][] getMap() {
     return walkingMap;
+  }
+
+  /**
+   * Generates an example 19x20 map string array.
+   * 'X' represents a wall, and ' ' represents a walkable path.
+   */
+  /*
+  "Q", quadra.
+  "L", top_left
+  "V", vertical
+  "D", down_left
+  "R", top_right
+  "A", down_right
+  "H", horizontal
+  "T", triple_top
+  "B", triple_down
+  "C", triple_left
+  "E", triple_right
+   */
+  public static String[][] generateExampleMap() {
+    return new String[][] {
+            {"X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"},
+            {"X", "L", "H", "H", "T", "H", "H", "H", "R", "X", "L", "H", "H", "H", "T", "H", "H", "R", "X"},
+            {"X", "V", "X", "X", "V", "X", "X", "X", "V", "X", "V", "X", "X", "X", "V", "X", "X", "V", "X"},
+            {"X", "C", "H", "H", "Q", "H", "T", "H", "B", "H", "B", "H", "T", "H", "Q", "H", "H", "E", "X"},
+            {"X", "V", "X", "X", "V", "X", "V", "X", "X", "X", "X", "X", "V", "X", "V", "X", "X", "V", "X"},
+            {"X", "D", "H", "H", "E", "X", "D", "H", "R", "X", "L", "H", "A", "X", "C", "H", "H", "A", "X"},
+            {"X", "X", "X", "X", "V", "X", "X", "X", "V", "X", "V", "X", "X", "X", "V", "X", "X", "X", "X"},
+            {"X", "L", "H", "H", "E", "X", "L", "H", "B", "T", "B", "H", "R", "X", "C", "H", "H", "R", "X"},
+            {"X", "V", "X", "X", "C", "H", "E", "X", "X", "V", "X", "X", "C", "H", "E", "X", "X", "V", "X"},
+            {"X", "D", "R", "X", "V", "X", "V", "X", "X", "V", "X", "X", "V", "X", "V", "X", "L", "A", "X"},
+            {"X", "X", "V", "X", "V", "X", "C", "H", "H", "Q", "H", "H", "E", "X", "V", "X", "V", "X", "X"},
+            {"X", "L", "B", "H", "E", "X", "V", "X", "X", "V", "X", "X", "V", "X", "C", "H", "B", "R", "X"},
+            {"X", "V", "X", "X", "C", "H", "B", "H", "T", "B", "T", "H", "B", "H", "E", "X", "X", "V", "X"},
+            {"X", "D", "R", "X", "V", "X", "X", "X", "V", "X", "V", "X", "X", "X", "V", "X", "L", "A", "X"},
+            {"X", "X", "V", "X", "V", "X", "L", "H", "B", "H", "B", "H", "R", "X", "V", "X", "V", "X", "X"},
+            {"X", "L", "B", "H", "A", "X", "V", "X", "X", "X", "X", "X", "V", "X", "D", "H", "B", "R", "X"},
+            {"X", "V", "X", "X", "X", "X", "D", "H", "R", "X", "L", "H", "A", "X", "X", "X", "X", "V", "X"},
+            {"X", "V", "X", "X", "X", "X", "X", "X", "V", "X", "V", "X", "X", "X", "X", "X", "X", "V", "X"},
+            {"X", "D", "H", "H", "H", "H", "H", "H", "B", "H", "B", "H", "H", "H", "H", "H", "H", "A", "X"},
+            {"X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"}
+    };
   }
 
 

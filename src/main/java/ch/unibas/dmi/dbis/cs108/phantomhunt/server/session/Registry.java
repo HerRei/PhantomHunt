@@ -25,10 +25,20 @@ public final class Registry {
   private static final Logger log =
           LogManager.getLogger(
                   Registry.class);
+  private static Registry instance;
   private final Vector<ClientHandler> sessions = new Vector<>(); //zwar O(n) for get but easier to work with than the hashMap with a dummy.
   private final ConcurrentHashMap<String, ClientHandler> byName =
           new ConcurrentHashMap<>(); // Nickname handling
   private final Vector<Highscore> highscores = new Vector<>();
+
+  public static Registry getInstance() {
+    if (instance == null) {
+      instance = new Registry();
+    }
+    return instance;
+  }
+
+  private Registry() {}
 
   private static class Highscore {
     private final String playerName;
@@ -66,9 +76,9 @@ public final class Registry {
   }
 
   public String getHighscoreBoard() {
-    StringBuilder highscoreBoard = new StringBuilder("Highscores:\n");
+    StringBuilder highscoreBoard = new StringBuilder("");
     for (int i = 0; i < highscores.size() && i < 10; i++) {
-      highscoreBoard.append(i + 1).append(". ").append(highscores.get(i)).append("\n");
+      highscoreBoard.append(i + 1).append(". ").append(highscores.get(i)).append("|");
     }
     return highscoreBoard.toString();
   }

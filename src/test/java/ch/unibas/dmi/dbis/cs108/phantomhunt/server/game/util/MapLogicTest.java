@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MapTest {
+class MapLogicTest {
 
     @Test
     void loadMapFromString_parsesCorrectly(){
@@ -15,7 +15,7 @@ class MapTest {
                 {"X", "L", "X"},
         };
 
-        Map map = new Map(rawMap);
+        MapLogic map = new MapLogic(rawMap);
         Boolean[][] boolMap = map.getMap();
 
         // Check if size is correct

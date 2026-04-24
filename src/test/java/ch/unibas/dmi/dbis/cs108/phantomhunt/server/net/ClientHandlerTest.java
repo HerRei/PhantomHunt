@@ -16,7 +16,7 @@ class ClientHandlerTest {
 
     @BeforeEach
     void setUp() {
-        realRegistry = new Registry();
+        realRegistry = Registry.getInstance();
         realLobbyHandler = LobbyHandler.getInstance();
     }
 

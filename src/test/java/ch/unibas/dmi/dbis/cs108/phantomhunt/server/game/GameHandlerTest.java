@@ -2,9 +2,8 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GamePhase;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.util.FakeClientHandler;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +23,7 @@ class GameHandlerTest {
         lobby.addPlayer(new FakeClientHandler("P4"));
 
         // we use the factory to build the state
-        Map map = new Map(LobbyHandler.generateExampleMap());
+        MapLogic map = new MapLogic(MapLogic.generateExampleMap());
         GameFactory factory = new GameFactory();
         List<GameState.PlayerSeed> seeds = List.of(
                 new GameState.PlayerSeed("P1", "P1"),

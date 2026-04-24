@@ -120,7 +120,7 @@ class LobbyHandlerTest {
     @Test
     void utilityMethods_generateMapAndFormatLobbyString() throws Exception {
         // Tests static map-generator
-        String[][] map = LobbyHandler.generateExampleMap();
+        String[][] map = Map.generateExampleMap();
         assertEquals(20, map.length, "Map should be 20 rows high");
 
         // security reset

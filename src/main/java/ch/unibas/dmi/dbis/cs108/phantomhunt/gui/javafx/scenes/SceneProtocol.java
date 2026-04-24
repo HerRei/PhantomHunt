@@ -11,5 +11,6 @@ public enum SceneProtocol {
   NICKNAME,
   JOINLOBBY,
   CREATELOBBY,
-  LOBBY;
+  LOBBY,
+  HIGHSCORE;
 }

@@ -22,7 +22,7 @@ class RegistryTest {
     // This method is automatically used before each test
     @BeforeEach
     void setUp() {
-        registry = new Registry();
+        registry = Registry.getInstance();
     }
 
     // Domain-management

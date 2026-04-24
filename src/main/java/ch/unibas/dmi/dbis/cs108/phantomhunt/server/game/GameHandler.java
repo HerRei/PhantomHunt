@@ -4,12 +4,10 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.client.net.ServerHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.*;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundEffect;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -99,7 +97,7 @@ public class GameHandler {
 
   private void updatePlayerPositions(double deltaTime) {
     double speed = gameState.getRules().moveSpeedPerSecond();
-    Map map = Map.getInstance();
+    MapLogic map = MapLogic.getInstance();
 
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState ps = gameState.getMutablePlayerAt(i);
@@ -172,7 +170,7 @@ public class GameHandler {
       if (dist < (radius * 2)) {
         if (state){
           human.addScore(gameState.getHumanCatchBonus());
-          phantom.setPosition(new Position(Map.getInstance().setRandomPosition(phantom.getPosition().getLastSpawn(), gameState.getPlayers(), GameState.SPAWN_DISTANCE), Map.getInstance()));
+          phantom.setPosition(new Position(MapLogic.getInstance().setRandomPosition(phantom.getPosition().getLastSpawn(), gameState.getPlayers(), GameState.SPAWN_DISTANCE), MapLogic.getInstance()));
         }
         else{
           endRoundHumanCaught(phantom.getPlayerId(), now);
@@ -287,6 +285,10 @@ public class GameHandler {
     ensurePhase(GamePhase.ROUND_ENDED, "Can only advance after a round has ended.");
     lobby.broadcast(Packet.of(Command.ABILITY, "END"));
     if (!hasNextRound()) {
+      List<PlayerState> players = gameState.getPlayers();
+      for (PlayerState p : players){
+        Registry.getInstance().addHighscore(p.getNickname(), p.getScore());
+      }
       gameState.setPhase(GamePhase.MATCH_ENDED);
       stopGameLoop(); // GameLoop stoppen!
       lobby.broadcast(Packet.of(Command.GAME_FINISH));
@@ -424,7 +426,7 @@ public class GameHandler {
   }
 
   private void resetPlayersForNewRound() {
-    Map.getInstance().resetSpawnPoints();
+    MapLogic.getInstance().resetSpawnPoints();
     List<Position> spawns =
         GameFactory.createDefaultSpawnPositions();
     for (int i = 0; i < gameState.getPlayerCount(); i++) {

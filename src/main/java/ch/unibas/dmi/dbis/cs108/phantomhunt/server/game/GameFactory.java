@@ -7,7 +7,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.InputState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerRole;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.Position;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.Map;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public final class GameFactory {
    * @param map The collision map for the game.
    */
   public GameState create(
-          String matchId, List<PlayerSeed> playerSeeds, GameRules rules, Map map) {
+          String matchId, List<PlayerSeed> playerSeeds, GameRules rules, MapLogic map) {
     Boolean[][] validatedMap = deepCopyAndValidateMap(map.getMap());
     List<PlayerState> players = createPlayers(playerSeeds, validatedMap);
     gs = new GameState(matchId, rules, validatedMap, players);
@@ -43,7 +43,7 @@ public final class GameFactory {
    * @return A newly initialized GameState.
    */
   public GameState createWithDefaultRules(
-          String matchId, List<PlayerSeed> playerSeeds, Map map) {
+          String matchId, List<PlayerSeed> playerSeeds, MapLogic map) {
     if (map == null) { //fallback for no Map
       return create(matchId, playerSeeds, GameRules.defaultRules(), map);
     }
@@ -111,7 +111,7 @@ public final class GameFactory {
 
   static List<Position> createDefaultSpawnPositions() {
     List<Position> spawns = new ArrayList<Position>();
-    spawns = Map.getInstance().getRandomSpawns(GameState.REQUIRED_PLAYER_COUNT, spawns, GameState.SPAWN_DISTANCE);
+    spawns = MapLogic.getInstance().getRandomSpawns(GameState.REQUIRED_PLAYER_COUNT, spawns, GameState.SPAWN_DISTANCE);
     return spawns;
   }
 
