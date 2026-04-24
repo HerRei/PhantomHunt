@@ -23,6 +23,7 @@ class RegistryTest {
     @BeforeEach
     void setUp() {
         registry = Registry.getInstance();
+        registry.resetForTests();
     }
 
     // Domain-management

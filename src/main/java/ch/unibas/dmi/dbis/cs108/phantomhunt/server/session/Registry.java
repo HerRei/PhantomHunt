@@ -40,6 +40,12 @@ public final class Registry {
 
   private Registry() {}
 
+  void resetForTests() {
+    sessions.clear();
+    byName.clear();
+    highscores.clear();
+  }
+
   private static class Highscore {
     private final String playerName;
     private final int score;
