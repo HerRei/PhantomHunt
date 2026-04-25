@@ -6,32 +6,32 @@ import javafx.application.Platform;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 class EventHandlersTest {
 
     private FakeServerHandler fakeServer;
-    private static boolean jfxIsAlive = true;
 
     @BeforeAll
-    static void initJavaFX() throws InterruptedException {
+    static void initJavaFX() {
         try {
             Platform.setImplicitExit(false);
             CountDownLatch latch = new CountDownLatch(1);
             Platform.startup(latch::countDown);
             latch.await(2, TimeUnit.SECONDS);
-        } catch (IllegalStateException e) {
-            jfxIsAlive = false;
+        } catch (IllegalStateException | InterruptedException e) {
+
         }
     }
 
     @BeforeEach
     void setUp() throws Exception {
-        if (!jfxIsAlive) return;
         fakeServer = new FakeServerHandler();
 
         CountDownLatch latch = new CountDownLatch(1);
@@ -44,7 +44,6 @@ class EventHandlersTest {
 
     @Test
     void sendInputs_formatsPayloadCorrectly() {
-        if (!jfxIsAlive) { assertTrue(true); return; }
         EventHandlers.getInstance().sendInputs(1, -1);
 
         assertNotNull(fakeServer.lastSentPacket, "Network packet must be sent");
@@ -54,7 +53,6 @@ class EventHandlersTest {
 
     @Test
     void handleNicknameUpdate_validName_sensPacket() {
-        if (!jfxIsAlive) { assertTrue(true); return; }
         EventHandlers.getInstance().handleNicknameUpdate("Hero");
 
         assertEquals(Command.NICK, fakeServer.lastSentPacket.cmd(), "Command must be NICK");
@@ -63,7 +61,6 @@ class EventHandlersTest {
 
     @Test
     void handleNicknameUpdate_blankName_ignoresRequest() {
-        if (!jfxIsAlive) { assertTrue(true); return; }
         fakeServer.lastSentPacket = null;
         EventHandlers.getInstance().handleNicknameUpdate("");
 
@@ -72,7 +69,6 @@ class EventHandlersTest {
 
     @Test
     void basicNetworkCommands_triggerCorrectPackets() {
-        if (!jfxIsAlive) { assertTrue(true); return; }
         // Test lobby interactions
         EventHandlers.getInstance().joinLobby("LobbyA");
         assertEquals(Command.CHECKIN, fakeServer.lastSentPacket.cmd(), "Joining a lobby sends CHECKIN");

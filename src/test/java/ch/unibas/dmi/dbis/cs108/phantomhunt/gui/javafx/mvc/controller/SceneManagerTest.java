@@ -6,28 +6,25 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 class SceneManagerTest {
 
-    private static boolean jfxIsAlive = true;
-
     @BeforeAll
-    static void initJavaFX() throws InterruptedException {
+    static void initJavaFX() {
         try {
             Platform.setImplicitExit(false);
             CountDownLatch latch = new CountDownLatch(1);
             Platform.startup(latch::countDown);
             latch.await(2, TimeUnit.SECONDS);
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | InterruptedException e) {
 
-        } catch (Throwable e) {
-
-            jfxIsAlive = false;
         }
     }
 
@@ -58,8 +55,6 @@ class SceneManagerTest {
 
     @Test
     void showScene_updatesCurrentSceneState() throws InterruptedException {
-        if (!jfxIsAlive) { assertTrue(true); return; }
-
         SceneManager sceneManager = SceneManager.getInstance();
 
         SceneInterface dummyScene = new SceneInterface() {

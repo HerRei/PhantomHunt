@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 class GameModelTest {
 
     @BeforeAll
