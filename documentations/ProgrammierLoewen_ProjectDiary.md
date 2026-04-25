@@ -275,8 +275,12 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - Alle Schnittstellen wurden vereint und ein funktionierender prototyp erstellt.
 - Gui Wurde komplett neu erstellt so das man Spiel versteht.
 
-
-
+## 2026-04-21 - Alle##
+**Dauer:** ~1h
+**Ziel:** Debrefing für MS4 & Aufgabenverteilung MS5
+**Was gemacht:**
+- Wir haben die Resultate des MS4 besprochen. Welche Prozesse gut funktioneirt haben und welche noch zu verbessern sind.
+- Wir haben die Aufgaben für den MS5 verteilt.
 
 
 
