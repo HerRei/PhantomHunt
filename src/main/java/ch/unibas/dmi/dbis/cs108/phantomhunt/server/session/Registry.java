@@ -81,6 +81,7 @@ public final class Registry {
   }
 
   public String getHighscoreBoard() {
+    log.info(highscores.size());
     StringBuilder highscoreBoard = new StringBuilder("");
     for (int i = 0; i < highscores.size() && i < 10; i++) {
       highscoreBoard.append(i + 1).append(". ").append(highscores.get(i)).append("|");

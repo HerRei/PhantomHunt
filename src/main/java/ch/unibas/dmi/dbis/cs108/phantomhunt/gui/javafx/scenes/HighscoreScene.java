@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 public class HighscoreScene implements SceneInterface {
@@ -27,27 +26,17 @@ public class HighscoreScene implements SceneInterface {
     // --- Tabelle ---
     TableView<Map.Entry<String, Integer>> tableView = new TableView<>();
 
-    TableColumn<Map.Entry<String, Integer>, Integer> rankColumn = new TableColumn<>("Rank");
-    rankColumn.setCellValueFactory(
-        data -> {
-          int rank =
-              new ArrayList<>(GameModel.getInstance().getHighscores().entrySet())
-                      .indexOf(data.getValue())
-                  + 1;
-          return new SimpleIntegerProperty(rank).asObject();
-        });
-
     TableColumn<Map.Entry<String, Integer>, String> nameColumn = new TableColumn<>("Player");
     nameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getKey()));
 
     TableColumn<Map.Entry<String, Integer>, Integer> scoreColumn = new TableColumn<>("Score");
     scoreColumn.setCellValueFactory(
-        data -> new SimpleIntegerProperty(data.getValue().getValue()).asObject());
+            data -> new SimpleIntegerProperty(data.getValue().getValue()).asObject());
 
-    tableView.getColumns().addAll(rankColumn, nameColumn, scoreColumn);
+    tableView.getColumns().addAll(nameColumn, scoreColumn);
 
     ObservableList<Map.Entry<String, Integer>> entries =
-        FXCollections.observableArrayList(GameModel.getInstance().getHighscores().entrySet());
+            FXCollections.observableArrayList(GameModel.getInstance().getHighscores().entrySet());
     tableView.setItems(entries);
     tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -58,11 +47,10 @@ public class HighscoreScene implements SceneInterface {
 
     Button btnRefresh = new Button("🔄 Refresh");
     btnRefresh.setPrefWidth(120);
-    btnRefresh.setOnAction(
-        e -> {
-          createScene();
-          SceneManager.getInstance().showScene(SceneProtocol.HIGHSCORE);
-        });
+    btnRefresh.setOnAction(e -> {
+      createScene();
+      SceneManager.getInstance().showScene(SceneProtocol.HIGHSCORE);
+    });
 
     HBox buttonBar = new HBox(10, btnBack, btnRefresh);
     buttonBar.setAlignment(Pos.CENTER);

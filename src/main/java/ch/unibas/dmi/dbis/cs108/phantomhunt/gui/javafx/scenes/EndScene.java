@@ -22,7 +22,7 @@ public class EndScene implements SceneInterface {
   private final Scene scene;
   private Button lobbyButton;
   private Label winnerText;
-  private String winnerName;
+  TableView<Player> rankingTable;
 
   public EndScene() {
     GameModel model = GameModel.getInstance();
@@ -44,8 +44,7 @@ public class EndScene implements SceneInterface {
       finalScoreLabel.textProperty().bind(model.getScore().asString("%d"));
     }
 
-    // Tabelle — direkt an ObservableList gebunden, aktualisiert sich automatisch
-    TableView<Player> rankingTable = new TableView<>(model.getPlayers());
+    this.rankingTable = new TableView<>(model.getPlayers());
     rankingTable.setPrefHeight(200);
     rankingTable.setMaxWidth(300);
 
@@ -68,7 +67,7 @@ public class EndScene implements SceneInterface {
         "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 10 20;";
     lobbyButton.setStyle(buttonStyle);
     hubButton.setStyle(buttonStyle);
-    lobbyButton.setVisible(false); // standardmässig versteckt, bis LOBBY_INFO kommt
+    lobbyButton.setVisible(false);
 
     HBox buttonBox = new HBox(20, lobbyButton, hubButton);
     buttonBox.setAlignment(Pos.CENTER);
@@ -96,6 +95,7 @@ public class EndScene implements SceneInterface {
 
   public void updateWinner() {
     String winner = GameModel.getInstance().getWinner();
+    rankingTable = new TableView<>(GameModel.getInstance().getPlayers());
     Platform.runLater(
         () -> {
           winnerText.setText("The Winner is: " + (winner.isBlank() ? "Nobody" : winner));

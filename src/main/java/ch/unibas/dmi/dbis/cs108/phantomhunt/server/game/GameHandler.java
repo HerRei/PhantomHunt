@@ -50,7 +50,7 @@ public class GameHandler {
 
   /** Broadcasts current positions and roles to all clients in the lobby. */
   public void broadcastGameState() {
-    if (gameState.getPhase() != GamePhase.ROUND_RUNNING) {
+    if (gameState.getPhase() != GamePhase.ROUND_RUNNING && gameState.getPhase() != GamePhase.ROUND_ENDED) {
       return;
     }
     String payload =
@@ -295,8 +295,9 @@ public class GameHandler {
       for (PlayerState p : players) {
         Registry.getInstance().addHighscore(p.getNickname(), p.getScore());
       }
+      broadcastGameState();
       gameState.setPhase(GamePhase.MATCH_ENDED);
-      stopGameLoop(); // GameLoop stoppen!
+      stopGameLoop();
       lobby.broadcast(Packet.of(Command.GAME_FINISH));
       lobbyHandler.finishLobby(gameState.getMatchId());
       return;

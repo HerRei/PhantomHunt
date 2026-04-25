@@ -167,14 +167,18 @@ public class ServerHandler implements Runnable {
     }
 
     String text = p.text();
+    LOGGER.info(text);
     Map<String, Integer> highscores = new LinkedHashMap<>();
     String[] lines = text.split("\\|");
 
     for (String line : lines) {
       if (line.isEmpty()) continue;
-      String entry = line.split("\\.\\s*", 2)[1].trim();
+      String[] rankAndEntry = line.split("\\.\\s*", 2);
+      String rank = rankAndEntry[0].trim();
+      String entry = rankAndEntry[1].trim();
       String[] parts = entry.split(":\\s*", 2);
-      highscores.put(parts[0].trim(), Integer.parseInt(parts[1].trim()));
+      String name = rank + ". " + parts[0].trim();
+      highscores.put(name, Integer.parseInt(parts[1].trim()));
     }
     GameModel.getInstance().setHighscores(highscores);
   }
