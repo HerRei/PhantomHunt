@@ -14,8 +14,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Manages all lobbies on the server including creating, joining, leaving,
- * spectating lobbies, and transitioning to active games.
+ * Manages all lobbies on the server including creating, joining, leaving, spectating lobbies, and
+ * transitioning to active games.
  */
 public class LobbyHandler {
 
@@ -48,7 +48,6 @@ public class LobbyHandler {
     return Optional.ofNullable(waitingLobbies);
   }
 
-
   /**
    * Returning a comma-separated string with the IDs of the lobbies across all states.
    *
@@ -68,7 +67,7 @@ public class LobbyHandler {
     }
 
     // put together
-    return String.join(":", waitingNames) + ";"  + String.join(":", playingNames);
+    return String.join(":", waitingNames) + ";" + String.join(":", playingNames);
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -78,13 +77,14 @@ public class LobbyHandler {
   /**
    * Starts a game in the given lobby.
    *
-   * @param id        the ID of the lobby to start the game in
+   * @param id the ID of the lobby to start the game in
    * @param requester the client requesting the game start
    */
   public void startGame(String id, ClientHandler requester) {
     Optional<Lobby> lobbyOpt = findLobbyById(id, waitingLobbies);
     if (lobbyOpt.isEmpty()) {
-      requester.sendMessage(Packet.of(Command.REJECT, "Lobby not found or has already started: " + id));
+      requester.sendMessage(
+          Packet.of(Command.REJECT, "Lobby not found or has already started: " + id));
       return;
     }
 
@@ -97,12 +97,12 @@ public class LobbyHandler {
     Vector<ClientHandler> players = lobby.getPlayers().orElseThrow();
     if (players.size() != GameState.REQUIRED_PLAYER_COUNT) {
       requester.sendMessage(
-              Packet.of(
-                      Command.REJECT,
-                      "Not the right amount of players. Is: "
-                              + players.size()
-                              + ", required: "
-                              + GameState.REQUIRED_PLAYER_COUNT));
+          Packet.of(
+              Command.REJECT,
+              "Not the right amount of players. Is: "
+                  + players.size()
+                  + ", required: "
+                  + GameState.REQUIRED_PLAYER_COUNT));
       return;
     }
 
@@ -118,7 +118,7 @@ public class LobbyHandler {
     lobby.attachGame(gameHandler);
     waitingLobbies.remove(lobby);
     playingLobbies.add(lobby);
-    
+
     gameHandler.startMatch(System.currentTimeMillis());
     lobby.broadcastGameStart();
     gameHandler.startGameLoop();
@@ -150,13 +150,14 @@ public class LobbyHandler {
   /**
    * Joins a player to a lobby.
    *
-   * @param id     the ID of the lobby to join
+   * @param id the ID of the lobby to join
    * @param player the player to join the lobby
    */
   public void joinLobby(String id, ClientHandler player) {
     Optional<Lobby> lobbyOpt = findLobbyById(id, waitingLobbies);
     if (lobbyOpt.isEmpty()) {
-      player.sendMessage(Packet.of(Command.REJECT, "Lobby not found or has already started: " + id));
+      player.sendMessage(
+          Packet.of(Command.REJECT, "Lobby not found or has already started: " + id));
       return;
     }
 
@@ -169,7 +170,7 @@ public class LobbyHandler {
   /**
    * Allows a player to spectates a lobby.
    *
-   * @param id     the ID of the lobby to spectate
+   * @param id the ID of the lobby to spectate
    * @param player the player to spectate the lobby
    */
   public void spectateLobby(String id, ClientHandler player) {
@@ -188,7 +189,7 @@ public class LobbyHandler {
   /**
    * Removes a player or spectator from a lobby. If the lobby becomes empty, it is destroyed.
    *
-   * @param id     the ID of the lobby
+   * @param id the ID of the lobby
    * @param player the client to remove
    */
   public void leaveLobby(String id, ClientHandler player) {
@@ -199,11 +200,10 @@ public class LobbyHandler {
     if (lobby.removePlayer(player) || lobby.removeSpectator(player)) {
       player.setCurrentLobby(null);
 
-      boolean isEmpty = lobby.getPlayers().get().isEmpty()
-              && lobby.getSpectators().get().isEmpty();
+      boolean isEmpty = lobby.getPlayers().get().isEmpty() && lobby.getSpectators().get().isEmpty();
 
-      LOGGER.info("leaveLobby: isEmpty={}, waitingContains={}",
-              isEmpty, waitingLobbies.contains(lobby));
+      LOGGER.info(
+          "leaveLobby: isEmpty={}, waitingContains={}", isEmpty, waitingLobbies.contains(lobby));
 
       if (isEmpty && waitingLobbies.contains(lobby)) {
         waitingLobbies.remove(lobby);

@@ -9,8 +9,8 @@ import org.apache.logging.log4j.Logger;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Main entry point for the application.
- * Starts either the server or the JavaFX client based on command-line arguments.
+ * Main entry point for the application. Starts either the server or the JavaFX client based on
+ * command-line arguments.
  */
 public class Main {
 
@@ -22,14 +22,12 @@ public class Main {
   public static String nickname;
 
   // private constructor to prevent instantiation
-  private Main() {
-  }
+  private Main() {}
 
   /**
-   * The main method to start the application.
-   * It parses command-line arguments to start either a server or a client.
-   * For a client, it expects "client" and "host:port".
-   * For a server, it expects "server" and "port".
+   * The main method to start the application. It parses command-line arguments to start either a
+   * server or a client. For a client, it expects "client" and "host:port". For a server, it expects
+   * "server" and "port".
    *
    * @param args the command-line arguments
    */
@@ -38,7 +36,6 @@ public class Main {
     if (args.length >= 2) {
       switch (args[0]) {
         case "client" -> {
-
           try {
             String[] socketInput = args[1].split(":");
             String host = socketInput[0];
@@ -47,7 +44,7 @@ public class Main {
             // Make parameters ready for GUI
             targetHost = host;
             targetPort = port;
-            if (args.length >= 3){
+            if (args.length >= 3) {
               nickname = args[2];
             }
             connect(host, port, args);
@@ -83,13 +80,15 @@ public class Main {
    */
   public static void startServer(int port) {
     LOGGER.info("Starting Server...");
-    CountDownLatch serverReadySignal = new CountDownLatch(1); //used to know when server ready
+    CountDownLatch serverReadySignal = new CountDownLatch(1); // used to know when server ready
 
     // Start Server via thread
-    Thread serverThread = new Thread(() -> {
-      TcpServer server = new TcpServer(port, serverReadySignal);
-      server.start();
-    });
+    Thread serverThread =
+        new Thread(
+            () -> {
+              TcpServer server = new TcpServer(port, serverReadySignal);
+              server.start();
+            });
     serverThread.start();
   }
 

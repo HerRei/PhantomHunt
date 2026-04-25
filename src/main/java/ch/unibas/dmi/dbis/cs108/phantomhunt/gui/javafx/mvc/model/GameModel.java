@@ -16,9 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Holds all the important data for the game.
- * This includes the player list, chat messages, and game maps.
- * Operates as a Singleton
+ * Holds all the important data for the game. This includes the player list, chat messages, and game
+ * maps. Operates as a Singleton
  */
 @SuppressWarnings("java:S6548")
 public class GameModel {
@@ -62,6 +61,7 @@ public class GameModel {
 
   /**
    * Updates the local game state based on the server's broadcast.
+   *
    * @param payload The raw string from the GSU packet
    */
   public void updatePlayersFromServer(String payload) {
@@ -70,7 +70,7 @@ public class GameModel {
     if (sections.length < 3) return;
     int currentRound = Integer.parseInt(sections[0]);
     int timeRemaining = Integer.parseInt(sections[1]);
-    remainingTime.set(timeRemaining/1000);
+    remainingTime.set(timeRemaining / 1000);
     int previousRound = round.get();
     if (previousRound != 0 && currentRound != previousRound) {
       SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
@@ -101,9 +101,7 @@ public class GameModel {
     }
   }
 
-  /**
-   * Updates the local list of lobbies when the server sends new data
-   */
+  /** Updates the local list of lobbies when the server sends new data */
   public void updateLobbyList(List<String> runningLobbys, List<String> waitingLobbys) {
     this.availableLobbies.setAll(waitingLobbys);
     this.runningLobbies.setAll(runningLobbys);
@@ -111,16 +109,19 @@ public class GameModel {
 
   private void updateOrAddPlayer(String name, String role, double x, double y, int score) {
     // Search for player by nickname
-    Player player = lobbyPlayers.stream()
+    Player player =
+        lobbyPlayers.stream()
             .filter(p -> p.nameProperty().get().equals(name))
             .findFirst()
             .orElse(null);
 
     if (player != null) {
 
-      //sound logic - this should not be here - but i dont see why this becoems an issue...
+      // sound logic - this should not be here - but i dont see why this becoems an issue...
       boolean wasMoving = player.getMoved();
-      boolean moved = Double.compare(player.getXPosition(), x) != 0 || Double.compare(player.getYPosition(), y) != 0;
+      boolean moved =
+          Double.compare(player.getXPosition(), x) != 0
+              || Double.compare(player.getYPosition(), y) != 0;
       boolean isLocalPlayer = name.equals(playerName.get());
 
       if (isLocalPlayer) {
@@ -156,7 +157,8 @@ public class GameModel {
     try {
       Image gameMapImage = new Image(getClass().getResourceAsStream("/assets/map_concept.png"));
       setGameMap(gameMapImage);
-      Image collisionMapImage = new Image(getClass().getResourceAsStream("/assets/map_collision_concept.png"));
+      Image collisionMapImage =
+          new Image(getClass().getResourceAsStream("/assets/map_collision_concept.png"));
       setCollisionMap(collisionMapImage);
       LOGGER.info("Maps loaded successfully.");
     } catch (Exception e) {
@@ -196,7 +198,6 @@ public class GameModel {
     return chatMessages;
   }
 
-
   /**
    * @return The list of lobby chat messages.
    */
@@ -204,32 +205,27 @@ public class GameModel {
     return lobbyChatMessages;
   }
 
-  /**
-   * Clears all messages from the chat.
-   */
+  /** Clears all messages from the chat. */
   public void clearChat() {
     Platform.runLater(chatMessages::clear);
   }
 
-  /**
-   * Clears all messages from the lobby chat.
-   */
+  /** Clears all messages from the lobby chat. */
   public void clearLobbyChat() {
     Platform.runLater(lobbyChatMessages::clear);
   }
 
   // ---GETTERS---
 
-  public String getWinner(){
+  public String getWinner() {
     LOGGER.info(lobbyPlayers);
     int max = 0;
     String winnerName = "";
-    for(Player p: getPlayers()){
-      if(p.getScore()>max){
+    for (Player p : getPlayers()) {
+      if (p.getScore() > max) {
         winnerName = p.getName();
         max = p.getScore();
-      }
-      else if(p.getScore() == max){
+      } else if (p.getScore() == max) {
         winnerName += ", " + p.getName();
       }
     }
@@ -280,14 +276,18 @@ public class GameModel {
     return collisionMap;
   }
 
-  public Map<String, Integer> getHighscores() {return highscores;}
+  public Map<String, Integer> getHighscores() {
+    return highscores;
+  }
 
   // ---SETTERS---
   public void setName(String name) {
     playerName.set(name);
   }
 
-  public void setAbility(Boolean value){ humanAbility.set(value);}
+  public void setAbility(Boolean value) {
+    humanAbility.set(value);
+  }
 
   public void setGameMap(Image gameMap) {
     this.gameMap.set(gameMap);
@@ -296,8 +296,10 @@ public class GameModel {
   public void setCollisionMap(Image collisionMap) {
     this.collisionMap.set(collisionMap);
   }
-  
-  public void setHighscores(Map<String, Integer> highscores) {this.highscores = highscores;}
+
+  public void setHighscores(Map<String, Integer> highscores) {
+    this.highscores = highscores;
+  }
 
   /**
    * updates direction of the player

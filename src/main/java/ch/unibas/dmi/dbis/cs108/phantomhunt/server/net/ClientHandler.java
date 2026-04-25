@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Handles the connection to a single client on the server. Listens for incoming packets, processes
  * them, and can send packets back.
- * <p>
- * <b>Attention:</b> Please refrain from putting any GameLogic into this class.
- * It should mainly handle Socket reading, Packet decoding, and sending.
+ *
+ * <p><b>Attention:</b> Please refrain from putting any GameLogic into this class. It should mainly
+ * handle Socket reading, Packet decoding, and sending.
  */
 public class ClientHandler implements Runnable {
 
@@ -49,8 +49,8 @@ public class ClientHandler implements Runnable {
   /**
    * Creates a new handler for a connected client.
    *
-   * @param socket       The socket connection to the client.
-   * @param registry     The server registry that manages all connected players.
+   * @param socket The socket connection to the client.
+   * @param registry The server registry that manages all connected players.
    * @param lobbyHandler The handler for managing lobbies.
    */
   public ClientHandler(Socket socket, Registry registry, LobbyHandler lobbyHandler) {
@@ -121,9 +121,7 @@ public class ClientHandler implements Runnable {
   // Packet Handlers & Helper Methods
   // ---------------------------------------------------------------------------------------------
 
-  /**
-   * Unregisters the client and closes the underlying socket connection.
-   */
+  /** Unregisters the client and closes the underlying socket connection. */
   public void disconnect() {
     if (scheduler != null && !scheduler.isShutdown()) {
       scheduler.shutdownNow();
@@ -144,26 +142,26 @@ public class ClientHandler implements Runnable {
     sendPlayers();
   }
 
-  /**
-   * Starts periodic ping checks and disconnects the client if no pong arrives in time.
-   */
+  /** Starts periodic ping checks and disconnects the client if no pong arrives in time. */
   private void startPinging() {
     sendMessage(Packet.of(Command.PING));
     this.scheduler = Executors.newSingleThreadScheduledExecutor();
-    scheduler.scheduleAtFixedRate(() -> {
-      long now = System.currentTimeMillis();
-      if (now - lastSeen > 16000) {
-        LOGGER.warn("Ping timeout for {}, client kicked.", name);
-        disconnect();
-      } else {
-        sendMessage(Packet.of(Command.PING));
-      }
-    }, 15, 15, TimeUnit.SECONDS);
+    scheduler.scheduleAtFixedRate(
+        () -> {
+          long now = System.currentTimeMillis();
+          if (now - lastSeen > 16000) {
+            LOGGER.warn("Ping timeout for {}, client kicked.", name);
+            disconnect();
+          } else {
+            sendMessage(Packet.of(Command.PING));
+          }
+        },
+        15,
+        15,
+        TimeUnit.SECONDS);
   }
 
-  /**
-   * Updates the last-seen timestamp after a pong response from the client.
-   */
+  /** Updates the last-seen timestamp after a pong response from the client. */
   private void handlePong() {
     lastSeen = System.currentTimeMillis();
     LOGGER.trace("Received pong from {}", name);
@@ -180,7 +178,7 @@ public class ClientHandler implements Runnable {
     registry.broadcast(this, Packet.of(Command.UNICOM, getName() + ": " + msg));
   }
 
-  private void handleLobbyList(){
+  private void handleLobbyList() {
     sendMessage(Packet.of(Command.LIST_LOBBY, lobbyHandler.getLobbies()));
   }
 
@@ -196,10 +194,10 @@ public class ClientHandler implements Runnable {
     }
     String lobbyName = String.join(" ", p.args());
     lobbyName = lobbyName.trim();
-    lobbyName = lobbyName.replace(" ","");
-    lobbyName = lobbyName.replace(":","");
-    lobbyName = lobbyName.replace(";","");
-    if (lobbyName.isBlank()){
+    lobbyName = lobbyName.replace(" ", "");
+    lobbyName = lobbyName.replace(":", "");
+    lobbyName = lobbyName.replace(";", "");
+    if (lobbyName.isBlank()) {
       return;
     }
     LOGGER.info("MKL from {}: {}", name, lobbyName);
@@ -240,9 +238,7 @@ public class ClientHandler implements Runnable {
     lobbyHandler.spectateLobby(lobbyId, this);
   }
 
-  /**
-   * Sends a goodbye message and disconnects the client.
-   */
+  /** Sends a goodbye message and disconnects the client. */
   private void handleLogout() {
     LOGGER.info("Logging out {}.", name);
     sendMessage(Packet.of(Command.UNICOM, "Okay, Bye."));
@@ -288,7 +284,8 @@ public class ClientHandler implements Runnable {
   private void handleWhisper(Packet p) {
     String[] args = p.args().get(0).split(" ", 2);
     if (args.length < 2) {
-      sendMessage(Packet.of(Command.REJECT, "Invalid whisper format. Use: WHISPER <user> <message>"));
+      sendMessage(
+          Packet.of(Command.REJECT, "Invalid whisper format. Use: WHISPER <user> <message>"));
       return;
     }
     String target = args[0];
@@ -382,7 +379,8 @@ public class ClientHandler implements Runnable {
     }
     sendMessage(Packet.of(Command.WELCOME, this.name));
     if (oldName != null) {
-      registry.broadcast(this, Packet.of(Command.INFO, oldName + ": changed nickname to -> " + this.name));
+      registry.broadcast(
+          this, Packet.of(Command.INFO, oldName + ": changed nickname to -> " + this.name));
     } else {
       registry.broadcast(this, Packet.of(Command.INFO, "Welcome to the Server: " + this.name));
     }
@@ -421,8 +419,12 @@ public class ClientHandler implements Runnable {
    */
   @Override
   public void run() {
-    try (var in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-         var out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
+    try (var in =
+            new BufferedReader(
+                new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        var out =
+            new BufferedWriter(
+                new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
       this.out = out;
       registry.register(this);
       LOGGER.info("New client connected: {}", name);

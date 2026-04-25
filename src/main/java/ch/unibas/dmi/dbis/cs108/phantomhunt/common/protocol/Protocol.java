@@ -5,16 +5,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-/**
- * Translates between strings and packet objects.
- */
+/** Translates between strings and packet objects. */
 public class Protocol {
 
   private static final Logger LOGGER = LogManager.getLogger(Protocol.class);
 
-  /**
-   * Translates between strings and packet objects.
-   */
+  /** Translates between strings and packet objects. */
   private Protocol() {}
 
   /**

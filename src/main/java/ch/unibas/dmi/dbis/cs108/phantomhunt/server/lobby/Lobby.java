@@ -7,25 +7,23 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 /**
- * Represents a lobby where players can gather before starting a game.
- * A lobby has a unique ID, a name, a host, and a list of players and spectators.
- * It also manages the game associated with the lobby.
+ * Represents a lobby where players can gather before starting a game. A lobby has a unique ID, a
+ * name, a host, and a list of players and spectators. It also manages the game associated with the
+ * lobby.
  */
 import java.util.Optional;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
- * Represents a lobby where players can gather before starting a game.
- * A lobby has a unique ID, a name, a host, and a list of players and spectators.
- * It also manages the game associated with the lobby.
+ * Represents a lobby where players can gather before starting a game. A lobby has a unique ID, a
+ * name, a host, and a list of players and spectators. It also manages the game associated with the
+ * lobby.
  */
 public class Lobby {
 
   private static final Logger LOGGER = LogManager.getLogger(Lobby.class);
-
 
   private final Vector<ClientHandler> players = new Vector<>();
   private final Vector<ClientHandler> spectators = new Vector<>();
@@ -33,6 +31,7 @@ public class Lobby {
   private final String name;
   public ClientHandler host;
   private GameHandler activeGame;
+
   // ---------------------------------------------------------------------------------------------
   // Constructor
   // ---------------------------------------------------------------------------------------------
@@ -40,7 +39,7 @@ public class Lobby {
   /**
    * Creates a new lobby with the given name and host.
    *
-   * @param id   the unique ID of the lobby
+   * @param id the unique ID of the lobby
    * @param name the name of the lobby
    * @param host the host of the lobby
    */
@@ -57,10 +56,11 @@ public class Lobby {
   // Getters & Setters
   // ---------------------------------------------------------------------------------------------
 
-  public boolean isTheGameRunning() { //this was here for debugging but should not be used as its just a redirecrted api call
+  public boolean
+      isTheGameRunning() { // this was here for debugging but should not be used as its just a
+                           // redirecrted api call
     return activeGame != null && activeGame.gameIsRunning();
   }
-
 
   public void attachGame(GameHandler gameHandler) {
     this.activeGame = gameHandler;
@@ -178,13 +178,10 @@ public class Lobby {
     return true;
   }
 
-  /**
-   * Broadcasts the current lobby information to all players in the lobby.
-   */
+  /** Broadcasts the current lobby information to all players in the lobby. */
   public void broadcastLobbyInfo() {
-    String playerNames = players.stream()
-            .map(ClientHandler::getName)
-            .collect(Collectors.joining(" "));
+    String playerNames =
+        players.stream().map(ClientHandler::getName).collect(Collectors.joining(" "));
     String packetText = id + " " + playerNames;
     Packet packet = Packet.of(Command.LOBBY_INFO, packetText);
     for (ClientHandler player : players) {
@@ -192,9 +189,7 @@ public class Lobby {
     }
   }
 
-  /**
-   * Broadcasts a game start message to all players in the lobby.
-   */
+  /** Broadcasts a game start message to all players in the lobby. */
   public void broadcastGameStart() {
     Packet packet = Packet.of(Command.GAME_START);
     for (ClientHandler player : players) {
@@ -202,9 +197,7 @@ public class Lobby {
     }
   }
 
-  /**
-   * Sends a packet to everyone in this lobby.
-   */
+  /** Sends a packet to everyone in this lobby. */
   public void broadcast(Packet packet) {
     // Send to active players
     for (ClientHandler player : players) {

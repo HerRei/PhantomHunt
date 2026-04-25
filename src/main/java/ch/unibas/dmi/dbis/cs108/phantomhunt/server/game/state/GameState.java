@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Thread-safe central state repository for a single match.
- * Holds all data regarding players, the map, rounds, and rules
+ * Thread-safe central state repository for a single match. Holds all data regarding players, the
+ * map, rounds, and rules
  */
 public class GameState {
   public static final int REQUIRED_PLAYER_COUNT = 4;
@@ -26,8 +26,8 @@ public class GameState {
    * Constructs a new GameState for a match.
    *
    * @param matchId A unique identifier for this specific match.
-   * @param rules   defining how this match should be played.
-   * @param map     2D array representing the map.
+   * @param rules defining how this match should be played.
+   * @param map 2D array representing the map.
    * @param players A list representing the players.
    */
   public GameState(String matchId, GameRules rules, Boolean[][] map, List<PlayerState> players) {
@@ -37,20 +37,20 @@ public class GameState {
     this.players = new ArrayList<>(Objects.requireNonNull(players, "players must not be null"));
     if (this.players.size() != REQUIRED_PLAYER_COUNT) {
       throw new IllegalArgumentException(
-              "A match requires exactly " + REQUIRED_PLAYER_COUNT + " players.");
+          "A match requires exactly " + REQUIRED_PLAYER_COUNT + " players.");
     }
     this.phase = GamePhase.WAITING_TO_START;
     this.roundState = new RoundState(0, -1, 0L, 0L);
     this.lastRoundOutcome = null;
   }
 
-  /**
-   * Checks whether a circular player hitbox collides with a wall or map boundary.
-   */
+  /** Checks whether a circular player hitbox collides with a wall or map boundary. */
   public synchronized boolean isColliding(double x, double y, double radius) {
     // Check bounds of the map first
-    if (x - radius < 0 || x + radius >= getMapWidth() ||
-            y - radius < 0 || y + radius >= getMapHeight()) {
+    if (x - radius < 0
+        || x + radius >= getMapWidth()
+        || y - radius < 0
+        || y + radius >= getMapHeight()) {
       return true;
     }
 
@@ -70,23 +70,22 @@ public class GameState {
     return false;
   }
 
-  /**
-   * Serializes current player states for network transmission.
-   */
+  /** Serializes current player states for network transmission. */
   public synchronized String getSerializedPlayers() {
     return players.stream()
-            .map(p -> String.format("%s:%s:%.2f:%.2f:%s",
+        .map(
+            p ->
+                String.format(
+                    "%s:%s:%.2f:%.2f:%s",
                     p.getNickname(),
                     p.getRole().name(),
                     p.getPosition().getX(),
                     p.getPosition().getY(),
                     p.getScore()))
-            .collect(Collectors.joining(";"));
+        .collect(Collectors.joining(";"));
   }
 
-  /**
-   * Retrieves a safe snapshot of a player's current state.
-   */
+  /** Retrieves a safe snapshot of a player's current state. */
   public synchronized Optional<PlayerState> findPlayer(String playerId) {
     for (PlayerState player : players) {
       if (player.getPlayerId().equals(playerId)) {
@@ -96,24 +95,18 @@ public class GameState {
     return Optional.empty();
   }
 
-  /**
-   * Retrieves a safe snapshot of the current human player.
-   */
+  /** Retrieves a safe snapshot of the current human player. */
   public synchronized PlayerState getHumanPlayer() {
     ensureAtLeastOneRoundStarted();
     return players.get(roundState.getHumanIndex()).copy();
   }
 
-  /**
-   * Returns the remaining round time in milliseconds.
-   */
+  /** Returns the remaining round time in milliseconds. */
   public synchronized long getRoundTimeRemaining() {
     return Math.max(0, roundState.getRoundEndTimeMillis() - System.currentTimeMillis());
   }
 
-  /**
-   * Retrieves safe snapshots of all current phantom players.
-   */
+  /** Retrieves safe snapshots of all current phantom players. */
   public synchronized List<PlayerState> getPhantomPlayers() {
     ensureAtLeastOneRoundStarted();
     List<PlayerState> phantoms = new ArrayList<>();
@@ -125,9 +118,7 @@ public class GameState {
     return phantoms;
   }
 
-  /**
-   * Retrieves the mutable player state for internal server modifications.
-   */
+  /** Retrieves the mutable player state for internal server modifications. */
   public synchronized PlayerState requireMutablePlayer(String playerId) {
     for (PlayerState player : players) {
       if (player.getPlayerId().equals(playerId)) {
@@ -145,9 +136,13 @@ public class GameState {
     return players.size();
   }
 
-  public int getHumanCatchBonus(){return rules.humanCatchBonus();}
+  public int getHumanCatchBonus() {
+    return rules.humanCatchBonus();
+  }
 
-  public synchronized List<PlayerState> getPlayers() {return this.players;}
+  public synchronized List<PlayerState> getPlayers() {
+    return this.players;
+  }
 
   public synchronized RoundState getMutableRoundState() {
     return roundState;
@@ -165,9 +160,7 @@ public class GameState {
     this.lastRoundOutcome = null;
   }
 
-  /**
-   * Returns a complete, detached copy of all players.
-   */
+  /** Returns a complete, detached copy of all players. */
   public synchronized List<PlayerState> getPlayersSnapshot() {
     List<PlayerState> copy = new ArrayList<>();
     for (PlayerState player : players) {
@@ -269,9 +262,6 @@ public class GameState {
     return copy;
   }
 
-  /**
-   * Initial data required to seed a player into the game.
-   */
-  public record PlayerSeed(String playerId, String nickname) {
-  }
+  /** Initial data required to seed a player into the game. */
+  public record PlayerSeed(String playerId, String nickname) {}
 }

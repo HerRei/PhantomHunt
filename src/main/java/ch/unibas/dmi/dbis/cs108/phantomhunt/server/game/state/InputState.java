@@ -1,8 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 
-/**
- * Represents the current movement intentions of a player based on their client input.
- */
+/** Represents the current movement intentions of a player based on their client input. */
 public final class InputState {
   private final int vertical;
   private final int horizontal;
@@ -10,8 +8,8 @@ public final class InputState {
   /**
    * Constructs a new InputState with the specified directional intentions.
    *
-   * @param vertical    -1 if player moves upwards, 1 upwards, 0 otherwise.
-   * @param horizontal  -1 if player moves to the left, 1 to the right, 0 otherwise.
+   * @param vertical -1 if player moves upwards, 1 upwards, 0 otherwise.
+   * @param horizontal -1 if player moves to the left, 1 to the right, 0 otherwise.
    */
   public InputState(int vertical, int horizontal) {
     this.vertical = vertical;
@@ -43,16 +41,20 @@ public final class InputState {
     return horizontal == 1;
   }
 
-  public int getHorizontal(){return horizontal;}
+  public int getHorizontal() {
+    return horizontal;
+  }
 
-  public int getVertical(){return vertical;}
+  public int getVertical() {
+    return vertical;
+  }
 
-  public boolean isMoving(){
-      return !(horizontal == 0) || !(vertical == 0);
+  public boolean isMoving() {
+    return !(horizontal == 0) || !(vertical == 0);
   }
 
   @Override
   public String toString() {
-    return "InputState{vertical=" + vertical + ", horizontal=" + horizontal +"}";
+    return "InputState{vertical=" + vertical + ", horizontal=" + horizontal + "}";
   }
 }

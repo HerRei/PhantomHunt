@@ -14,21 +14,20 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * Manages all connected clients and their nicknames.
- * It provides methods to broadcast messages to everyone, send lobby messages, or send private whispers.
+ * Manages all connected clients and their nicknames. It provides methods to broadcast messages to
+ * everyone, send lobby messages, or send private whispers.
  */
 public final class Registry {
 
   // hash map that is thread safe as we dont want a O(n) lookup with e.g. vector that is also
   // threadsafe.
 
-  private static final Logger log =
-          LogManager.getLogger(
-                  Registry.class);
+  private static final Logger log = LogManager.getLogger(Registry.class);
   private static Registry instance;
-  private final Vector<ClientHandler> sessions = new Vector<>(); //zwar O(n) for get but easier to work with than the hashMap with a dummy.
+  private final Vector<ClientHandler> sessions =
+      new Vector<>(); // zwar O(n) for get but easier to work with than the hashMap with a dummy.
   private final ConcurrentHashMap<String, ClientHandler> byName =
-          new ConcurrentHashMap<>(); // Nickname handling
+      new ConcurrentHashMap<>(); // Nickname handling
   private final Vector<Highscore> highscores = new Vector<>();
 
   public static Registry getInstance() {
@@ -90,11 +89,11 @@ public final class Registry {
   }
 
   /**
-   * Assign a requested nickname to a client.
-   * If the name is taken, it appends a number to ensure uniqueness.
+   * Assign a requested nickname to a client. If the name is taken, it appends a number to ensure
+   * uniqueness.
    *
    * @param requestedName Name the player wants
-   * @param h             Client handler requesting the name
+   * @param h Client handler requesting the name
    * @return final unique nickname
    */
   public String claimName(String requestedName, ClientHandler h) {
@@ -121,14 +120,15 @@ public final class Registry {
    * @return a list of all names as a string
    */
   public String names() {
-    return String.join(" ", byName.keySet()); // this should return all the people that are in the registry
+    return String.join(
+        " ", byName.keySet()); // this should return all the people that are in the registry
   }
 
   /**
    * Makes nickname available.
    *
    * @param name Nickname to release.
-   * @param h    Client handler with this nickname.
+   * @param h Client handler with this nickname.
    */
   public void releaseName(String name, ClientHandler h) {
     if (name != null & !name.isBlank()) {
@@ -162,14 +162,15 @@ public final class Registry {
    * Send messages to all connected clients.
    *
    * @param sender Client who send the broadcast.
-   * @param p      message to send.
+   * @param p message to send.
    */
   public void broadcast(ClientHandler sender, Packet p) {
     log.debug("Registry broadcast packet from {}: {}", sender.getName(), p.cmd());
     String str = Protocol.encode(p);
     for (ClientHandler h : sessions) {
-      //if (h == sender) continue; //this will lead to errors later as the sender doesn't get its own packages again...!
-      //section should be unnecessary, the sender will always receive his own messages as well
+      // if (h == sender) continue; //this will lead to errors later as the sender doesn't get its
+      // own packages again...!
+      // section should be unnecessary, the sender will always receive his own messages as well
       h.sendMessage(p);
     }
   }
@@ -185,7 +186,8 @@ public final class Registry {
     Lobby senderLobby = sender.getCurrentLobby();
 
     if (senderLobby == null) {
-      sender.sendMessage(Packet.of(Command.REJECT, "You are not in a lobby, what are you \" yapping \""));
+      sender.sendMessage(
+          Packet.of(Command.REJECT, "You are not in a lobby, what are you \" yapping \""));
       return;
     }
 
@@ -201,7 +203,7 @@ public final class Registry {
    *
    * @param sender Client handler sending the message.
    * @param targetName Nickname of the receiver.
-   * @param message    The text.
+   * @param message The text.
    * @return true if the whisper was successfully sent, false if the target was not found.
    */
   public boolean whisper(ClientHandler sender, String targetName, String message) {

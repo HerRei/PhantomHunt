@@ -9,9 +9,8 @@ import org.apache.logging.log4j.Logger;
 import java.util.function.Consumer;
 
 /**
- * Client-side application wrapper used by the GUI.
- * It manages the TCP client connection and exposes helper methods for nickname changes,
- * global chat, whispers and logout.
+ * Client-side application wrapper used by the GUI. It manages the TCP client connection and exposes
+ * helper methods for nickname changes, global chat, whispers and logout.
  */
 public class ClientApp {
 
@@ -26,12 +25,9 @@ public class ClientApp {
   private static volatile Consumer<String> whisperMessageListener;
   private static volatile Consumer<String> lobbyMessageListener;
 
-  /**
-   * Creates a client app that connects to the default host and port.
-   */
+  /** Creates a client app that connects to the default host and port. */
   public ClientApp() {
     this(DEFAULT_HOST, DEFAULT_PORT);
-
   }
 
   /**
@@ -46,8 +42,8 @@ public class ClientApp {
   }
 
   /**
-   * Helper method to safely send a packet to the server if the connection is active.
-   * Centralizes the null-check to avoid code duplication.
+   * Helper method to safely send a packet to the server if the connection is active. Centralizes
+   * the null-check to avoid code duplication.
    *
    * @param packet the packet to be sent
    */
@@ -79,7 +75,7 @@ public class ClientApp {
    *
    * @param confirmedNickname nickname accepted by the server
    */
-  public static void setConfirmedNickname(String confirmedNickname) { //setter
+  public static void setConfirmedNickname(String confirmedNickname) { // setter
     ClientApp.confirmedNickname = confirmedNickname;
   }
 
@@ -88,10 +84,9 @@ public class ClientApp {
    *
    * @return confirmed nickname, or {@code null} if no nickname was confirmed yet
    */
-  public static String getConfirmedNickname() { //getter
+  public static String getConfirmedNickname() { // getter
     return confirmedNickname;
   }
-
 
   /**
    * Sends a global chat message to the server.
@@ -152,7 +147,7 @@ public class ClientApp {
    * Sends a private whisper message to another user.
    *
    * @param targetUser nickname of the whisper recipient
-   * @param message    whisper text
+   * @param message whisper text
    */
   public void sendWhisper(String targetUser, String message) {
     if (targetUser == null || targetUser.isBlank() || message == null || message.isBlank()) {
@@ -209,18 +204,17 @@ public class ClientApp {
       return;
     }
 
-    sendPacket(Packet.of(Command.SPEC,lobbyId));
+    sendPacket(Packet.of(Command.SPEC, lobbyId));
   }
 
-  /**
-   * Sends a logout request to the server.
-   */
+  /** Sends a logout request to the server. */
   public void logout() {
     // Null-Check added
     if (tcpClient.getServerHandler() != null) {
       tcpClient.getServerHandler().sendMessage(Packet.of(Command.LOGOUT));
     }
   }
+
   /**
    * Gets the underlying TCP client.
    *

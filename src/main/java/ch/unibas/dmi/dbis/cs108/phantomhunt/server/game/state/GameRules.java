@@ -1,8 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 
-/**
- * Defines the immutable configuration and parameters for a match
- */
+/** Defines the immutable configuration and parameters for a match */
 public record GameRules(
     int totalRounds,
     long roundDurationMillis,
@@ -36,16 +34,6 @@ public record GameRules(
    * @return A GameRules instance with default parameters.
    */
   public static GameRules defaultRules() {
-    return new GameRules(
-        4,
-        50000,
-        6.0,
-        100.0,
-        1,
-        50,
-        10,
-        10,
-        3,
-        10);
+    return new GameRules(4, 50000, 6.0, 100.0, 1, 50, 10, 10, 3, 10);
   }
 }

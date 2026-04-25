@@ -9,8 +9,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 
 /**
- * Enhanced JoinLobbyScene that displays available and running lobbies from the GameModel.
- * Allows joining via list selection or manual ID entry.
+ * Enhanced JoinLobbyScene that displays available and running lobbies from the GameModel. Allows
+ * joining via list selection or manual ID entry.
  */
 public class JoinLobbyScene extends AbstractInputScene {
 
@@ -22,9 +22,7 @@ public class JoinLobbyScene extends AbstractInputScene {
     setupLobbyLists();
   }
 
-  /**
-   * Initializes the ListViews and binds them to the GameModel's observable lists.
-   */
+  /** Initializes the ListViews and binds them to the GameModel's observable lists. */
   private void setupLobbyLists() {
     GameModel model = GameModel.getInstance();
 
@@ -63,16 +61,18 @@ public class JoinLobbyScene extends AbstractInputScene {
   @Override
   protected void setupEvents() {
     // Join logic
-    confirmButton.setOnAction(e -> {
-      String lobbyId = inputField.getText().trim();
-      if (!lobbyId.isEmpty()) {
-        EventHandlers.getInstance().sendMessage(Command.CHECKIN, lobbyId);
-      }
-    });
+    confirmButton.setOnAction(
+        e -> {
+          String lobbyId = inputField.getText().trim();
+          if (!lobbyId.isEmpty()) {
+            EventHandlers.getInstance().sendMessage(Command.CHECKIN, lobbyId);
+          }
+        });
 
     // Navigation back
-    backButton.setOnAction(e -> {
-      SceneManager.getInstance().showScene(SceneProtocol.HOME);
-    });
+    backButton.setOnAction(
+        e -> {
+          SceneManager.getInstance().showScene(SceneProtocol.HOME);
+        });
   }
 }

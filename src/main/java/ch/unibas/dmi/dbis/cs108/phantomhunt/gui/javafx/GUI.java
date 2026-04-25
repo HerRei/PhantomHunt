@@ -9,17 +9,14 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-/**
- * Main Entry Point for the JavaFX Application.
- * Manages the lifecycle and links Singletons.
- */
+/** Main Entry Point for the JavaFX Application. Manages the lifecycle and links Singletons. */
 public class GUI extends Application {
 
   /**
    * Initializes the primary stage, sets up the scene infrastructure, and launches the UI.
    *
-   * @param primaryStage the primary stage for this application, onto which
-   *                     the application scene can be set.
+   * @param primaryStage the primary stage for this application, onto which the application scene
+   *     can be set.
    */
   @Override
   public void start(Stage primaryStage) {
@@ -55,8 +52,8 @@ public class GUI extends Application {
   }
 
   /**
-   * Fallback entry point for the JavaFX application.
-   * This is primarily used to launch the app from IDEs that don't fully support JavaFX natively.
+   * Fallback entry point for the JavaFX application. This is primarily used to launch the app from
+   * IDEs that don't fully support JavaFX natively.
    *
    * @param args command line arguments
    */

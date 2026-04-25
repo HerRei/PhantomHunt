@@ -1,8 +1,8 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.sound;
 
 /**
- * Defines the available sound effects for the game.
- * Each sound effect includes its file path, looping behavior, and base volume (gain).
+ * Defines the available sound effects for the game. Each sound effect includes its file path,
+ * looping behavior, and base volume (gain).
  */
 public enum SoundEffect {
 

@@ -10,9 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Singleton manager responsible for handling and switching between JavaFX scenes.
- */
+/** Singleton manager responsible for handling and switching between JavaFX scenes. */
 public class SceneManager {
   private static final Logger LOGGER = LogManager.getLogger(SceneManager.class);
   private static SceneManager instance;
@@ -20,8 +18,7 @@ public class SceneManager {
   private SceneProtocol currentScene;
   private final Map<SceneProtocol, SceneInterface> scenes = new HashMap<>();
 
-  private SceneManager() {
-  } // Private constructor
+  private SceneManager() {} // Private constructor
 
   /**
    * Retrieves the singleton instance of the SceneManager.
@@ -47,7 +44,7 @@ public class SceneManager {
   /**
    * Registers a new scene with the manager.
    *
-   * @param type  the protocol enum identifying the scene
+   * @param type the protocol enum identifying the scene
    * @param scene the scene interface implementation
    */
   public void addScene(SceneProtocol type, SceneInterface scene) {
@@ -55,8 +52,8 @@ public class SceneManager {
   }
 
   /**
-   * Switches the active scene on the primary stage.
-   * Automatically executes on the JavaFX Application Thread.
+   * Switches the active scene on the primary stage. Automatically executes on the JavaFX
+   * Application Thread.
    *
    * @param type the protocol enum identifying the scene to show
    */
@@ -64,21 +61,25 @@ public class SceneManager {
     SceneInterface myScene = scenes.get(type);
     if (myScene != null) {
       this.currentScene = type;
-      Platform.runLater(() -> {
-        if (stageRef != null) {
-          stageRef.setScene(myScene.getScene());
-          stageRef.show();
-        } else {
-          LOGGER.error("Stage reference is null. Did you forget to call setStage()?");
-        }
-      });
+      Platform.runLater(
+          () -> {
+            if (stageRef != null) {
+              stageRef.setScene(myScene.getScene());
+              stageRef.show();
+            } else {
+              LOGGER.error("Stage reference is null. Did you forget to call setStage()?");
+            }
+          });
 
     } else {
       LOGGER.error("Tried to show a scene that doesn't exist: {}", type);
     }
   }
 
-  public SceneProtocol getCurrentScene() {return currentScene;}
+  public SceneProtocol getCurrentScene() {
+    return currentScene;
+  }
+
   public SceneInterface getScene(SceneProtocol type) {
     return scenes.get(type);
   }

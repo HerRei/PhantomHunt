@@ -14,105 +14,109 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LobbyTest {
 
-    // Fake-Handler
-    static class FakeClientHandler extends ClientHandler {
-        public List<Packet> receivedPackets = new ArrayList<>();
-        private String fakeName;
+  // Fake-Handler
+  static class FakeClientHandler extends ClientHandler {
+    public List<Packet> receivedPackets = new ArrayList<>();
+    private String fakeName;
 
-        public FakeClientHandler(String name) throws Exception {
-            super(new Socket(), null, null);
-            this.fakeName = name;
-        }
-
-        @Override
-        public String getName() {return fakeName;}
-
-        @Override
-        public void sendMessage(Packet p) {receivedPackets.add(p);}
+    public FakeClientHandler(String name) throws Exception {
+      super(new Socket(), null, null);
+      this.fakeName = name;
     }
 
-    private FakeClientHandler host;
-    private Lobby lobby;
-
-    @BeforeEach
-    void setUp() throws Exception {
-        host = new FakeClientHandler("HostUser");
-        lobby = new Lobby("123", "TestLobby", host);
+    @Override
+    public String getName() {
+      return fakeName;
     }
 
-    @Test
-    void constructor_setsHostAndAddsToPlayers() {
-        assertEquals("123", lobby.getId());
-        assertEquals("TestLobby", lobby.getName());
-        assertEquals(host, lobby.getHost());
-        assertTrue(lobby.getPlayers().get().contains(host));
+    @Override
+    public void sendMessage(Packet p) {
+      receivedPackets.add(p);
     }
+  }
 
-    @Test
-    void addPlayer_successAndRejectsDuplicates() throws Exception {
-        FakeClientHandler p2 = new FakeClientHandler("Player2");
+  private FakeClientHandler host;
+  private Lobby lobby;
 
-        // adding works
-        assertTrue(lobby.addPlayer(p2));
-        assertTrue(lobby.getPlayers().get().contains(p2));
+  @BeforeEach
+  void setUp() throws Exception {
+    host = new FakeClientHandler("HostUser");
+    lobby = new Lobby("123", "TestLobby", host);
+  }
 
-        // double adding doesn't work
-        assertFalse(lobby.addPlayer(p2));
-    }
+  @Test
+  void constructor_setsHostAndAddsToPlayers() {
+    assertEquals("123", lobby.getId());
+    assertEquals("TestLobby", lobby.getName());
+    assertEquals(host, lobby.getHost());
+    assertTrue(lobby.getPlayers().get().contains(host));
+  }
 
-    @Test
-    void addPlayer_rejectsWhenFull() throws Exception {
-        // lobby has host, we add 3 others -> 4 = full
-        lobby.addPlayer(new FakeClientHandler("P2"));
-        lobby.addPlayer(new FakeClientHandler("P3"));
-        lobby.addPlayer(new FakeClientHandler("P4"));
+  @Test
+  void addPlayer_successAndRejectsDuplicates() throws Exception {
+    FakeClientHandler p2 = new FakeClientHandler("Player2");
 
-        FakeClientHandler p5 = new FakeClientHandler("P5");
-        assertFalse(lobby.addPlayer(p5));
-    }
+    // adding works
+    assertTrue(lobby.addPlayer(p2));
+    assertTrue(lobby.getPlayers().get().contains(p2));
 
-    @Test
-    void removePlayer_reassignsHostIfHostLeaves() throws Exception {
-        FakeClientHandler p2 = new FakeClientHandler("P2");
-        lobby.addPlayer(p2);
+    // double adding doesn't work
+    assertFalse(lobby.addPlayer(p2));
+  }
 
-        // Host leaves lobby
-        assertTrue(lobby.removePlayer(host));
+  @Test
+  void addPlayer_rejectsWhenFull() throws Exception {
+    // lobby has host, we add 3 others -> 4 = full
+    lobby.addPlayer(new FakeClientHandler("P2"));
+    lobby.addPlayer(new FakeClientHandler("P3"));
+    lobby.addPlayer(new FakeClientHandler("P4"));
 
-        // p2 must be the new host
-        assertEquals(p2, lobby.getHost());
-        assertFalse(lobby.getPlayers().get().contains(host));
-    }
+    FakeClientHandler p5 = new FakeClientHandler("P5");
+    assertFalse(lobby.addPlayer(p5));
+  }
 
-    @Test
-    void spectators_canBeAddedAndRemoved() throws Exception {
-        FakeClientHandler spec = new FakeClientHandler("Spec1");
+  @Test
+  void removePlayer_reassignsHostIfHostLeaves() throws Exception {
+    FakeClientHandler p2 = new FakeClientHandler("P2");
+    lobby.addPlayer(p2);
 
-        assertTrue(lobby.addSpectator(spec));
-        assertTrue(lobby.getSpectators().get().contains(spec));
+    // Host leaves lobby
+    assertTrue(lobby.removePlayer(host));
 
-        // adding doubled doesn't work
-        assertFalse(lobby.addSpectator(spec));
+    // p2 must be the new host
+    assertEquals(p2, lobby.getHost());
+    assertFalse(lobby.getPlayers().get().contains(host));
+  }
 
-        // removing works
-        assertTrue(lobby.removeSpectator(spec));
-        assertFalse(lobby.getSpectators().get().contains(spec));
-    }
+  @Test
+  void spectators_canBeAddedAndRemoved() throws Exception {
+    FakeClientHandler spec = new FakeClientHandler("Spec1");
 
-    @Test
-    void broadcast_sendsToPlayersAndSpectators() throws Exception {
-        FakeClientHandler p2 = new FakeClientHandler("P2");
-        FakeClientHandler spec = new FakeClientHandler("Spec1");
+    assertTrue(lobby.addSpectator(spec));
+    assertTrue(lobby.getSpectators().get().contains(spec));
 
-        lobby.addPlayer(p2);
-        lobby.addSpectator(spec);
+    // adding doubled doesn't work
+    assertFalse(lobby.addSpectator(spec));
 
-        Packet testPacket = Packet.of(Command.INFO, "Hello Lobby");
-        lobby.broadcast(testPacket);
+    // removing works
+    assertTrue(lobby.removeSpectator(spec));
+    assertFalse(lobby.getSpectators().get().contains(spec));
+  }
 
-        // host, p2, spectator must have received the packet
-        assertEquals(Command.INFO, host.receivedPackets.get(host.receivedPackets.size()-1).cmd());
-        assertEquals(Command.INFO, p2.receivedPackets.get(p2.receivedPackets.size()-1).cmd());
-        assertEquals(Command.INFO, spec.receivedPackets.get(spec.receivedPackets.size()-1).cmd());
-    }
+  @Test
+  void broadcast_sendsToPlayersAndSpectators() throws Exception {
+    FakeClientHandler p2 = new FakeClientHandler("P2");
+    FakeClientHandler spec = new FakeClientHandler("Spec1");
+
+    lobby.addPlayer(p2);
+    lobby.addSpectator(spec);
+
+    Packet testPacket = Packet.of(Command.INFO, "Hello Lobby");
+    lobby.broadcast(testPacket);
+
+    // host, p2, spectator must have received the packet
+    assertEquals(Command.INFO, host.receivedPackets.get(host.receivedPackets.size() - 1).cmd());
+    assertEquals(Command.INFO, p2.receivedPackets.get(p2.receivedPackets.size() - 1).cmd());
+    assertEquals(Command.INFO, spec.receivedPackets.get(spec.receivedPackets.size() - 1).cmd());
+  }
 }
