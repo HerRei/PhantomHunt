@@ -36,6 +36,9 @@ public class GameModel {
   private final ObservableList<String> availableLobbies = FXCollections.observableArrayList();
   private final ObservableList<String> runningLobbies = FXCollections.observableArrayList();
   private final ObservableList<String> lobbyChatMessages = FXCollections.observableArrayList();
+  private final Ability ability = new Ability(100, 100);
+  private final BooleanProperty isAbilityVisible = new SimpleBooleanProperty(false);
+
 
   // Map properties
   private final ObjectProperty<Image> gameMap = new SimpleObjectProperty<>();
@@ -67,7 +70,7 @@ public class GameModel {
   public void updatePlayersFromServer(String payload) {
     // 1. Split top-level components (Round, Time, Players)
     String[] sections = payload.split(" ");
-    if (sections.length < 3) return;
+    if (sections.length < 6) return;
     int currentRound = Integer.parseInt(sections[0]);
     int timeRemaining = Integer.parseInt(sections[1]);
     remainingTime.set(timeRemaining / 1000);
@@ -99,6 +102,10 @@ public class GameModel {
       // 3. Find existing player in our list or create a new one
       updateOrAddPlayer(name, role, x, y, score);
     }
+
+    ability.xPosition().set(Double.parseDouble(sections[3]));
+    ability.yPosition().set(Double.parseDouble(sections[4]));
+    isAbilityVisible.set(Boolean.parseBoolean(sections[5]));
   }
 
   /** Updates the local list of lobbies when the server sends new data */
@@ -164,6 +171,19 @@ public class GameModel {
     } catch (Exception e) {
       LOGGER.error("Failed to load maps.", e);
     }
+  }
+
+  public boolean checkCollision(Player player) {
+    double playerX = player.getXPosition();
+    double playerY = player.getYPosition();
+    double abilityX = ability.getX();
+    double abilityY = ability.getY();
+    double distance = Math.sqrt(Math.pow(playerX - abilityX, 2) + Math.pow(playerY - abilityY, 2));
+    return distance < 20;
+  }
+
+  public Ability getAbility() {
+    return ability;
   }
 
   /**
@@ -278,6 +298,14 @@ public class GameModel {
 
   public Map<String, Integer> getHighscores() {
     return highscores;
+  }
+
+  public BooleanProperty humanAbilityProperty() {
+    return humanAbility;
+  }
+
+  public BooleanProperty isAbilityVisibleProperty() {
+    return isAbilityVisible;
   }
 
   // ---SETTERS---

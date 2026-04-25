@@ -55,10 +55,13 @@ public class GameHandler {
     }
     String payload =
         String.format(
-            "%d %d %s",
+            "%d %d %s %f %f %b",
             gameState.getRoundStateSnapshot().getCurrentRound(),
             gameState.getRoundTimeRemaining(),
-            gameState.getSerializedPlayers());
+            gameState.getSerializedPlayers(),
+            gameState.getAbilityPosition().getX(),
+            gameState.getAbilityPosition().getY(),
+            gameState.isAbilityAvailable());
     lobby.broadcast(Packet.of(Command.GSU, payload));
   }
 
@@ -82,15 +85,18 @@ public class GameHandler {
     // 2. Check if phantoms caught the human or reversed
     checkCatchCollisions(now, humanCatchesGhosts);
 
-    // 3. Check for round timeout
+    // 3. Check for ability collision
+    checkAbilityCollision();
+
+    // 4. Check for round timeout
     if (now >= gameState.getRoundEndTimeMillis()) {
       endRoundHumanSurvived(now);
     }
 
-    // 4. Inform all clients about the new state
+    // 5. Inform all clients about the new state
     broadcastGameState();
 
-    // 5. Check if there are still 4 players inside
+    // 6. Check if there are still 4 players inside
     checkPlayerSize();
   }
 
@@ -183,6 +189,18 @@ public class GameHandler {
           break;
         }
       }
+    }
+  }
+
+  private void checkAbilityCollision() {
+    if (!gameState.isAbilityAvailable()) {
+      return;
+    }
+    PlayerState human = gameState.getHumanPlayer();
+    double dist = calculateDistance(human.getPosition(), gameState.getAbilityPosition());
+    if (dist < gameState.getRules().playerRadius() * 2) {
+      gameState.setAbilityAvailable(false);
+      tryAbility(human.getPlayerId());
     }
   }
 
@@ -407,6 +425,9 @@ public class GameHandler {
     resetPlayersForNewRound();
     resetAllInputs();
 
+    gameState.setAbilityPosition(new Position(MapLogic.getInstance().useRandomSpawnPoint(), MapLogic.getInstance()));
+    gameState.setAbilityAvailable(true);
+
     roundState.setRoundStartTimeMillis(nowMillis);
     roundState.setRoundEndTimeMillis(nowMillis + gameState.getRules().roundDurationMillis());
     gameState.setPhase(GamePhase.ROUND_RUNNING);
@@ -505,7 +526,7 @@ public class GameHandler {
             lobby.broadcast(Packet.of(Command.ABILITY, "END"));
             scheduler.shutdown();
           },
-          5,
+          10,
           TimeUnit.SECONDS);
     }
   }

@@ -42,13 +42,16 @@ public class GameScene implements SceneInterface {
   private final Map<Player, ImageView> playerSprites = new HashMap<>();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
-  private boolean w, a, s, d, q; // INPUTS
+  private boolean w, a, s, d; // INPUTS
   private final double mapScale;
   private final Map<String, Image> floorImageMap = new HashMap<>();
   private final Map<String, Image[]> humanSprites = new HashMap<>();
   private final Map<String, Image> phantomSprites = new HashMap<>();
+  private final Map<String, Image> phantomGlitchedSprites = new HashMap<>();
   private final Map<Player, Integer> frameIndex = new HashMap<>();
   private final Map<Player, Long> lastFrameUpdate = new HashMap<>();
+  private ImageView abilitySprite;
+
 
   /** Initializes the game scene, building the map from tiles and scaling to fit the screen. */
   public GameScene() {
@@ -120,6 +123,15 @@ public class GameScene implements SceneInterface {
     setupControls();
     setupPlayerTracking();
     setupChatBinding();
+    setupAbility();
+
+    model.humanAbilityProperty().addListener((obs, oldVal, newVal) -> {
+      if (newVal) {
+        playerSprites.forEach((player, sprite) ->
+            updatePlayerSprite(player, sprite)
+        );
+      }
+    });
   }
 
   private void loadSprites() {
@@ -143,6 +155,9 @@ public class GameScene implements SceneInterface {
         String key = color + direction + "_ghost";
         phantomSprites.put(
             key, new Image(getClass().getResourceAsStream("/assets/ghosts/" + key + ".png")));
+        String glitchKey = color + direction + "_glitch";
+        phantomGlitchedSprites.put(
+            glitchKey, new Image(getClass().getResourceAsStream("/assets/ghosts/" + glitchKey + ".png")));
       }
     }
   }
@@ -323,12 +338,6 @@ public class GameScene implements SceneInterface {
           changed = true;
         }
       }
-      case Q -> {
-        if (!q) {
-          q = true;
-          EventHandlers.getInstance().sendAbility();
-        }
-      }
       default -> {}
     }
 
@@ -338,9 +347,7 @@ public class GameScene implements SceneInterface {
   }
 
   private void handleKeyReleased(KeyCode code) {
-    if (code == KeyCode.Q) {
-      q = false;
-    }
+    // In case we implement a key released feature
   }
 
   // ── Player tracking ────────────────────────────────────────────────────────
@@ -428,26 +435,46 @@ public class GameScene implements SceneInterface {
     Map<String, String> phantomDirections =
         Map.of("front", "d", "back", "u", "left", "l", "right", "r");
 
+    int frame = frameIndex.getOrDefault(player, 0);
+
     if ("HUMAN".equals(skin)) {
       String key = "p" + player.getPlayerNumber() + "_" + direction;
       Image[] frames = humanSprites.get(key);
       if (frames == null) {
         return;
       }
-      int frame = frameIndex.getOrDefault(player, 0);
+
       sprite.setImage(frames[frame]);
-    } else { // ghost static
-      sprite.setImage(
-          phantomSprites.get(
-              phantomColors[player.getPlayerNumber() - 1]
-                  + phantomDirections.get(direction)
-                  + "_ghost"));
+
+    } else { // ghost
+      String color = phantomColors[player.getPlayerNumber() - 1];
+      String dir = phantomDirections.get(direction);
+      String baseKey = color + dir;
+
+      boolean abilityActive = GameModel.getInstance().humanAbilityProperty().get();
+
+      if (abilityActive && frame == 1) {
+        sprite.setImage(phantomGlitchedSprites.get(baseKey + "_glitch"));
+      } else {
+        sprite.setImage(phantomSprites.get(baseKey + "_ghost"));
+      }
     }
   }
 
   private void removePlayer(Player player) {
     ImageView sprite = playerSprites.remove(player);
     if (sprite != null) gamePane.getChildren().remove(sprite);
+  }
+
+  private void setupAbility() {
+    Image image = new Image(getClass().getResourceAsStream("/assets/abilities/ability.png"));
+    abilitySprite = new ImageView(image);
+    abilitySprite.setFitWidth(TILE_SIZE * mapScale);
+    abilitySprite.setFitHeight(TILE_SIZE * mapScale);
+    abilitySprite.layoutXProperty().bind(GameModel.getInstance().getAbility().xPosition().multiply(mapScale));
+    abilitySprite.layoutYProperty().bind(GameModel.getInstance().getAbility().yPosition().multiply(mapScale));
+    abilitySprite.visibleProperty().bind(GameModel.getInstance().isAbilityVisibleProperty());
+    gamePane.getChildren().add(abilitySprite);
   }
 
   @Override
