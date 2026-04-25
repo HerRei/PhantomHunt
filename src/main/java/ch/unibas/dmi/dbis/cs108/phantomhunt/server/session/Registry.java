@@ -212,7 +212,7 @@ public final class Registry {
       return false;
     }
 
-    // all of this needs to be tested at some point!!!! #todo test this mess
+    // all of this needs to be tested at some point!!!!
     log.info("Whisper: {} -> {}: [message hidden]", sender.getName(), targetName);
 
     String attributed = "[Whisper from " + sender.getName() + "]: " + message;
