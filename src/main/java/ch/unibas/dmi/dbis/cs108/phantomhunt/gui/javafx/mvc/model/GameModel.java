@@ -94,7 +94,9 @@ public class GameModel {
       double x = Double.parseDouble(data[2]);
       double y = Double.parseDouble(data[3]);
       int score = Integer.parseInt(data[4]);
-      if (name.endsWith(playerName.getValue())) {
+
+      String currentName = playerName.getValue();
+      if (currentName != null && name.endsWith(currentName)) {
         playerScore.set(score);
         playerRole.set(role);
       }
@@ -129,7 +131,9 @@ public class GameModel {
       boolean moved =
           Double.compare(player.getXPosition(), x) != 0
               || Double.compare(player.getYPosition(), y) != 0;
-      boolean isLocalPlayer = name.equals(playerName.get());
+
+      String currentName = playerName.get();
+      boolean isLocalPlayer = currentName != null && name.equals(currentName);
 
       if (isLocalPlayer) {
         PlayerRole currentRole = PlayerRole.valueOf(role);
