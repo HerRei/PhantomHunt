@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +22,8 @@ public class GameState {
   private GamePhase phase;
   private final RoundState roundState;
   private RoundOutcome lastRoundOutcome;
+  private Position abilityPosition;
+  private boolean isAbilityAvailable;
 
   /**
    * Constructs a new GameState for a match.
@@ -42,6 +45,8 @@ public class GameState {
     this.phase = GamePhase.WAITING_TO_START;
     this.roundState = new RoundState(0, -1, 0L, 0L);
     this.lastRoundOutcome = null;
+    this.abilityPosition = new Position(new int[]{0,0}, MapLogic.getInstance());
+    this.isAbilityAvailable = false;
   }
 
   /** Checks whether a circular player hitbox collides with a wall or map boundary. */
@@ -238,6 +243,22 @@ public class GameState {
 
   public synchronized int getMapWidth() {
     return map[0].length;
+  }
+
+  public synchronized Position getAbilityPosition() {
+    return abilityPosition;
+  }
+
+  public synchronized void setAbilityPosition(Position abilityPosition) {
+    this.abilityPosition = abilityPosition;
+  }
+
+  public synchronized boolean isAbilityAvailable() {
+    return isAbilityAvailable;
+  }
+
+  public synchronized void setAbilityAvailable(boolean isAbilityAvailable) {
+    this.isAbilityAvailable = isAbilityAvailable;
   }
 
   private static String requireNonBlank(String value, String message) {
