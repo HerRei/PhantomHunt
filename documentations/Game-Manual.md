@@ -70,6 +70,15 @@ Um den Menschen zu erschrecken, muss ein Geist auf genau dasselbe Feld (die glei
 
 Sobald sich der Mensch und ein Geist auf derselben Stelle befinden, ist der Mensch gefangen! Die aktuelle Runde endet sofort zugunsten der Geister und die Punkte werden verteilt.
 
+## Power-Up:
+Jede Runde erscheint zufällig auf der Karte eine Fähigkeit. Dann wird der Spiess umgedreht!
+
+**Sichtbare Verwundbarkeit (Glitch-Effekt):** 
+Sobald der Mensch dieses Power-Up einsammelt, bleibt die Schwäche der Phantome nicht verborgen. Solange der Mensch die Fähigkeit aktiv hat, wird die Form der Geister instabil. Sie flackern hektisch zwischen ihrer normalen Gestalt und einer verzerrten, "geglitchten" Form hin und her.
+
+**Geister verjagen:**
+Wenn der Mensch auf dasselbe Feld wie ein Geist trifft, scheidet der Geist dadurch nicht aus, wird aber magisch an einer andere, weit entfernten Position im Schloss teleportiert und der Mensch erhält 10 Punkt.
+
 ## Punkte und Siegbedingungen
 Am Ende der 4 Runden gewinnt nicht das Team, sondern der Einzelspieler mit den meisten Punkten. Punkte sammelst du wie folgt:
 
@@ -81,6 +90,8 @@ Schaffst du es, die komplette Rundenzeit zu überleben, erhältst du einen massi
 
 **Wenn du als Geist spielst:**
 
-Ihr müsst euch absprechen! Ihr erhaltet je 10 Punkte, wenn ihr den Menschen erfolgreich aufspürt und fangt. Der Fänger erhält zusätzlich noch einen +20 Punkte-Bonus
+Ihr müsst euch absprechen! Ihr erhaltet je 10 Punkte, wenn ihr den Menschen erfolgreich aufspürt und fangt. Der Fänger erhält zusätzlich noch einen +10 Punkte-Bonus.
 
 Wer am Ende der vierten Runde ganz oben auf dem Scoreboard steht, hat die Partie gewonnen!
+
+![PhantomHunt Screenshot](./images/Phantom-Hunt_game.png)
