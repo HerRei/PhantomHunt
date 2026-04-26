@@ -80,7 +80,7 @@ public enum Command {
   /** Client movement input update. */
   INPUT,
 
-  /** Client want to use Ability*/
+  /** Client want to use Ability. */
   ABILITY,
 
   /** Request to show the highscore. */

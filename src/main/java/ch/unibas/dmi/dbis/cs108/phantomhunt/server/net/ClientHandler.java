@@ -333,11 +333,11 @@ public class ClientHandler implements Runnable {
     if (lobby == null) return;
 
     GameHandler gameHandler = lobby.getActiveGame().orElse(null);
-    if (gameHandler == null) return;
-
-    if (lobby.getHost() == this) {
-      lobbyHandler.resetLobby(lobby.getId());
+    if (gameHandler == null || !gameHandler.isMatchFinished()) {
+      return;
     }
+
+    lobbyHandler.resetLobby(lobby.getId());
   }
 
   private void handleAbility() {

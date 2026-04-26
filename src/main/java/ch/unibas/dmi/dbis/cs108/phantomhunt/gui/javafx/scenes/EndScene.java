@@ -84,11 +84,14 @@ public class EndScene implements SceneInterface {
 
     public void updateLobbyInfo(String lobbyId, String[] players) {
         String currentPlayerName = GameModel.getInstance().getName().get();
-        if (players.length > 0 && players[0].equals(currentPlayerName)) {
-            lobbyButton.setVisible(true);
-        } else {
-            lobbyButton.setVisible(false);
+        boolean isStillInLobby = false;
+        for (String player : players) {
+            if (player.equals(currentPlayerName)) {
+                isStillInLobby = true;
+                break;
+            }
         }
+        lobbyButton.setVisible(isStillInLobby);
     }
 
     public void updateWinner() {
