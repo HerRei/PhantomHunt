@@ -11,77 +11,97 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ClientHandlerTest {
 
-    private Registry realRegistry;
-    private LobbyHandler realLobbyHandler;
+  private Registry realRegistry;
+  private LobbyHandler realLobbyHandler;
 
-    @BeforeEach
-    void setUp() {
-        realRegistry = Registry.getInstance();
-        realLobbyHandler = LobbyHandler.getInstance();
-    }
+  @BeforeEach
+  void setUp() {
+    realRegistry = Registry.getInstance();
+    realLobbyHandler = LobbyHandler.getInstance();
+  }
 
-    @Test
-    void run_handlesNickChange() {
-        FakeSocket socket = new FakeSocket("NICK Alice\nLOGOUT\n");
-        ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+  @Test
+  void run_handlesNickChange() {
+    FakeSocket socket = new FakeSocket("NICK Alice\nLOGOUT\n");
+    ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
 
-        handler.run();
+    handler.run();
 
-        // has handler internally changed name?
-        assertEquals("Alice", handler.getName());
-        // has handler got a welcome from server?
-        assertTrue(socket.getSentData().contains("WELCOME Alice"));
-    }
+    // has handler internally changed name?
+    assertEquals("Alice", handler.getName());
+    // has handler got a welcome from server?
+    assertTrue(socket.getSentData().contains("WELCOME Alice"));
+  }
 
-    @Test
-    void run_handlesLobbyCommands_MKL_and_SPEC() {
-        FakeSocket socket = new FakeSocket("MKL MyLobby\nSPEC 123\nLOGOUT\n");
-        ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+  @Test
+  void run_handlesLobbyCommands_MKL_and_SPEC() {
+    FakeSocket socket = new FakeSocket("MKL MyLobby\nSPEC 123\nLOGOUT\n");
+    ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
 
-        handler.run();
+    handler.run();
 
-        String sentData = socket.getSentData();
+    String sentData = socket.getSentData();
 
-        assertTrue(sentData.contains("LOBBY_INFO"), "The Lobby should have been created.");
+    assertTrue(sentData.contains("LOBBY_INFO"), "The Lobby should have been created.");
 
-        assertTrue(sentData.contains("REJECT You are already in a lobby"));
-    }
+    assertTrue(sentData.contains("REJECT You are already in a lobby"));
+  }
 
-    @Test
-    void run_handlesYapping_rejectsIfNoLobby() {
-        FakeSocket socket = new FakeSocket("YAP Hello Lobby\nLOGOUT\n");
-        ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+  @Test
+  void run_handlesYapping_rejectsIfNoLobby() {
+    FakeSocket socket = new FakeSocket("YAP Hello Lobby\nLOGOUT\n");
+    ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
 
-        handler.run();
+    handler.run();
 
-        assertTrue(socket.getSentData().contains("REJECT You are not in a lobby"));
-    }
+    assertTrue(socket.getSentData().contains("REJECT You are not in a lobby"));
+  }
 
-    @Test
-    void run_handlesInvalidInput_sendsReject() {
-        FakeSocket socket = new FakeSocket("NOT_A_COMMAND This is garbage\nLOGOUT\n");
-        ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+  @Test
+  void run_handlesInvalidInput_sendsReject() {
+    FakeSocket socket = new FakeSocket("NOT_A_COMMAND This is garbage\nLOGOUT\n");
+    ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
 
-        handler.run();
+    handler.run();
 
-        assertTrue(socket.getSentData().contains("REJECT"));
-    }
+    assertTrue(socket.getSentData().contains("REJECT"));
+  }
 
-    @Test
-    void run_handlesGameAndLobbyCommands() {
-        // we put all the missing commands in one simulated data-stream
-        String commands = "PONG\nLIST_LOBBY\nCHECKIN 123\nLOGOUT_LOBBY 123\nSTART\nINPUT 1 0\nABILITY START\nLOGOUT\n";
-        FakeSocket socket = new FakeSocket(commands);
-        ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+  @Test
+  void run_handlesGameAndLobbyCommands() {
+    // we put all the missing commands in one simulated data-stream
+    String commands =
+        "PONG\nLIST_LOBBY\nCHECKIN 123\nLOGOUT_LOBBY 123\nSTART\nINPUT 1 0\nABILITY START\nLOGOUT\n";
+    FakeSocket socket = new FakeSocket(commands);
+    ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
 
-        handler.run();
+    handler.run();
 
-        String sentData = socket.getSentData();
+    String sentData = socket.getSentData();
 
-        // did he react to LIST_LOBBY and sent us a LIST_LOBBY packet back?
-        assertTrue(sentData.contains("LIST_LOBBY"));
+    // did he react to LIST_LOBBY and sent us a LIST_LOBBY packet back?
+    assertTrue(sentData.contains("LIST_LOBBY"));
 
-        // since Lobby "123" doesn't exist, CHECKIN must be handled with REJECT
-        assertTrue(sentData.contains("REJECT Lobby not found"));
-    }
+    // since Lobby "123" doesn't exist, CHECKIN must be handled with REJECT
+    assertTrue(sentData.contains("REJECT Lobby not found"));
+  }
+
+  @Test
+  void run_handlesCorruptInputsGracefully() {
+    // intentionally sends broken commands
+    String garbageCommands =
+            "INPUT a b\n" + // expects number, receives letters
+            "WHISPER\n" + // expects target and message, receives nothing
+            "CHECKIN\n" + // expects LobbyID, receives nothing
+            "LOGOUT\n";
+
+    FakeSocket socket = new FakeSocket(garbageCommands);
+    ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+
+    // thread must not crash
+    assertDoesNotThrow(() -> handler.run(), "ClientHandler must catch exceptions and not crash on bad input");
+
+    String sentData = socket.getSentData();
+    assertTrue(sentData.contains("REJECT"), "Server should respond to bad commands with REJECT");
+  }
 }

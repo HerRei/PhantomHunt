@@ -3,9 +3,7 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Encapsulates the results and statistics of a completed game round.
- */
+/** Encapsulates the results and statistics of a completed game round. */
 public final class RoundOutcome {
   private final int roundNumber;
   private final RoundOutcomeType type;
@@ -17,23 +15,22 @@ public final class RoundOutcome {
   /**
    * Constructs a new RoundOutcome.
    *
-   * @param roundNumber     Number of the round that ended.
-   * @param type            Type of outcome (e.g. "HUMAN_SURVIVED")
-   * @param humanPlayerId   ID of the player that was the human this round.
+   * @param roundNumber Number of the round that ended.
+   * @param type Type of outcome (e.g. "HUMAN_SURVIVED")
+   * @param humanPlayerId ID of the player that was the human this round.
    * @param catcherPlayerId ID of the players that were the ghosts
-   * @param endedAtMillis   Timestamp when the round ended.
+   * @param endedAtMillis Timestamp when the round ended.
    */
   public RoundOutcome(
-          int roundNumber,
-          RoundOutcomeType type,
-          String humanPlayerId,
-          Optional<String> catcherPlayerId,
-          long endedAtMillis) {
+      int roundNumber,
+      RoundOutcomeType type,
+      String humanPlayerId,
+      Optional<String> catcherPlayerId,
+      long endedAtMillis) {
     this(roundNumber, type, humanPlayerId, catcherPlayerId, endedAtMillis, null);
   }
 
   /**
-   *
    * @param roundNumber
    * @param type
    * @param humanPlayerId
@@ -42,17 +39,17 @@ public final class RoundOutcome {
    * @param reason
    */
   public RoundOutcome(
-          int roundNumber,
-          RoundOutcomeType type,
-          String humanPlayerId,
-          Optional<String> catcherPlayerId,
-          long endedAtMillis,
-          String reason) {
+      int roundNumber,
+      RoundOutcomeType type,
+      String humanPlayerId,
+      Optional<String> catcherPlayerId,
+      long endedAtMillis,
+      String reason) {
     this.roundNumber = roundNumber;
     this.type = Objects.requireNonNull(type, "type must not be null");
     this.humanPlayerId = humanPlayerId;
     this.catcherPlayerId =
-            Objects.requireNonNull(catcherPlayerId, "catcherPlayerId must not be null");
+        Objects.requireNonNull(catcherPlayerId, "catcherPlayerId must not be null");
     this.endedAtMillis = endedAtMillis;
     this.reason = reason;
   }

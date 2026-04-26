@@ -9,8 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Singleton controller that handles UI events and translates them into
- * network commands or scene changes.
+ * Singleton controller that handles UI events and translates them into network commands or scene
+ * changes.
  */
 public class EventHandlers {
   private static final Logger LOGGER = LogManager.getLogger(EventHandlers.class);
@@ -32,8 +32,8 @@ public class EventHandlers {
   }
 
   /**
-   * Sends the current movement input state to the server.
-   * Format: "INPUT vertical horizontal", where 1 is pressed and 0 is released.
+   * Sends the current movement input state to the server. Format: "INPUT vertical horizontal",
+   * where 1 is pressed and 0 is released.
    */
   public void sendInputs(int vertical, int horizontal) {
     if (serverHandler == null) {
@@ -41,13 +41,12 @@ public class EventHandlers {
       return;
     }
 
-    String payload = String.format("%d %d",
-        vertical, horizontal);
+    String payload = String.format("%d %d", vertical, horizontal);
 
     serverHandler.sendMessage(Packet.of(Command.INPUT, payload));
   }
 
-  public void sendAbility(){
+  public void sendAbility() {
     if (serverHandler == null) {
       LOGGER.warn("Cannot send inputs: Not connected to server.");
       return;
@@ -56,8 +55,8 @@ public class EventHandlers {
   }
 
   /**
-   * Sets the ServerHandler used for network communication.
-   * Synchronizes the GameModel nickname if one is already set.
+   * Sets the ServerHandler used for network communication. Synchronizes the GameModel nickname if
+   * one is already set.
    *
    * @param sh the active ServerHandler
    */
@@ -68,9 +67,7 @@ public class EventHandlers {
     }
   }
 
-  /**
-   * Resets game state and navigates back to the hub (HOME scene).
-   */
+  /** Resets game state and navigates back to the hub (HOME scene). */
   public void resetAndBackToHub() {
     if (serverHandler == null) {
       LOGGER.warn("resetAndBackToHub: not connected, skipping server message.");
@@ -85,14 +82,12 @@ public class EventHandlers {
     LOGGER.info("resetAndBackToHub: left lobby, navigated to HOME.");
   }
 
-  public void backToLobby(){
-      SceneManager.getInstance().showScene(SceneProtocol.LOBBY);
-      serverHandler.sendMessage(Packet.of(Command.GAME_FINISH));
+  public void backToLobby() {
+    SceneManager.getInstance().showScene(SceneProtocol.LOBBY);
+    serverHandler.sendMessage(Packet.of(Command.GAME_FINISH));
   }
 
-  /**
-   * Switches the UI to the main game scene.
-   */
+  /** Switches the UI to the main game scene. */
   public void handleStartGame() {
     SceneManager.getInstance().showScene(SceneProtocol.GAME);
   }
@@ -142,12 +137,11 @@ public class EventHandlers {
     sendMessage(Command.NICK, name.trim());
   }
 
-  /**
-   * sends request for lobby-lists
-   */
+  /** sends request for lobby-lists */
   public void updateLists() {
     serverHandler.sendMessage(Packet.of(Command.LIST_LOBBY));
   }
+
   public void updateHighscore() {
     serverHandler.sendMessage(Packet.of(Command.SHOW_HIGHSCORE));
   }

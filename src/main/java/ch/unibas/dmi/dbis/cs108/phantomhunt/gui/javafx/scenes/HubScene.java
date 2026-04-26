@@ -13,149 +13,164 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-/**
- * The primary hub scene displaying the global chat, profile options, and lobby navigation.
- */
+/** The primary hub scene displaying the global chat, profile options, and lobby navigation. */
 public class HubScene implements SceneInterface {
 
-    private ListView<String> chatDisplay;
-    private ListView<String> playerListDisplay; // New: Display for all players
-    private TextField chatInput;
-    private TextField whisperTargetInput;
-    private ComboBox<String> chatMode;
-    private Label nicknameLabel;
-    private Scene localScene;
+  private ListView<String> chatDisplay;
+  private ListView<String> playerListDisplay; // New: Display for all players
+  private TextField chatInput;
+  private TextField whisperTargetInput;
+  private ComboBox<String> chatMode;
+  private Label nicknameLabel;
+  private Scene localScene;
 
-    public HubScene(){
-        createScene();
-    }
+  public HubScene() {
+    createScene();
+  }
 
-    /**
-     * Constructs the UI layout for the hub.
-     */
-    public void createScene() {
-        GameModel model = GameModel.getInstance();
+  /** Constructs the UI layout for the hub. */
+  public void createScene() {
+    GameModel model = GameModel.getInstance();
 
-        // --- LEFT SIDE: Navigation, Profile & Player List ---
-        VBox leftMenu = new VBox(15); // Slightly tighter spacing
-        leftMenu.setPadding(new Insets(25));
-        leftMenu.setAlignment(Pos.TOP_CENTER);
-        leftMenu.setPrefWidth(350);
+    // --- LEFT SIDE: Navigation, Profile & Player List ---
+    VBox leftMenu = new VBox(15); // Slightly tighter spacing
+    leftMenu.setPadding(new Insets(25));
+    leftMenu.setAlignment(Pos.TOP_CENTER);
+    leftMenu.setPrefWidth(350);
 
-        // Profile Section
-        VBox profileBox = new VBox(8);
-        profileBox.setAlignment(Pos.CENTER);
-        Label headLabel = new Label("Logged in as:");
-        headLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: gray;");
+    // Profile Section
+    VBox profileBox = new VBox(8);
+    profileBox.setAlignment(Pos.CENTER);
+    Label headLabel = new Label("Logged in as:");
+    headLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: gray;");
 
-        nicknameLabel = new Label();
-        nicknameLabel.textProperty().bind(Bindings.concat( model.getName()));
-        nicknameLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        profileBox.getChildren().addAll(headLabel, nicknameLabel);
+    nicknameLabel = new Label();
+    nicknameLabel.textProperty().bind(Bindings.concat(model.getName()));
+    nicknameLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+    profileBox.getChildren().addAll(headLabel, nicknameLabel);
 
-        // Buttons
-        Button btnNickname = new Button("Change Nickname");
-        Button btnJoin = new Button("Join Lobby");
-        Button btnCreate = new Button("Create Lobby");
-        Button btnHighscore = new Button("Show Highscores");
+    // Buttons
+    Button btnNickname = new Button("Change Nickname");
+    Button btnJoin = new Button("Join Lobby");
+    Button btnCreate = new Button("Create Lobby");
+    Button btnHighscore = new Button("Show Highscores");
 
-        btnJoin.setMaxWidth(Double.MAX_VALUE);
-        btnNickname.setMaxWidth(Double.MAX_VALUE);
-        btnCreate.setMaxWidth(Double.MAX_VALUE);
-        btnHighscore.setMaxWidth(Double.MAX_VALUE);
-        btnJoin.setPrefHeight(40);
-        btnCreate.setPrefHeight(40);
-        btnHighscore.setPrefHeight(40);
+    btnJoin.setMaxWidth(Double.MAX_VALUE);
+    btnNickname.setMaxWidth(Double.MAX_VALUE);
+    btnCreate.setMaxWidth(Double.MAX_VALUE);
+    btnHighscore.setMaxWidth(Double.MAX_VALUE);
+    btnJoin.setPrefHeight(40);
+    btnCreate.setPrefHeight(40);
+    btnHighscore.setPrefHeight(40);
 
-        // Player List Section (replacing Volume)
-        Label onlineLabel = new Label("Players Online:");
-        onlineLabel.setStyle("-fx-font-weight: bold;");
+    // Player List Section (replacing Volume)
+    Label onlineLabel = new Label("Players Online:");
+    onlineLabel.setStyle("-fx-font-weight: bold;");
 
-        playerListDisplay = new ListView<>();
-        // BINDING: Connect to the observable list in GameModel
-        playerListDisplay.setItems(model.players);
-        VBox.setVgrow(playerListDisplay, Priority.ALWAYS); // Let the list take up remaining space
+    playerListDisplay = new ListView<>();
+    // BINDING: Connect to the observable list in GameModel
+    playerListDisplay.setItems(model.players);
+    VBox.setVgrow(playerListDisplay, Priority.ALWAYS); // Let the list take up remaining space
 
-        leftMenu.getChildren().addAll(profileBox, btnNickname, new Separator(), btnJoin, btnCreate, btnHighscore, new Separator(), onlineLabel, playerListDisplay);
+    leftMenu
+        .getChildren()
+        .addAll(
+            profileBox,
+            btnNickname,
+            new Separator(),
+            btnJoin,
+            btnCreate,
+            btnHighscore,
+            new Separator(),
+            onlineLabel,
+            playerListDisplay);
 
-        // --- RIGHT SIDE: Chat System ---
-        VBox chatBox = new VBox(10);
-        chatBox.setPadding(new Insets(15));
-        HBox.setHgrow(chatBox, Priority.ALWAYS);
+    // --- RIGHT SIDE: Chat System ---
+    VBox chatBox = new VBox(10);
+    chatBox.setPadding(new Insets(15));
+    HBox.setHgrow(chatBox, Priority.ALWAYS);
 
-        chatDisplay = new ListView<>();
-        chatDisplay.setItems(model.chatMessagesProperty());
-        VBox.setVgrow(chatDisplay, Priority.ALWAYS);
+    chatDisplay = new ListView<>();
+    chatDisplay.setItems(model.chatMessagesProperty());
+    VBox.setVgrow(chatDisplay, Priority.ALWAYS);
 
-        model.chatMessagesProperty().addListener((ListChangeListener<String>) c -> {
-            Platform.runLater(() -> chatDisplay.scrollTo(chatDisplay.getItems().size() - 1));
+    model
+        .chatMessagesProperty()
+        .addListener(
+            (ListChangeListener<String>)
+                c -> {
+                  Platform.runLater(() -> chatDisplay.scrollTo(chatDisplay.getItems().size() - 1));
+                });
+
+    HBox inputArea = new HBox(8);
+    chatInput = new TextField();
+    chatInput.setPromptText("Type a message...");
+    HBox.setHgrow(chatInput, Priority.ALWAYS);
+
+    chatMode = new ComboBox<>();
+    chatMode.getItems().addAll("Global", "Whisper");
+    chatMode.setValue("Global");
+    chatMode.setPrefWidth(100);
+
+    whisperTargetInput = new TextField();
+    whisperTargetInput.setPromptText("To whom?");
+    whisperTargetInput.setPrefWidth(100);
+    whisperTargetInput.visibleProperty().bind(Bindings.equal("Whisper", chatMode.valueProperty()));
+    whisperTargetInput.managedProperty().bind(whisperTargetInput.visibleProperty());
+
+    Button btnSend = new Button("Send");
+    btnSend.setPrefWidth(80);
+
+    // --- Actions ---
+    btnSend.setOnAction(e -> handleSendMessage());
+    btnHighscore.setOnAction(
+        e -> {
+          SceneManager.getInstance().showScene(SceneProtocol.HIGHSCORE);
+          EventHandlers.getInstance().updateHighscore();
         });
-
-        HBox inputArea = new HBox(8);
-        chatInput = new TextField();
-        chatInput.setPromptText("Type a message...");
-        HBox.setHgrow(chatInput, Priority.ALWAYS);
-
-        chatMode = new ComboBox<>();
-        chatMode.getItems().addAll("Global", "Whisper");
-        chatMode.setValue("Global");
-        chatMode.setPrefWidth(100);
-
-        whisperTargetInput = new TextField();
-        whisperTargetInput.setPromptText("To whom?");
-        whisperTargetInput.setPrefWidth(100);
-        whisperTargetInput.visibleProperty().bind(Bindings.equal("Whisper", chatMode.valueProperty()));
-        whisperTargetInput.managedProperty().bind(whisperTargetInput.visibleProperty());
-
-        Button btnSend = new Button("Send");
-        btnSend.setPrefWidth(80);
-
-        //--- Actions ---
-        btnSend.setOnAction(e -> handleSendMessage());
-        btnHighscore.setOnAction(e -> {
-            SceneManager.getInstance().showScene(SceneProtocol.HIGHSCORE);
-            EventHandlers.getInstance().updateHighscore();
+    btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
+    btnJoin.setOnAction(
+        e -> {
+          EventHandlers.getInstance().updateLists();
+          SceneManager.getInstance().showScene(SceneProtocol.JOINLOBBY);
         });
-        btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
-        btnJoin.setOnAction(e -> {
-            EventHandlers.getInstance().updateLists();
-            SceneManager.getInstance().showScene(SceneProtocol.JOINLOBBY);
-        });
-        btnCreate.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.CREATELOBBY));
-        chatInput.setOnAction(e -> handleSendMessage());
+    btnCreate.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.CREATELOBBY));
+    chatInput.setOnAction(e -> handleSendMessage());
 
-        inputArea.getChildren().addAll(chatMode, whisperTargetInput, chatInput, btnSend);
-        chatBox.getChildren().addAll(new Label("Server Chat"), chatDisplay, inputArea);
+    inputArea.getChildren().addAll(chatMode, whisperTargetInput, chatInput, btnSend);
+    chatBox.getChildren().addAll(new Label("Server Chat"), chatDisplay, inputArea);
 
-        // --- MAIN LAYOUT ---
-        HBox mainLayout = new HBox();
-        mainLayout.getChildren().addAll(leftMenu, new Separator(javafx.geometry.Orientation.VERTICAL), chatBox);
+    // --- MAIN LAYOUT ---
+    HBox mainLayout = new HBox();
+    mainLayout
+        .getChildren()
+        .addAll(leftMenu, new Separator(javafx.geometry.Orientation.VERTICAL), chatBox);
 
-        localScene = new Scene(mainLayout, 900, 600); // Increased window size slightly for the list
-    }
+    localScene = new Scene(mainLayout, 900, 600); // Increased window size slightly for the list
+  }
 
-    private void handleSendMessage() {
-        String message = chatInput.getText().trim();
-        String mode = chatMode.getValue();
+  private void handleSendMessage() {
+    String message = chatInput.getText().trim();
+    String mode = chatMode.getValue();
 
-        if (!message.isEmpty()) {
-            if ("Global".equals(mode)) {
-                EventHandlers.getInstance().sendMessage(Command.UNICOM, message);
-                chatInput.clear();
-            } else {
-                String target = whisperTargetInput.getText().trim();
-                if (target.isEmpty()) {
-                    GameModel.getInstance().addChatMessage("SYSTEM: You need to enter a target");
-                    return;
-                }
-                EventHandlers.getInstance().sendMessage(Command.WHISPER, target, message);
-                chatInput.clear();
-            }
+    if (!message.isEmpty()) {
+      if ("Global".equals(mode)) {
+        EventHandlers.getInstance().sendMessage(Command.UNICOM, message);
+        chatInput.clear();
+      } else {
+        String target = whisperTargetInput.getText().trim();
+        if (target.isEmpty()) {
+          GameModel.getInstance().addChatMessage("SYSTEM: You need to enter a target");
+          return;
         }
+        EventHandlers.getInstance().sendMessage(Command.WHISPER, target, message);
+        chatInput.clear();
+      }
     }
+  }
 
-    @Override
-    public Scene getScene() {
-        return localScene;
-    }
+  @Override
+  public Scene getScene() {
+    return localScene;
+  }
 }

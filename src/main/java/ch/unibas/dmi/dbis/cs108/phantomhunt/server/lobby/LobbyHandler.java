@@ -200,8 +200,7 @@ public class LobbyHandler {
     if (lobby.removePlayer(player) || lobby.removeSpectator(player)) {
       player.setCurrentLobby(null);
 
-      boolean isEmpty = lobby.getPlayers().get().isEmpty()
-              && lobby.getSpectators().get().isEmpty();
+      boolean isEmpty = lobby.getPlayers().get().isEmpty() && lobby.getSpectators().get().isEmpty();
 
       LOGGER.info("leaveLobby: isEmpty={}, waitingContains={}, finishedContains={}",
               isEmpty, waitingLobbies.contains(lobby), finishedLobbies.contains(lobby));

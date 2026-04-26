@@ -4,8 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * High-level audio API backed by the OpenAL SoundEngine.
- * Operates as a Singleton and gracefully falls back to "silent mode" if no audio device is present.
+ * High-level audio API backed by the OpenAL SoundEngine. Operates as a Singleton and gracefully
+ * falls back to "silent mode" if no audio device is present.
  */
 public final class SoundManager {
 
@@ -16,8 +16,7 @@ public final class SoundManager {
   private boolean initialized;
   private boolean hasFailed = false;
 
-  private SoundManager() {
-  }
+  private SoundManager() {}
 
   /**
    * Retrieves the singleton instance of the SoundManager.
@@ -29,8 +28,8 @@ public final class SoundManager {
   }
 
   /**
-   * Attempts to initialize the underlying sound engine and load all sound effects.
-   * If initialization fails, it fails silently to prevent game crashes-
+   * Attempts to initialize the underlying sound engine and load all sound effects. If
+   * initialization fails, it fails silently to prevent game crashes-
    */
   public synchronized void initialize() {
     if (initialized || hasFailed) {
@@ -71,9 +70,7 @@ public final class SoundManager {
     soundEngine.stopSound(effect);
   }
 
-  /**
-   * Stops all currently playing sounds.
-   */
+  /** Stops all currently playing sounds. */
   public synchronized void stopAll() {
     if (!initialized) {
       return;
@@ -81,9 +78,7 @@ public final class SoundManager {
     soundEngine.stopAll();
   }
 
-  /**
-   * Shuts down the sound engine and frees native resources.
-   */
+  /** Shuts down the sound engine and frees native resources. */
   public synchronized void shutdown() {
     if (!initialized) {
       return;

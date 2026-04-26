@@ -28,7 +28,15 @@ public class Player {
    * @param y The Y coordinate
    * @param playerNumber The player's number
    */
-  public Player(String name, String skin, String role, int score, double x, double y, int playerNumber, String playerDirection) {
+  public Player(
+      String name,
+      String skin,
+      String role,
+      int score,
+      double x,
+      double y,
+      int playerNumber,
+      String playerDirection) {
     this.name = new SimpleStringProperty(name);
     this.skin = new SimpleStringProperty(skin);
     this.score = new SimpleIntegerProperty(score);
@@ -38,26 +46,25 @@ public class Player {
     this.playerDirection = new SimpleStringProperty(playerDirection);
     this.role = new SimpleStringProperty(role);
     this.moved = false;
-
   }
 
-  public void setMoved(Boolean didMove){
+  public void setMoved(Boolean didMove) {
     moved = didMove;
   }
 
-  public boolean didMove(){
+  public boolean didMove() {
     return moved;
   }
 
-  public boolean getMoved(){
+  public boolean getMoved() {
     return moved;
   }
 
-  public String getRole(){
+  public String getRole() {
     return role.get();
   }
 
-  public void setRole(String value){
+  public void setRole(String value) {
     role.set(value);
   }
 

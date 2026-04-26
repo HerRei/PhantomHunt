@@ -7,9 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Represents a network packet consisting of a command and optional arguments.
- */
+/** Represents a network packet consisting of a command and optional arguments. */
 public final class Packet {
 
   private static final Logger LOGGER = LogManager.getLogger(Packet.class);
@@ -63,13 +61,13 @@ public final class Packet {
   /**
    * A helper method to easily create a new packet.
    *
-   * @param cmd  The command of the packet.
+   * @param cmd The command of the packet.
    * @param args The arguments
    * @return A new packet instance.
    */
   public static Packet of(Command cmd, String... args) {
     LOGGER.debug("Static factory Packet.of called for command: {}", cmd);
-    return new Packet(cmd, args == null ? null :Arrays.asList(args));
+    return new Packet(cmd, args == null ? null : Arrays.asList(args));
   }
 
   @Override

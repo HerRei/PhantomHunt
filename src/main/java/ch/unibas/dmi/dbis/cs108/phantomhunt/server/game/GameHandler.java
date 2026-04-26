@@ -19,8 +19,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Owns the match flow and mutates the extracted game state classes safely.
- * Acts as the authoritative controller for a running game.
+ * Owns the match flow and mutates the extracted game state classes safely. Acts as the
+ * authoritative controller for a running game.
  */
 public class GameHandler {
 
@@ -38,31 +38,34 @@ public class GameHandler {
   public GameHandler(GameState gs, Lobby lobby) {
     this.lobby = lobby;
     this.gameState = Objects.requireNonNull(gs, "gameState must not be null");
-    this.lobbyHandler = Objects.requireNonNull(LobbyHandler.getInstance(), "lobbyHandler must not be null");
+    this.lobbyHandler =
+        Objects.requireNonNull(LobbyHandler.getInstance(), "lobbyHandler must not be null");
     this.humanCatchesGhosts = false;
     instance = this;
   }
+
   public static synchronized GameHandler getInstance() {
     return instance;
   }
-  /**
-   * Broadcasts current positions and roles to all clients in the lobby.
-   */
+
+  /** Broadcasts current positions and roles to all clients in the lobby. */
   public void broadcastGameState() {
-    if (gameState.getPhase() != GamePhase.ROUND_RUNNING) {
+    if (gameState.getPhase() != GamePhase.ROUND_RUNNING && gameState.getPhase() != GamePhase.ROUND_ENDED) {
       return;
     }
-    String payload = String.format("%d %d %s",
+    String payload =
+        String.format(
+            "%d %d %s %f %f %b",
             gameState.getRoundStateSnapshot().getCurrentRound(),
             gameState.getRoundTimeRemaining(),
-            gameState.getSerializedPlayers()
-    );
+            gameState.getSerializedPlayers(),
+            gameState.getAbilityPosition().getX(),
+            gameState.getAbilityPosition().getY(),
+            gameState.isAbilityAvailable());
     lobby.broadcast(Packet.of(Command.GSU, payload));
   }
 
-  /**
-   * Main game loop iteration (tick).
-   */
+  /** Main game loop iteration (tick). */
   public synchronized void tick(double deltaTime, long now) {
     if (gameState.getPhase() == GamePhase.ROUND_ENDED) {
       long timeSinceRoundEnd = now - gameState.getLastRoundOutcome().get().getEndedAtMillis();
@@ -82,18 +85,20 @@ public class GameHandler {
     // 2. Check if phantoms caught the human or reversed
     checkCatchCollisions(now, humanCatchesGhosts);
 
-    // 3. Check for round timeout
+    // 3. Check for ability collision
+    checkAbilityCollision();
+
+    // 4. Check for round timeout
     if (now >= gameState.getRoundEndTimeMillis()) {
       endRoundHumanSurvived(now);
     }
 
-    // 4. Inform all clients about the new state
+    // 5. Inform all clients about the new state
     broadcastGameState();
 
-    //5. Check if there are still 4 players inside
+    // 6. Check if there are still 4 players inside
     checkPlayerSize();
   }
-
 
   private void updatePlayerPositions(double deltaTime) {
     double speed = gameState.getRules().moveSpeedPerSecond();
@@ -105,11 +110,13 @@ public class GameHandler {
       InputState currentMovement = ps.getRealInput();
 
       pos.updatePosition(currentMovement, speed, deltaTime, map);
-      InputState nextRequest = ps.getInputState();;
+      InputState nextRequest = ps.getInputState();
+      ;
       if (pos.checkValidInput(currentMovement, nextRequest, map) && nextRequest.isMoving()) {
         ps.setRealInput(nextRequest);
+      } else {
+        pos.checkValidInput(currentMovement, currentMovement, map);
       }
-      else {pos.checkValidInput(currentMovement, currentMovement, map);}
     }
   }
 
@@ -117,32 +124,31 @@ public class GameHandler {
     return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
   }
 
-
   private boolean isCollidingWithWall(double x, double y, double radius) {
     return MapCollision.collidesWithWall(gameState.getMapSnapshot(), x, y, radius);
   }
 
-  /**
-   * Starts the game loop.
-   */
+  /** Starts the game loop. */
   public void startGameLoop() {
     if (gameLoopExecutor != null) return;
 
     gameLoopExecutor = Executors.newSingleThreadScheduledExecutor();
 
-    gameLoopExecutor.scheduleAtFixedRate(() -> {
-      try {
-        double deltaTime = TICK_TIME_MS / 1000.0;
-        tick(deltaTime, System.currentTimeMillis());
-      } catch (Exception e) {
-        // Important
-      }
-    }, 0, TICK_TIME_MS, TimeUnit.MILLISECONDS);
+    gameLoopExecutor.scheduleAtFixedRate(
+        () -> {
+          try {
+            double deltaTime = TICK_TIME_MS / 1000.0;
+            tick(deltaTime, System.currentTimeMillis());
+          } catch (Exception e) {
+            // Important
+          }
+        },
+        0,
+        TICK_TIME_MS,
+        TimeUnit.MILLISECONDS);
   }
 
-  /**
-   * Stops the game loop when the game ends.
-   */
+  /** Stops the game loop when the game ends. */
   public void stopGameLoop() {
     if (gameLoopExecutor != null) {
       gameLoopExecutor.shutdown();
@@ -168,15 +174,33 @@ public class GameHandler {
 
       // If circles overlap, human is caught or player respawns
       if (dist < (radius * 2)) {
-        if (state){
+        if (state) {
           human.addScore(gameState.getHumanCatchBonus());
-          phantom.setPosition(new Position(MapLogic.getInstance().setRandomPosition(phantom.getPosition().getLastSpawn(), gameState.getPlayers(), GameState.SPAWN_DISTANCE), MapLogic.getInstance()));
-        }
-        else{
+          phantom.setPosition(
+              new Position(
+                  MapLogic.getInstance()
+                      .setRandomPosition(
+                          phantom.getPosition().getLastSpawn(),
+                          gameState.getPlayers(),
+                          GameState.SPAWN_DISTANCE),
+                  MapLogic.getInstance()));
+        } else {
           endRoundHumanCaught(phantom.getPlayerId(), now);
           break;
         }
       }
+    }
+  }
+
+  private void checkAbilityCollision() {
+    if (!gameState.isAbilityAvailable()) {
+      return;
+    }
+    PlayerState human = gameState.getHumanPlayer();
+    double dist = calculateDistance(human.getPosition(), gameState.getAbilityPosition());
+    if (dist < gameState.getRules().playerRadius() * 2) {
+      gameState.setAbilityAvailable(false);
+      tryAbility(human.getPlayerId());
     }
   }
 
@@ -197,7 +221,7 @@ public class GameHandler {
    * Concludes the round immediately with the human being caught.
    *
    * @param catcherPlayerId The ID of the phantom who caught the human.
-   * @param nowMillis       The current server time in milliseconds.
+   * @param nowMillis The current server time in milliseconds.
    */
   public synchronized void endRoundHumanCaught(String catcherPlayerId, long nowMillis) {
     ensurePhase(GamePhase.ROUND_RUNNING, "Round is not running.");
@@ -251,7 +275,7 @@ public class GameHandler {
   private void checkPlayerSize() {
     if (lobby.getPlayers().get().size() != GameState.REQUIRED_PLAYER_COUNT) {
       if (gameState.getPhase() == GamePhase.MATCH_ENDED
-              || gameState.getPhase() == GamePhase.ABORTED) {
+          || gameState.getPhase() == GamePhase.ABORTED) {
         return;
       }
       LOGGER.warn("Not enough players in lobby {}, aborting match.", lobby.getId());
@@ -266,7 +290,7 @@ public class GameHandler {
    */
   public synchronized void abortMatch(String reason) {
     if (gameState.getPhase() == GamePhase.MATCH_ENDED
-            || gameState.getPhase() == GamePhase.ABORTED) {
+        || gameState.getPhase() == GamePhase.ABORTED) {
       return;
     }
     gameState.setPhase(GamePhase.ABORTED);
@@ -286,11 +310,12 @@ public class GameHandler {
     lobby.broadcast(Packet.of(Command.ABILITY, "END"));
     if (!hasNextRound()) {
       List<PlayerState> players = gameState.getPlayers();
-      for (PlayerState p : players){
+      for (PlayerState p : players) {
         Registry.getInstance().addHighscore(p.getNickname(), p.getScore());
       }
+      broadcastGameState();
       gameState.setPhase(GamePhase.MATCH_ENDED);
-      stopGameLoop(); // GameLoop stoppen!
+      stopGameLoop();
       lobby.broadcast(Packet.of(Command.GAME_FINISH));
       lobbyHandler.finishLobby(gameState.getMatchId());
       return;
@@ -317,12 +342,12 @@ public class GameHandler {
     return gameState.getCurrentRound() < gameState.getRules().totalRounds();
   }
 
-  public synchronized boolean gameIsRunning(){
-    return gameState.getPhase() == GamePhase.ROUND_RUNNING || gameState.getPhase() == GamePhase.ROUND_ENDED;
+  public synchronized boolean gameIsRunning() {
+    return gameState.getPhase() == GamePhase.ROUND_RUNNING
+        || gameState.getPhase() == GamePhase.ROUND_ENDED;
   }
 
-  public synchronized void updateInput(
-      String playerId, int vertical, int horizontal) {
+  public synchronized void updateInput(String playerId, int vertical, int horizontal) {
     PlayerState player = gameState.requireMutablePlayer(playerId);
     player.setInputState(new InputState(vertical, horizontal));
   }
@@ -391,13 +416,17 @@ public class GameHandler {
       throw new IllegalStateException(
           "Cannot start illegal round number: " + roundState.getCurrentRound());
     }
-    if (roundState.getHumanIndex() < 0 || roundState.getHumanIndex() >= gameState.getPlayerCount()) {
+    if (roundState.getHumanIndex() < 0
+        || roundState.getHumanIndex() >= gameState.getPlayerCount()) {
       throw new IllegalStateException("Invalid humanIndex: " + roundState.getHumanIndex());
     }
 
     assignRolesForCurrentRound();
     resetPlayersForNewRound();
     resetAllInputs();
+
+    gameState.setAbilityPosition(new Position(MapLogic.getInstance().useRandomSpawnPoint(), MapLogic.getInstance()));
+    gameState.setAbilityAvailable(true);
 
     roundState.setRoundStartTimeMillis(nowMillis);
     roundState.setRoundEndTimeMillis(nowMillis + gameState.getRules().roundDurationMillis());
@@ -427,8 +456,7 @@ public class GameHandler {
 
   private void resetPlayersForNewRound() {
     MapLogic.getInstance().resetSpawnPoints();
-    List<Position> spawns =
-        GameFactory.createDefaultSpawnPositions();
+    List<Position> spawns = GameFactory.createDefaultSpawnPositions();
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
       player.setPosition(spawns.get(i).copy());
@@ -438,8 +466,8 @@ public class GameHandler {
   private void resetAllInputs() {
     for (int i = 0; i < gameState.getPlayerCount(); i++) {
       PlayerState player = gameState.getMutablePlayerAt(i);
-      player.setRealInput(new InputState(0,0));
-      player.setInputState(new InputState(0,0));
+      player.setRealInput(new InputState(0, 0));
+      player.setInputState(new InputState(0, 0));
     }
   }
 
@@ -447,7 +475,8 @@ public class GameHandler {
     long survivedMillis =
         Math.max(
             0L,
-            Math.min(nowMillis, gameState.getRoundEndTimeMillis()) - gameState.getRoundStartTimeMillis());
+            Math.min(nowMillis, gameState.getRoundEndTimeMillis())
+                - gameState.getRoundStartTimeMillis());
     int survivedWholeSeconds = (int) Math.ceil(survivedMillis / 1000L);
 
     int humanIndex = gameState.getHumanIndex();
@@ -469,8 +498,9 @@ public class GameHandler {
           .getCatcherPlayerId()
           .ifPresent(
               catcherId ->
-                  gameState.requireMutablePlayer(catcherId).addScore(
-                      gameState.getRules().phantomCatchBonus()));
+                  gameState
+                      .requireMutablePlayer(catcherId)
+                      .addScore(gameState.getRules().phantomCatchBonus()));
     }
   }
 
@@ -482,17 +512,21 @@ public class GameHandler {
 
   public void tryAbility(String playerId) {
     PlayerState player = gameState.requireMutablePlayer(playerId);
-    if(player.getRole() == PlayerRole.HUMAN && player.getRemainingAbility() > 0 && !humanCatchesGhosts){
-      LOGGER.info("Sollte fangen können");
+    if (player.getRole() == PlayerRole.HUMAN
+        && player.getRemainingAbility() > 0
+        && !humanCatchesGhosts) {
       humanCatchesGhosts = true;
       lobby.broadcast(Packet.of(Command.ABILITY, "START"));
       player.setRemainingAbility(player.getRemainingAbility() - 1);
       ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-      scheduler.schedule(() -> {
-        humanCatchesGhosts = false;
-        lobby.broadcast(Packet.of(Command.ABILITY, "END"));
-        scheduler.shutdown();
-      }, 5, TimeUnit.SECONDS);
+      scheduler.schedule(
+          () -> {
+            humanCatchesGhosts = false;
+            lobby.broadcast(Packet.of(Command.ABILITY, "END"));
+            scheduler.shutdown();
+          },
+          10,
+          TimeUnit.SECONDS);
     }
   }
 }

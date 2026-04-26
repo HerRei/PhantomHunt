@@ -13,11 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Builds a fresh game state and owns the setup/validation logic for match creation.
- */
+/** Builds a fresh game state and owns the setup/validation logic for match creation. */
 public final class GameFactory {
   private static GameState gs;
+
   /**
    * Creates a game with the provided rules and map.
    *
@@ -27,7 +26,7 @@ public final class GameFactory {
    * @param map The collision map for the game.
    */
   public GameState create(
-          String matchId, List<PlayerSeed> playerSeeds, GameRules rules, MapLogic map) {
+      String matchId, List<PlayerSeed> playerSeeds, GameRules rules, MapLogic map) {
     Boolean[][] validatedMap = deepCopyAndValidateMap(map.getMap());
     List<PlayerState> players = createPlayers(playerSeeds, validatedMap);
     gs = new GameState(matchId, rules, validatedMap, players);
@@ -43,8 +42,8 @@ public final class GameFactory {
    * @return A newly initialized GameState.
    */
   public GameState createWithDefaultRules(
-          String matchId, List<PlayerSeed> playerSeeds, MapLogic map) {
-    if (map == null) { //fallback for no Map
+      String matchId, List<PlayerSeed> playerSeeds, MapLogic map) {
+    if (map == null) { // fallback for no Map
       return create(matchId, playerSeeds, GameRules.defaultRules(), map);
     }
     return create(matchId, playerSeeds, GameRules.defaultRules(), map);
@@ -55,7 +54,7 @@ public final class GameFactory {
 
     if (playerSeeds.size() != GameState.REQUIRED_PLAYER_COUNT) {
       throw new IllegalArgumentException(
-              "A match requires exactly " + GameState.REQUIRED_PLAYER_COUNT + " players.");
+          "A match requires exactly " + GameState.REQUIRED_PLAYER_COUNT + " players.");
     }
 
     List<PlayerState> result = new ArrayList<>();
@@ -65,16 +64,16 @@ public final class GameFactory {
       PlayerSeed seed = Objects.requireNonNull(playerSeeds.get(i), "player seed must not be null");
 
       result.add(
-              new PlayerState(
-                      requireNonBlank(seed.playerId(), "playerId must not be blank"),
-                      requireNonBlank(seed.nickname(), "nickname must not be blank"),
-                      PlayerRole.PHANTOM,
-                      defaultSpawns.get(i).copy(),
-                      new InputState(0, 0),
-                      0,
-                      0,
-                      true,
-                      false));
+          new PlayerState(
+              requireNonBlank(seed.playerId(), "playerId must not be blank"),
+              requireNonBlank(seed.nickname(), "nickname must not be blank"),
+              PlayerRole.PHANTOM,
+              defaultSpawns.get(i).copy(),
+              new InputState(0, 0),
+              0,
+              0,
+              true,
+              false));
     }
 
     return result;
@@ -111,7 +110,9 @@ public final class GameFactory {
 
   static List<Position> createDefaultSpawnPositions() {
     List<Position> spawns = new ArrayList<Position>();
-    spawns = MapLogic.getInstance().getRandomSpawns(GameState.REQUIRED_PLAYER_COUNT, spawns, GameState.SPAWN_DISTANCE);
+    spawns =
+        MapLogic.getInstance()
+            .getRandomSpawns(GameState.REQUIRED_PLAYER_COUNT, spawns, GameState.SPAWN_DISTANCE);
     return spawns;
   }
 

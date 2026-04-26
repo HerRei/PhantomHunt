@@ -27,11 +27,10 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 /**
- * Manages the client's active network connection to the server.
- * This class runs in its own thread, constantly listens for incoming
- * messages from the server, and provides a method for sending packets.
+ * Manages the client's active network connection to the server. This class runs in its own thread,
+ * constantly listens for incoming messages from the server, and provides a method for sending
+ * packets.
  */
 public class ServerHandler implements Runnable {
 
@@ -51,19 +50,18 @@ public class ServerHandler implements Runnable {
     thread.start();
   }
 
-
   /**
-   * Starts the read loop for the server connection.
-   * Incoming lines are decoded into packets and forwarded to the packet dispatcher.
+   * Starts the read loop for the server connection. Incoming lines are decoded into packets and
+   * forwarded to the packet dispatcher.
    */
   @Override
   public void run() {
-    try (
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-            BufferedWriter out = new BufferedWriter(
-                    new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))
-    ) {
+    try (BufferedReader in =
+            new BufferedReader(
+                new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        BufferedWriter out =
+            new BufferedWriter(
+                new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
       this.out = out;
       String line;
       initializeUser();
@@ -148,7 +146,7 @@ public class ServerHandler implements Runnable {
 
   private void handleAbility(Packet packet) {
 
-    switch(packet.args().get(0)){
+    switch (packet.args().get(0)) {
       case "START":
         SoundManager.getInstance().play(SoundEffect.COIN_UP);
         GameModel.getInstance().setAbility(true);
@@ -169,27 +167,32 @@ public class ServerHandler implements Runnable {
     }
 
     String text = p.text();
+    LOGGER.info(text);
     Map<String, Integer> highscores = new LinkedHashMap<>();
     String[] lines = text.split("\\|");
 
     for (String line : lines) {
       if (line.isEmpty()) continue;
-      String entry = line.split("\\.\\s*", 2)[1].trim();
+      String[] rankAndEntry = line.split("\\.\\s*", 2);
+      String rank = rankAndEntry[0].trim();
+      String entry = rankAndEntry[1].trim();
       String[] parts = entry.split(":\\s*", 2);
-      highscores.put(parts[0].trim(), Integer.parseInt(parts[1].trim()));
+      String name = rank + ". " + parts[0].trim();
+      highscores.put(name, Integer.parseInt(parts[1].trim()));
     }
     GameModel.getInstance().setHighscores(highscores);
   }
 
   public void handleGameFinish() {
     SoundManager.getInstance().play(SoundEffect.DESCENT_WHOOSH);
-    Platform.runLater(() -> {
-      EndScene endScene = (EndScene) SceneManager.getInstance().getScene(SceneProtocol.END);
-      if (endScene != null) {
-        endScene.updateWinner();
-      }
-      SceneManager.getInstance().showScene(SceneProtocol.END);
-    });
+    Platform.runLater(
+        () -> {
+          EndScene endScene = (EndScene) SceneManager.getInstance().getScene(SceneProtocol.END);
+          if (endScene != null) {
+            endScene.updateWinner();
+          }
+          SceneManager.getInstance().showScene(SceneProtocol.END);
+        });
     SoundManager.getInstance().stopAll();
   }
 
@@ -197,28 +200,30 @@ public class ServerHandler implements Runnable {
     if (packet.argc() < 1) {
       return;
     }
-    Platform.runLater(() -> {
-      String[] names = packet.args().get(0).split(" ");
-      GameModel.getInstance().players.setAll(names);
-    });
+    Platform.runLater(
+        () -> {
+          String[] names = packet.args().get(0).split(" ");
+          GameModel.getInstance().players.setAll(names);
+        });
   }
 
   /**
-   * Handles the game start packet by switching the UI to the game scene
-   * This action is executed on the JavaFX Application Thread.
+   * Handles the game start packet by switching the UI to the game scene This action is executed on
+   * the JavaFX Application Thread.
    */
   private void handleGameStart() {
     SoundManager.getInstance().play(SoundEffect.DESCENT_WHOOSH);
     SoundManager.getInstance().play(SoundEffect.WIND_OUTSIDE_ROOM_TONE);
-    Platform.runLater(() -> {
-      SceneManager.getInstance().showScene(SceneProtocol.GAME);
-      GameModel.getInstance().clearChat();
-    });
+    Platform.runLater(
+        () -> {
+          SceneManager.getInstance().showScene(SceneProtocol.GAME);
+          GameModel.getInstance().clearChat();
+        });
   }
 
   /**
-   * Parses lobby information received from the server and updates the lobby scene.
-   * If the lobby scene is active, it updates the lobby ID and the list of connected players.
+   * Parses lobby information received from the server and updates the lobby scene. If the lobby
+   * scene is active, it updates the lobby ID and the list of connected players.
    *
    * @param packet the packet containing the lobby ID and player names
    */
@@ -233,26 +238,27 @@ public class ServerHandler implements Runnable {
     String lobbyId = parts[0];
     String[] players = Arrays.copyOfRange(parts, 1, parts.length);
 
-    Platform.runLater(() -> {
-      SceneManager sceneManager = SceneManager.getInstance();
-      SceneProtocol current = sceneManager.getCurrentScene();
+    Platform.runLater(
+        () -> {
+          SceneManager sceneManager = SceneManager.getInstance();
+          SceneProtocol current = sceneManager.getCurrentScene();
 
       if (current != SceneProtocol.GAME && current != SceneProtocol.END) {
         sceneManager.showScene(SceneProtocol.LOBBY);
       }
 
-      LobbyScene lobbyScene = (LobbyScene) sceneManager.getScene(SceneProtocol.LOBBY);
-      if (lobbyScene != null) {
-        lobbyScene.updateLobbyInfo(lobbyId, players);
-      } else {
-        LOGGER.error("LobbyScene is not registered in SceneManager.");
-      }
+          LobbyScene lobbyScene = (LobbyScene) sceneManager.getScene(SceneProtocol.LOBBY);
+          if (lobbyScene != null) {
+            lobbyScene.updateLobbyInfo(lobbyId, players);
+          } else {
+            LOGGER.error("LobbyScene is not registered in SceneManager.");
+          }
 
-      EndScene endScene = (EndScene) sceneManager.getScene(SceneProtocol.END);
-      if (endScene != null) {
-        endScene.updateLobbyInfo(lobbyId, players);
-      }
-    });
+          EndScene endScene = (EndScene) sceneManager.getScene(SceneProtocol.END);
+          if (endScene != null) {
+            endScene.updateLobbyInfo(lobbyId, players);
+          }
+        });
   }
 
   /**
@@ -263,9 +269,10 @@ public class ServerHandler implements Runnable {
   private void handleWelcome(Packet packet) {
     this.name = packet.text();
     try {
-      Platform.runLater(() -> {
-        GameModel.getInstance().setName(this.name);
-      });
+      Platform.runLater(
+          () -> {
+            GameModel.getInstance().setName(this.name);
+          });
     } catch (Exception e) {
       LOGGER.info("JavaFX is not available");
     }
@@ -278,23 +285,21 @@ public class ServerHandler implements Runnable {
     }
     String payload = p.args().get(0);
 
-    Platform.runLater(() -> {
-      try {
-        GameModel.getInstance().updatePlayersFromServer(payload);
-      } catch (Exception e) {
-        LOGGER.error("Failed to process Game State Update: {}", payload, e);
-      }
-    });
+    Platform.runLater(
+        () -> {
+          try {
+            GameModel.getInstance().updatePlayersFromServer(payload);
+          } catch (Exception e) {
+            LOGGER.error("Failed to process Game State Update: {}", payload, e);
+          }
+        });
   }
 
-  /**
-   * Responds to a server ping with a pong packet.
-   */
+  /** Responds to a server ping with a pong packet. */
   private void handlePing() {
     sendMessage(Packet.of(Command.PONG));
     LOGGER.trace("Received Ping {}", System.currentTimeMillis());
   }
-
 
   /**
    * Stores the nickname confirmed by the server.
@@ -321,7 +326,7 @@ public class ServerHandler implements Runnable {
     }
 
     LOGGER.info("Info: {}", text);
-    GameModel.getInstance().addChatMessage(text); //adds message to chat
+    GameModel.getInstance().addChatMessage(text); // adds message to chat
   }
 
   /**
@@ -331,13 +336,10 @@ public class ServerHandler implements Runnable {
    */
   private void handleUnicom(Packet packet) {
     LOGGER.info("Chat: {}", packet.text());
-    GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
+    GameModel.getInstance().addChatMessage(packet.text()); // adds message to text
   }
 
-  /**
-   * Handles LOBBY_LIST command.
-   * Protocol: LOBBY_LIST waiting1:waiting2;running1:running2
-   */
+  /** Handles LOBBY_LIST command. Protocol: LOBBY_LIST waiting1:waiting2;running1:running2 */
   private void handleLobbyList(Packet p) {
     if (p.args().isEmpty()) return;
 
@@ -361,9 +363,7 @@ public class ServerHandler implements Runnable {
     // Update model on FX thread
     final List<String> finalWaiting = waiting;
     final List<String> finalRunning = running;
-    Platform.runLater(() ->
-            GameModel.getInstance().updateLobbyList(finalRunning, finalWaiting)
-    );
+    Platform.runLater(() -> GameModel.getInstance().updateLobbyList(finalRunning, finalWaiting));
   }
 
   /**
@@ -373,16 +373,18 @@ public class ServerHandler implements Runnable {
    */
   private void handleWhisper(Packet packet) {
     String text = packet.text();
-    if (text.startsWith("[Whisper from ")) { //if this hardedcoded logic isnt gonna break soemthing down the line...
+    if (text.startsWith(
+        "[Whisper from ")) { // if this hardedcoded logic isnt gonna break soemthing down the
+                             // line...
       SoundManager.getInstance().play(SoundEffect.UNIVERSFIELD_MESSAGE);
     }
     LOGGER.info("Whisper: {}", packet.text());
-    GameModel.getInstance().addChatMessage(packet.text()); //adds message to text
+    GameModel.getInstance().addChatMessage(packet.text()); // adds message to text
   }
 
   private void handleYap(Packet packet) {
     LOGGER.info("YAP: {}", packet.text());
-    GameModel.getInstance().addLobbyChatMessage(packet.text()); //adds message to text
+    GameModel.getInstance().addLobbyChatMessage(packet.text()); // adds message to text
   }
 
   /**
@@ -412,12 +414,10 @@ public class ServerHandler implements Runnable {
     LOGGER.info("Received unknown command: {}", packet.cmd());
   }
 
-  /**
-   * Initializes the client nickname from the local system user name or a generated fallback.
-   */
+  /** Initializes the client nickname from the local system user name or a generated fallback. */
   private void initializeUser() {
     String systemName = System.getProperty("user.name");
-    if (Main.nickname != null){
+    if (Main.nickname != null) {
       systemName = Main.nickname;
     }
     if (systemName == null || systemName.isBlank()) {
@@ -426,7 +426,6 @@ public class ServerHandler implements Runnable {
     }
     sendMessage(Packet.of(Command.NICK, systemName));
   }
-
 
   /**
    * Sends a packet to the server over the active socket connection.
@@ -438,7 +437,7 @@ public class ServerHandler implements Runnable {
       LOGGER.error("User tried sending an invalid packet");
       return;
     }
-    //Debugging
+    // Debugging
     LOGGER.info("Client side sends packet : {}", p);
 
     try {
@@ -452,9 +451,7 @@ public class ServerHandler implements Runnable {
     }
   }
 
-  /**
-   * Closes the client socket if it is still open.
-   */
+  /** Closes the client socket if it is still open. */
   private void closeSocket() {
     try {
       if (!socket.isClosed()) {

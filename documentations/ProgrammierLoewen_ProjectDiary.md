@@ -165,7 +165,7 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Die GUI and diese Funktionen anbinden.
 - Weitere Tests die danne erggeben, ob die Mehrdeutigkeit wirklich behoben wurde. evt. erstellen von Unit-tests und Äquivalenzklassenf um all das auf nicht Ambiguative Art zu testen. 
 
-## 2026-03-28 - Ismail
+## 2026-03-28 - Ismail ##
 **Dauer:** ~0.5h
 **Ziel:** Build-Prozess anpassen.
 **Was gemacht:**
@@ -212,7 +212,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - Die neuen Funktionen für den Zuschauer-Modus (Spectator) an die GUI anbinden.
 - Prüfen, ob die Logik für Leerzeichen in Usernamen bei allen Befehlen (Whisper, MKL) einwandfrei funktioniert.
 
-## 2026-04-05 - Ismail 
+## 2026-04-05 - Ismail ##
 **dauer:** ~11h
 **Ziel:** Spielkarte implementieren und anzeigen.
 **Was gemacht:**
@@ -223,7 +223,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - isWalkable()-Methode für zukünftige Bewegungsabfragen via Kollisionskarte in der GameScene bereitgestellt.
 - Skalierung der Karte hinzugefügt, damit sie sich an die Bildschirmgröße der User anpasst.
 
-## 2026-04-8 bis 2026-04-09 — Vera ##
+## 2026-04-08 bis 2026-04-09 — Vera ##
 **Dauer:** ~7h
 **Ziel:** Grundlage für das QA-Konzept erarbeiten und erste Ausformulierung erstellen.
 **Was gemacht:**
@@ -235,7 +235,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Nächstes:**
 - Das Konzept weiter vertiefen und zusätzliche Aspekte ergänzen.
 
-## 2026-04-10 - Ismail
+## 2026-04-10 - Ismail ##
 **Dauer:** ~10h
 **Ziel:**
 - Serverseitiges Laden der Karte vorbereiten.
@@ -268,15 +268,130 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - Struktur verbessert, damit der Aufbau logischer ist.
 - Javadoc überarbeitet und allgemeines Housekeeping im Code durchgeführt (Kommentare verbessert, kleinere Unsauberkeiten behoben).
 
-## 2026-04-13 — Silas & Hermes##
+## 2026-04-13 — Silas & Hermes ##
 **Dauer:** ~14h(pro Person)
 **Ziel:** GUI implementierung und erstellen prototyps
 **Was gemacht:**
 - Alle Schnittstellen wurden vereint und ein funktionierender prototyp erstellt.
 - Gui Wurde komplett neu erstellt so das man Spiel versteht.
 
+## 2026-04-16 — Silas ##
+**Dauer:** ~5h
+**Ziel:** Rebuilden und aufräumen von Serverseite und Collision-system.
+**Was gemacht:**
+- Konzept von wie das movement und Kollisionen funktionieren sollte.
 
 
+## 2026-04-16 — Silas ##
+**Dauer:** ~5h
+**Ziel:** Rebuilden und aufräumen von Serverseite und Collision-system.
+**Was gemacht:**
+- Konzept von wie das movement und Kollisionen funktionieren sollte.
+
+## 2026-04-19 bis 2026-04-26 — Vera ##
+**Dauer:** ~25h
+**Ziel:** Erweiterung und Verbesserung der Unit Tests.
+**Was gemacht:**
+- Umfangreiche Unit Tests implementiert und bestehende Tests erweitert.
+- Testabdeckung gezielt verbessert und zentrale Komponenten systematisch getestet.
+- Struktur und Organisation der Tests überarbeitet.
+
+**Nächstes:**
+- Weitere Unit Tests implementieren, um die Abdeckung zu erhöhen.
+- QA-Dokumentation vervollständigen und präzisieren.
+
+
+## 2026-04-19 — Silas ##
+**Dauer:** ~4h
+**Ziel:** Pacman-movement implementieren und Spawnpunkte random machen.
+**Was gemacht:**
+- Ich konnte das Ziel mit Schwierigkeiten umsetzen.
+
+## 2026-04-20 — Silas ##
+**Dauer:** ~3h
+**Ziel:** Ability implementieren
+**Was gemacht:**
+- Die Ability funktioniert jetzt über "Q" und Geister spawnen beim Fangen an zufälliger Stelle.
+
+## 2026-04-21 — Hermes ##
+**Dauer:** ~1h
+**Ziel:** Highscore im Spiel einbauen.
+**Was gemacht:**
+- **Highscore-Befehl:** Einen neuen Befehl für den Highscore hinzugefügt.
+- **Registry:** Die Registry so erweitert, dass sie die Highscores speichern kann.
+- **Client-Handler:** Den Client-Handler so angepasst, dass er die Highscores verarbeiten kann.
+
+## 2026-04-21 — Silas ##
+**Dauer:** ~4h
+**Ziele:** 
+- Lobby sauber verlassen/schliessen nach Spielende. 
+- Gewinner muss angezeigt werden im GUI.
+
+**Was gemacht:**
+- Ich konnte eine Funktion implementieren welche die Lobby mehr oder weniger sauber schliesst jedoch immer noch nicht komplett sauber.
+- Gewinner wird in der Endscene richtig angezeigt
+
+## 2026-04-20 - Ismail
+**Dauer:** ~8h
+**Ziel:** Implementieren der neuen Map, zeichnen und implementieren der Skins zur optischen Differenzierung der Spieler.
+**Was gemacht:** 
+- Alle Böden einen Buchstaben zugeordnet und ein 2D Array mit diesen Buchstaben für die Map definiert.
+- Zeichnen von verschiedenen Sprites für Geister und Menschen (unterschiedliche Farben/Designs), um jedem Spieler einzigartig zu machen.
+
+## 2026-04-22 - Ismail
+**Dauer:** ~6h
+**Ziel:** Implementierung der visuellen Orientierung für Geist und Mensch und Animation des Menschen.
+**Was gemacht:** 
+- Grafik erstellt: Zeichnen der drei übrigen Hauptrichtungen für jeden Geist und Mensch.
+- Implementierung der Logik, wenn der Spieler die Richtung ändert, aktualisiert sich sein Sprite.
+
+## 2026-04-23 — Hermes ##
+**Dauer:** ~7h
+**Ziel:** Soundeffekte im Spiel einbauen.
+**Was gemacht:**
+- **Soundeffekte:** Die Soundeffekte, die schon im Projekt waren, wurden ins Spiel eingebaut.
+- **Bugfix:** Ein Fehler wurde behoben, bei dem die Schritt-Sounds weiter abgespielt wurden, obwohl der Spieler schon gefangen war.
+
+## 2026-04-24 — Silas ##
+**Dauer:** ~1h
+**Ziel:** Man kann den Highscore im GUI anschauen.
+**Was gemacht:**
+- Ich konnte das Ziel umsetzen.
+
+## 2026-04-21 - Alle ##
+**Dauer:** ~1h
+**Ziel:** Debrefing für MS4 & Aufgabenverteilung MS5
+**Was gemacht:**
+- Wir haben die Resultate des MS4 besprochen. Welche Prozesse gut funktioneirt haben und welche noch zu verbessern sind.
+- Wir haben die Aufgaben für den MS5 verteilt.
+
+## 2026-04-25/26 — Ismail
+**Dauer:** ~7h
+**Ziel:** Aktivierung der Fähigkeit von einem Tastendruck auf ein Item umstellen, welches sich auf der Map befindet und visuell die Geister während der Fähigkeit darstellen. Lobbybeitritt per Doppelklick
+**Was gemacht:**
+- Zeichnungen der Fähigkeit und der geglitchten Geister erstellt.
+- Die 'Q' Tastenaktivierung entfernt und durch ein Sprite auf der Karte ersetzt.
+- Wenn man auf eine Lobby in der Lobbyliste doppelklickt, tritt man dieser bei.
+
+## 2026-04-26 — Hermes ##
+**Dauer:** ~4h
+**Ziel:** Unit-Tests reparieren.
+**Was gemacht:**
+- **Fehlerbehebung:** Kaputte Unit-Tests repariert.
+- **Pipeline-Fix:** Die Pipeline repariert, indem die kaputten Tests korrigiert wurden.
+- **Registry-Reset:** Einen Reset für die Registry hinzugefügt, um die Tests stabiler zu machen.
+
+## 2026-04-19 bis 2026-04-26 — Vera ##
+**Dauer:** ~25h
+**Ziel:** Erweiterung und Verbesserung der Unit Tests.
+**Was gemacht:**
+- Umfangreiche Unit Tests implementiert und bestehende Tests erweitert.
+- Testabdeckung gezielt verbessert und zentrale Komponenten systematisch getestet.
+- Struktur und Organisation der Tests überarbeitet.
+
+**Nächstes:**
+- Weitere Unit Tests implementieren, um die Abdeckung zu erhöhen.
+- QA-Dokumentation vervollständigen und präzisieren.
 
 
 

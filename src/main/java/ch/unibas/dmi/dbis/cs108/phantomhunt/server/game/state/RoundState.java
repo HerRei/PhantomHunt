@@ -1,8 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 
-/**
- * Tracks the progression, timing, and role assignments of the active round.
- */
+/** Tracks the progression, timing, and role assignments of the active round. */
 public final class RoundState {
   private int currentRound;
   private int humanIndex;
@@ -10,15 +8,13 @@ public final class RoundState {
   private long roundEndTimeMillis;
 
   /**
-   *
-   *
-   * @param currentRound         The current round number.
-   * @param humanIndex           The index of the human player in the player list.
+   * @param currentRound The current round number.
+   * @param humanIndex The index of the human player in the player list.
    * @param roundStartTimeMillis The timestamp when the round started.
-   * @param roundEndTimeMillis   The timestamp when the round is scheduled to end.
+   * @param roundEndTimeMillis The timestamp when the round is scheduled to end.
    */
   public RoundState(
-          int currentRound, int humanIndex, long roundStartTimeMillis, long roundEndTimeMillis) {
+      int currentRound, int humanIndex, long roundStartTimeMillis, long roundEndTimeMillis) {
     this.currentRound = currentRound;
     this.humanIndex = humanIndex;
     this.roundStartTimeMillis = roundStartTimeMillis;

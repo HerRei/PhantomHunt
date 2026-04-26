@@ -11,9 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-/**
- * Represents the lobby waiting area, displaying connected players and a lobby chat.
- */
+/** Represents the lobby waiting area, displaying connected players and a lobby chat. */
 public class LobbyScene implements SceneInterface {
 
   private Scene scene;
@@ -26,10 +24,7 @@ public class LobbyScene implements SceneInterface {
   private ListView<String> chatArea;
   private TextField chatInput;
 
-  /**
-   * Constructs a new LobbyScene.
-   * Initializes UI components, binds the chat to the game model
-   */
+  /** Constructs a new LobbyScene. Initializes UI components, binds the chat to the game model */
   public LobbyScene() {
     root = new VBox(10);
     root.setAlignment(Pos.CENTER);
@@ -41,7 +36,8 @@ public class LobbyScene implements SceneInterface {
     chatInput = new TextField();
     chatInput.setPromptText("Type your message here");
 
-    root.getChildren().addAll(lobbyIdLabel, playerList, startGameButton, backButton, chatArea, chatInput);
+    root.getChildren()
+        .addAll(lobbyIdLabel, playerList, startGameButton, backButton, chatArea, chatInput);
 
     setupEvents();
     bindChat();
@@ -50,31 +46,38 @@ public class LobbyScene implements SceneInterface {
   }
 
   private void setupEvents() {
-    startGameButton.setOnAction(e -> {
-      // Logic to start the game
-      EventHandlers.getInstance().sendMessage(Command.START, "");
-    });
+    startGameButton.setOnAction(
+        e -> {
+          // Logic to start the game
+          EventHandlers.getInstance().sendMessage(Command.START, "");
+        });
 
-    backButton.setOnAction(e -> {
-      // Logic to leave the lobby
-      EventHandlers.getInstance().quitLobby(id);
-      SceneManager.getInstance().showScene(SceneProtocol.HOME);
-    });
+    backButton.setOnAction(
+        e -> {
+          // Logic to leave the lobby
+          EventHandlers.getInstance().quitLobby(id);
+          SceneManager.getInstance().showScene(SceneProtocol.HOME);
+        });
 
-    chatInput.setOnAction(e -> {
-      String message = chatInput.getText();
-      if (message != null && !message.isEmpty()) {
-        EventHandlers.getInstance().sendMessage(Command.YAP, message);
-        chatInput.clear();
-      }
-    });
+    chatInput.setOnAction(
+        e -> {
+          String message = chatInput.getText();
+          if (message != null && !message.isEmpty()) {
+            EventHandlers.getInstance().sendMessage(Command.YAP, message);
+            chatInput.clear();
+          }
+        });
   }
 
   private void bindChat() {
     chatArea.setItems(GameModel.getInstance().lobbyChatMessagesProperty());
-    GameModel.getInstance().lobbyChatMessagesProperty().addListener((ListChangeListener<String>) c -> {
-      Platform.runLater(() -> chatArea.scrollTo(chatArea.getItems().size() - 1));
-    });
+    GameModel.getInstance()
+        .lobbyChatMessagesProperty()
+        .addListener(
+            (ListChangeListener<String>)
+                c -> {
+                  Platform.runLater(() -> chatArea.scrollTo(chatArea.getItems().size() - 1));
+                });
   }
 
   /**

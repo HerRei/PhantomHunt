@@ -10,9 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
 
-/**
- * The main server class that listens for incoming client connections.
- */
+/** The main server class that listens for incoming client connections. */
 public class TcpServer {
 
   private static final Logger LOGGER = LogManager.getLogger(TcpServer.class);
@@ -24,10 +22,13 @@ public class TcpServer {
    *
    * @param port The port the server will listen on.
    */
-  public TcpServer(int port){this.port = port;} //should be deleted soon left it for serverApp
+  public TcpServer(int port) {
+    this.port = port;
+  } // should be deleted soon left it for serverApp
 
   /**
    * Creates a new TCP server.
+   *
    * @param port The port the server will listen.
    * @param readyLatch Timer to see if server is started
    */
@@ -37,8 +38,8 @@ public class TcpServer {
   }
 
   /**
-   * Starts the server loop, accepting incoming connections and assigning each
-   * to a new dedicated ClientHandler thread.
+   * Starts the server loop, accepting incoming connections and assigning each to a new dedicated
+   * ClientHandler thread.
    */
   public void start() {
     try (ServerSocket serverSocket = new ServerSocket(port)) {
@@ -54,14 +55,17 @@ public class TcpServer {
       while (true) {
         Socket socket =
             serverSocket
-                .accept(); // loops until successful connection, this is the last step of the server activation
+                .accept(); // loops until successful connection, this is the last step of the server
+                           // activation
         LOGGER.info(
             "Connection to server from client-adress: {}",
             socket.getRemoteSocketAddress()); // debug logs
 
         ClientHandler clientHandler =
             new ClientHandler(
-                socket, registry, lobbyHandler); // thread-per-client. everyone gets a handler trough this here.
+                socket,
+                registry,
+                lobbyHandler); // thread-per-client. everyone gets a handler trough this here.
         Thread t = new Thread(clientHandler);
         t.start();
       }

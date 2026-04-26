@@ -5,33 +5,34 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManag
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import javafx.beans.binding.Bindings;
 
-/**
- * Scene allowing the user to update their current nickname.
- */
+/** Scene allowing the user to update their current nickname. */
 public class NicknameScene extends AbstractInputScene {
-    public NicknameScene(){
-        super();
-    }
+  public NicknameScene() {
+    super();
+  }
 
+  @Override
+  protected void setupTexts() {
+    descriptionLabel
+        .textProperty()
+        .bind(Bindings.concat("Your name: ", GameModel.getInstance().getName()));
+    inputField.setPromptText("Enter your new nickname...");
+    confirmButton.setText("Update Name");
+  }
 
-    @Override
-    protected void setupTexts() {
-        descriptionLabel.textProperty().bind(Bindings.concat("Your name: ", GameModel.getInstance().getName()));
-        inputField.setPromptText("Enter your new nickname...");
-        confirmButton.setText("Update Name");
-    }
-
-    @Override
-    protected void setupEvents() {
-        // Handle the confirmation logic
-        confirmButton.setOnAction(e -> {
-            EventHandlers.getInstance().handleNicknameUpdate(inputField.getText());
-            inputField.clear();
+  @Override
+  protected void setupEvents() {
+    // Handle the confirmation logic
+    confirmButton.setOnAction(
+        e -> {
+          EventHandlers.getInstance().handleNicknameUpdate(inputField.getText());
+          inputField.clear();
         });
 
-        // Handle the back button logic
-        backButton.setOnAction(e -> {
-            SceneManager.getInstance().showScene(SceneProtocol.HOME);
+    // Handle the back button logic
+    backButton.setOnAction(
+        e -> {
+          SceneManager.getInstance().showScene(SceneProtocol.HOME);
         });
-    }
+  }
 }

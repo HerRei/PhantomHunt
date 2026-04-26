@@ -57,5 +57,4 @@ class RoundStateTest {
     assertEquals(50L, state.getRoundStartTimeMillis());
     assertEquals(150L, state.getRoundEndTimeMillis());
   }
-
 }

@@ -49,9 +49,9 @@ import static org.lwjgl.openal.AL10.alSourcei;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
- * A sound engine powered by LWJGL and OpenAL for playing audio.
- * Modeled after the "GamesWithGabe" OpenAL 2D Game Engine tutorial from YouTube
- * It has to be disclosed that this is pretty much a 1:1 copy.
+ * A sound engine powered by LWJGL and OpenAL for playing audio. Modeled after the "GamesWithGabe"
+ * OpenAL 2D Game Engine tutorial from YouTube It has to be disclosed that this is pretty much a 1:1
+ * copy.
  */
 public final class SoundEngine {
 
@@ -64,8 +64,8 @@ public final class SoundEngine {
   private final Map<SoundEffect, Integer> sourceIds = new EnumMap<>(SoundEffect.class);
 
   /**
-   * Initializes the OpenAL audio device and context.
-   * Must be called before loading or playing any sounds.
+   * Initializes the OpenAL audio device and context. Must be called before loading or playing any
+   * sounds.
    *
    * @throws IllegalStateException if OpenAL is unsupported or fails to initialize.
    */
@@ -97,6 +97,7 @@ public final class SoundEngine {
     initialized = true;
     LOGGER.info("OpenAL sound engine initialized successfully.");
   }
+
   /**
    * Loads a sound effect into memory and assigns it an OpenAL source ID.
    *
@@ -150,9 +151,7 @@ public final class SoundEngine {
     alSourceStop(sourceId);
   }
 
-  /**
-   * Stops all currently playing sounds.
-   */
+  /** Stops all currently playing sounds. */
   public synchronized void stopAll() {
     for (Integer sourceId : sourceIds.values()) {
       alSourceStop(sourceId);
@@ -160,8 +159,8 @@ public final class SoundEngine {
   }
 
   /**
-   * Cleans up all OpenAL resources, buffers, and destroys the audio context.
-   * Should be called when the application is closing.
+   * Cleans up all OpenAL resources, buffers, and destroys the audio context. Should be called when
+   * the application is closing.
    */
   public synchronized void shutdown() {
     for (Integer sourceId : sourceIds.values()) {
@@ -233,11 +232,15 @@ public final class SoundEngine {
 
         int bufferId = alGenBuffers();
         alBufferData(
-            bufferId, resolveFormat(pcmFormat.getChannels()), pcmBuffer, (int) pcmFormat.getSampleRate());
+            bufferId,
+            resolveFormat(pcmFormat.getChannels()),
+            pcmBuffer,
+            (int) pcmFormat.getSampleRate());
         return bufferId;
       }
     } catch (UnsupportedAudioFileException | IOException | IllegalArgumentException e) {
-      throw new IllegalStateException("Could not load sound resource '" + effect.resourcePath() + "'", e);
+      throw new IllegalStateException(
+          "Could not load sound resource '" + effect.resourcePath() + "'", e);
     }
   }
 

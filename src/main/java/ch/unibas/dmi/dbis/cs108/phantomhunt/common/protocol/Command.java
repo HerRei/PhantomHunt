@@ -1,28 +1,28 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol;
 
 /**
- * Defines the available network protocol commands used for communication
- * between the client and the server.
+ * Defines the available network protocol commands used for communication between the client and the
+ * server.
  */
 public enum Command {
   // --- Connection & Health ---
   /** Server requests to check connection health. */
   PING,
 
-  /** Client response to a health check.*/
+  /** Client response to a health check. */
   PONG, // pong
 
   // --- Identity & Session ---
-  /** Request to change or set a nickname, for example  name. */
+  /** Request to change or set a nickname, for example name. */
   NICK,
 
-  /** Server confirms a successful action, for example  action details. */
+  /** Server confirms a successful action, for example action details. */
   CLEARED,
 
-  /** Server rejects an action, for example  reason. */
+  /** Server rejects an action, for example reason. */
   REJECT,
 
-  /** Server welcomes the client and confirms their assigned name, for example  name. */
+  /** Server welcomes the client and confirms their assigned name, for example name. */
   WELCOME,
 
   /** Request to disconnect completely from the server. */
@@ -80,7 +80,7 @@ public enum Command {
   /** Client movement input update. */
   INPUT,
 
-  /** Client want to use Ability. */
+  /** Client want to use Ability*/
   ABILITY,
 
   /** Request to show the highscore. */

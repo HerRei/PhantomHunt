@@ -118,11 +118,11 @@ class LobbyHandlerTest {
         assertTrue(((Vector<Lobby>) finishedField.get(handler)).contains(lobby));
     }
 
-    @Test
-    void utilityMethods_generateMapAndFormatLobbyString() throws Exception {
-        // Tests static map-generator
-        String[][] map = MapLogic.generateExampleMap();
-        assertEquals(20, map.length, "Map should be 20 rows high");
+  @Test
+  void utilityMethods_generateMapAndFormatLobbyString() throws Exception {
+    // Tests static map-generator
+    String[][] map = MapLogic.generateExampleMap();
+    assertEquals(20, map.length, "Map should be 20 rows high");
 
         // security reset
         clearVectorField("waitingLobbies");
