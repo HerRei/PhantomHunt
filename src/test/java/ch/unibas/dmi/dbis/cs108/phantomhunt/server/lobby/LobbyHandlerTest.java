@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class LobbyHandlerTest {
     static class FakeClientHandler extends ClientHandler {
@@ -55,6 +57,13 @@ class LobbyHandlerTest {
         Field field = LobbyHandler.class.getDeclaredField(fieldName);
         field.setAccessible(true);
         ((Vector<?>) field.get(handler)).clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Vector<Lobby> getVectorField(String fieldName) throws Exception {
+        Field field = LobbyHandler.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return (Vector<Lobby>) field.get(handler);
     }
 
     @Test
@@ -136,5 +145,55 @@ class LobbyHandlerTest {
         // if this fails, gitlab logs string
         assertTrue(lobbiesString.contains("SuperLobby"), "Lobby-Name fehlt im String");
         assertTrue(lobbiesString.contains(";"), "Semikolon fehlt");
+    }
+
+    @Test
+    void leaveLobby_onFinishedLobbyWithRemainingPlayers_resetsLobbyAndAllowsRejoin() throws Exception {
+        FakeClientHandler host = new FakeClientHandler("Host");
+        FakeClientHandler p2 = new FakeClientHandler("P2");
+        Lobby lobby = handler.createLobby("LobbyReset", host);
+        handler.joinLobby("LobbyReset", p2);
+
+        GameHandler gameHandler = mock(GameHandler.class);
+        lobby.attachGame(gameHandler);
+
+        Vector<Lobby> waiting = getVectorField("waitingLobbies");
+        Vector<Lobby> finished = getVectorField("finishedLobbies");
+        waiting.remove(lobby);
+        finished.add(lobby);
+
+        handler.leaveLobby("LobbyReset", p2);
+
+        assertNull(p2.getCurrentLobby());
+        assertTrue(waiting.contains(lobby), "Lobby should be reopened as waiting");
+        assertFalse(finished.contains(lobby), "Lobby should leave the finished list");
+        assertFalse(lobby.hasActiveGame(), "Finished lobby should detach its game after reset");
+        verify(gameHandler).shutdown();
+
+        FakeClientHandler p3 = new FakeClientHandler("P3");
+        handler.joinLobby("LobbyReset", p3);
+        assertEquals(lobby, p3.getCurrentLobby(), "Lobby should be joinable again after reset");
+    }
+
+    @Test
+    void leaveLobby_onFinishedLobbyWithoutRemainingPlayers_removesLobbyCompletely() throws Exception {
+        FakeClientHandler host = new FakeClientHandler("Host");
+        Lobby lobby = handler.createLobby("LobbyCleanup", host);
+
+        GameHandler gameHandler = mock(GameHandler.class);
+        lobby.attachGame(gameHandler);
+
+        Vector<Lobby> waiting = getVectorField("waitingLobbies");
+        Vector<Lobby> finished = getVectorField("finishedLobbies");
+        waiting.remove(lobby);
+        finished.add(lobby);
+
+        handler.leaveLobby("LobbyCleanup", host);
+
+        assertNull(host.getCurrentLobby());
+        assertFalse(waiting.contains(lobby), "Empty finished lobby should be removed");
+        assertFalse(finished.contains(lobby), "Empty finished lobby should not stay finished");
+        assertFalse(lobby.hasActiveGame(), "Removed finished lobby should detach its game");
+        verify(gameHandler).shutdown();
     }
 }
