@@ -22,6 +22,7 @@ public final class MapLogic {
   private int tileSize;
   private ArrayList<int[]> possibleSpawnPoints;
   private Boolean[][] walkingMap;
+  private int recursionDepth = 0;
 
   public MapLogic(String[][] map) {
     this.walkingMap = loadMapFromString(map);
@@ -145,10 +146,18 @@ public final class MapLogic {
    * @return
    */
   public List<Position> getRandomSpawns(int len, List<Position> spawns, double distance) {
-    Position possiblePos = new Position(useRandomSpawnPoint(), this);
-    if (len <= 0) {
+    recursionDepth++;
+    if (recursionDepth > 1000) {
+      recursionDepth = 0;
       return spawns;
     }
+
+    Position possiblePos = new Position(useRandomSpawnPoint(), this);
+    if (len <= 0) {
+      recursionDepth = 0;
+      return spawns;
+    }
+
     for (Position pos : spawns) {
       if (calcDistance(pos.getLastSpawn(), possiblePos.getX(), possiblePos.getY()) < distance) {
         possibleSpawnPoints.add(possiblePos.getLastSpawn());

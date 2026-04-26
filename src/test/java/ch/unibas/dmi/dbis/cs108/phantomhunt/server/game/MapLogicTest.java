@@ -1,10 +1,15 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.Position;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MapLogicCollisionTest {
+class MapLogicTest {
 
   @Test
   void movementRadius_scalesCorrectly() {
@@ -35,5 +40,20 @@ class MapLogicCollisionTest {
     // Out of bounds is treated as if it was a wall
     assertTrue(MapCollision.collidesWithWall(map, 5.0, 5.0, 0.4), "Out of bounds is a wall");
     assertTrue(MapCollision.collidesWithWall(map, -1.0, 1.5, 0.4), "Negative values are a wall");
+  }
+
+  @Test
+  void getRandomSpawns_tinyMap_doesNotCauseStackOverflow() {
+    String[][] tinyMap = {
+            {" ", " ", " "},
+            {" ", " ", " "},
+            {" ", " ", " "}
+    };
+    MapLogic mapLogic = new MapLogic(tinyMap);
+    List<Position> spawns = new ArrayList<>();
+
+    assertDoesNotThrow(() -> {
+      mapLogic.getRandomSpawns(4, spawns, 150.0);
+    }, "Cannot end in StackOverflow");
   }
 }
