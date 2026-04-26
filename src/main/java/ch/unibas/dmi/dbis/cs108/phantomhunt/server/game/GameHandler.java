@@ -515,7 +515,6 @@ public class GameHandler {
     if (player.getRole() == PlayerRole.HUMAN
         && player.getRemainingAbility() > 0
         && !humanCatchesGhosts) {
-      LOGGER.info("Sollte fangen können");
       humanCatchesGhosts = true;
       lobby.broadcast(Packet.of(Command.ABILITY, "START"));
       player.setRemainingAbility(player.getRemainingAbility() - 1);

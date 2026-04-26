@@ -352,7 +352,6 @@ public class ClientHandler implements Runnable {
     if (gameHandler == null) {
       return;
     }
-    LOGGER.info("Ability wird gehandelt");
 
     gameHandler.tryAbility(getName());
   }

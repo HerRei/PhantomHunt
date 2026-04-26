@@ -165,7 +165,7 @@ Technische Integration: Einarbeitung in das Versionsverwaltungsprogramm Git.
 - Die GUI and diese Funktionen anbinden.
 - Weitere Tests die danne erggeben, ob die Mehrdeutigkeit wirklich behoben wurde. evt. erstellen von Unit-tests und Äquivalenzklassenf um all das auf nicht Ambiguative Art zu testen. 
 
-## 2026-03-28 - Ismail
+## 2026-03-28 - Ismail ##
 **Dauer:** ~0.5h
 **Ziel:** Build-Prozess anpassen.
 **Was gemacht:**
@@ -212,7 +212,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - Die neuen Funktionen für den Zuschauer-Modus (Spectator) an die GUI anbinden.
 - Prüfen, ob die Logik für Leerzeichen in Usernamen bei allen Befehlen (Whisper, MKL) einwandfrei funktioniert.
 
-## 2026-04-05 - Ismail 
+## 2026-04-05 - Ismail ##
 **dauer:** ~11h
 **Ziel:** Spielkarte implementieren und anzeigen.
 **Was gemacht:**
@@ -235,7 +235,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Nächstes:**
 - Das Konzept weiter vertiefen und zusätzliche Aspekte ergänzen.
 
-## 2026-04-10 - Ismail
+## 2026-04-10 - Ismail ##
 **Dauer:** ~10h
 **Ziel:**
 - Serverseitiges Laden der Karte vorbereiten.
@@ -268,14 +268,55 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - Struktur verbessert, damit der Aufbau logischer ist.
 - Javadoc überarbeitet und allgemeines Housekeeping im Code durchgeführt (Kommentare verbessert, kleinere Unsauberkeiten behoben).
 
-## 2026-04-13 — Silas & Hermes##
+## 2026-04-13 — Silas & Hermes ##
 **Dauer:** ~14h(pro Person)
 **Ziel:** GUI implementierung und erstellen prototyps
 **Was gemacht:**
 - Alle Schnittstellen wurden vereint und ein funktionierender prototyp erstellt.
 - Gui Wurde komplett neu erstellt so das man Spiel versteht.
 
-## 2026-04-21 - Alle##
+## 2026-04-16 — Silas ##
+**Dauer:** ~5h
+**Ziel:** Rebuilden und aufräumen von Serverseite und Collision-system.
+**Was gemacht:**
+- Konzept von wie das movement und Kollisionen funktionieren sollte.
+
+
+## 2026-04-16 — Silas ##
+**Dauer:** ~5h
+**Ziel:** Rebuilden und aufräumen von Serverseite und Collision-system.
+**Was gemacht:**
+- Konzept von wie das movement und Kollisionen funktionieren sollte.
+
+## 2026-04-19 — Silas ##
+**Dauer:** ~4h
+**Ziel:** Pacman-movement implementieren und Spawnpunkte random machen.
+**Was gemacht:**
+- Ich konnte das Ziel mit Schwierigkeiten umsetzen.
+
+## 2026-04-20 — Silas ##
+**Dauer:** ~3h
+**Ziel:** Ability implementieren
+**Was gemacht:**
+- Die Ability funktioniert jetzt über "Q" und Geister spawnen beim Fangen an zufälliger Stelle.
+
+## 2026-04-21 — Silas ##
+**Dauer:** ~4h
+**Ziele:** 
+- Lobby sauber verlassen/schliessen nach Spielende. 
+- Gewinner muss angezeigt werden im GUI.
+
+**Was gemacht:**
+- Ich konnte eine Funktion implementieren welche die Lobby mehr oder weniger sauber schliesst jedoch immer noch nicht komplett sauber.
+- Gewinner wird in der Endscene richtig angezeigt
+
+## 2026-04-24 — Silas ##
+**Dauer:** ~1h
+**Ziel:** Man kann den Highscore im GUI anschauen.
+**Was gemacht:**
+- Ich konnte das Ziel umsetzen.
+
+## 2026-04-21 - Alle ##
 **Dauer:** ~1h
 **Ziel:** Debrefing für MS4 & Aufgabenverteilung MS5
 **Was gemacht:**
