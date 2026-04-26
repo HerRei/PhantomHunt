@@ -331,6 +331,20 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - Ich konnte eine Funktion implementieren welche die Lobby mehr oder weniger sauber schliesst jedoch immer noch nicht komplett sauber.
 - Gewinner wird in der Endscene richtig angezeigt
 
+## 2026-04-20 - Ismail
+**Dauer:** ~8h
+**Ziel:** Implementieren der neuen Map, zeichnen und implementieren der Skins zur optischen Differenzierung der Spieler.
+**Was gemacht:** 
+- Alle Böden einen Buchstaben zugeordnet und ein 2D Array mit diesen Buchstaben für die Map definiert.
+- Zeichnen von verschiedenen Sprites für Geister und Menschen (unterschiedliche Farben/Designs), um jedem Spieler einzigartig zu machen.
+
+## 2026-04-22 - Ismail
+**Dauer:** ~6h
+**Ziel:** Implementierung der visuellen Orientierung für Geist und Mensch und Animation des Menschen.
+**Was gemacht:** 
+- Grafik erstellt: Zeichnen der drei übrigen Hauptrichtungen für jeden Geist und Mensch.
+- Implementierung der Logik, wenn der Spieler die Richtung ändert, aktualisiert sich sein Sprite.
+
 ## 2026-04-23 — Hermes ##
 **Dauer:** ~7h
 **Ziel:** Soundeffekte im Spiel einbauen.
@@ -350,6 +364,14 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Was gemacht:**
 - Wir haben die Resultate des MS4 besprochen. Welche Prozesse gut funktioneirt haben und welche noch zu verbessern sind.
 - Wir haben die Aufgaben für den MS5 verteilt.
+
+## 2026-04-25/26 — Ismail
+**Dauer:** ~7h
+**Ziel:** Aktivierung der Fähigkeit von einem Tastendruck auf ein Item umstellen, welches sich auf der Map befindet und visuell die Geister während der Fähigkeit darstellen. Lobbybeitritt per Doppelklick
+**Was gemacht:**
+- Zeichnungen der Fähigkeit und der geglitchten Geister erstellt.
+- Die 'Q' Tastenaktivierung entfernt und durch ein Sprite auf der Karte ersetzt.
+- Wenn man auf eine Lobby in der Lobbyliste doppelklickt, tritt man dieser bei.
 
 ## 2026-04-26 — Hermes ##
 **Dauer:** ~4h
