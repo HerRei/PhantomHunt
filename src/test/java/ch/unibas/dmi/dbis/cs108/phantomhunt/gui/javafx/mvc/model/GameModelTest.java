@@ -44,8 +44,8 @@ class GameModelTest {
     void updatePlayersFromServer_parsesPayloadCorrectly() throws InterruptedException {
         GameModel model = GameModel.getInstance();
 
-        // payload format from GSU packet
-        String payload = "2 45000 Alice:HUMAN:10.5:20.5:150;Bob:PHANTOM:5.0:5.0:300";
+        // payload format from GSU packet: Round Time Players AbilityX AbilityY AbilityVisible
+        String payload = "2 45000 Alice:HUMAN:10.5:20.5:150;Bob:PHANTOM:5.0:5.0:300 0.0 0.0 false";
 
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(() -> {
@@ -71,7 +71,7 @@ class GameModelTest {
     void getWinner_returnsPlayerWithHighestScore() throws InterruptedException {
         GameModel model = GameModel.getInstance();
         // setup 3 players with different scores
-        String payload = "1 10000 A:HUMAN:0:0:100;B:PHANTOM:0:0:500;C:PHANTOM:0:0:50";
+        String payload = "1 10000 A:HUMAN:0:0:100;B:PHANTOM:0:0:500;C:PHANTOM:0:0:50 0.0 0.0 false";
 
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(() -> {
