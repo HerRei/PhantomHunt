@@ -49,11 +49,13 @@ To ensure the stability and correctness of the game, we use automated testing an
 **Execute Unit Tests:**
 To run all automated tests, execute: 
 **./gradlew test**
-Once finished, view the detailed test results by executing 
+
+This command will execute all unit tests and automatically generate a JaCoCo code coverage report.
+
+**View Test Results:**
+After running the tests, you can open the detailed text report: 
 **open build/reports/tests/test/index.html**.
 
-**Generate Code Coverage Report (JaCoCo):**
-To measure the line coverage of our test site, run: 
-**./gradlew test jacocoTestReport**
-The generated HTML report can be viewed by executing 
-**open build/reports/jacoco/test/html/index.html**.
+**View Code Coverage Report:**
+The JaCoCo coverage report can be viewed with:
+**open build/reports/jacoco/test/html/index.html**
