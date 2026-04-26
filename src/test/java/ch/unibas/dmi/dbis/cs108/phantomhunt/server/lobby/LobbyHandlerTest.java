@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -120,7 +121,7 @@ class LobbyHandlerTest {
     @Test
     void utilityMethods_generateMapAndFormatLobbyString() throws Exception {
         // Tests static map-generator
-        String[][] map = Map.generateExampleMap();
+        String[][] map = MapLogic.generateExampleMap();
         assertEquals(20, map.length, "Map should be 20 rows high");
 
         // security reset

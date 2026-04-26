@@ -8,6 +8,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.util.FakeClientHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,22 @@ class RegistryTest {
 
     // This method is automatically used before each test
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         registry = Registry.getInstance();
+        clearRegistryState("sessions");
+        clearRegistryState("byName");
+        clearRegistryState("highscores");
+    }
+
+    private void clearRegistryState(String fieldName) throws Exception {
+        Field field = Registry.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        Object value = field.get(registry);
+        if (value instanceof java.util.Collection<?> collection) {
+            collection.clear();
+        } else if (value instanceof java.util.Map<?, ?> map) {
+            map.clear();
+        }
     }
 
     // Domain-management
