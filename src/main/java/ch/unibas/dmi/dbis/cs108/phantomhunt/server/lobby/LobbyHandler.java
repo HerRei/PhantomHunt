@@ -197,17 +197,27 @@ public class LobbyHandler {
     if (lobbyOpt.isEmpty()) return;
 
     Lobby lobby = lobbyOpt.get();
+    boolean wasFinishedLobby = finishedLobbies.contains(lobby);
     if (lobby.removePlayer(player) || lobby.removeSpectator(player)) {
       player.setCurrentLobby(null);
 
       boolean isEmpty = lobby.getPlayers().get().isEmpty() && lobby.getSpectators().get().isEmpty();
 
       LOGGER.info(
-          "leaveLobby: isEmpty={}, waitingContains={}", isEmpty, waitingLobbies.contains(lobby));
+          "leaveLobby: isEmpty={}, waitingContains={}, finishedContains={}",
+          isEmpty,
+          waitingLobbies.contains(lobby),
+          finishedLobbies.contains(lobby));
 
-      if (isEmpty && waitingLobbies.contains(lobby)) {
-        waitingLobbies.remove(lobby);
+      if (isEmpty) {
+        lobby.resetGame();
+        removeLobbyFromStateLists(lobby);
         LOGGER.info("Empty lobby {} removed.", id);
+        return;
+      }
+
+      if (wasFinishedLobby) {
+        resetLobby(id);
       }
     }
   }
@@ -280,5 +290,11 @@ public class LobbyHandler {
       }
     }
     return Optional.empty();
+  }
+
+  private void removeLobbyFromStateLists(Lobby lobby) {
+    waitingLobbies.remove(lobby);
+    playingLobbies.remove(lobby);
+    finishedLobbies.remove(lobby);
   }
 }

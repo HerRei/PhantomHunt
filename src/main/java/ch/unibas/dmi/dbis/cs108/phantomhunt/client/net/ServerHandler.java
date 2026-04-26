@@ -243,7 +243,7 @@ public class ServerHandler implements Runnable {
           SceneManager sceneManager = SceneManager.getInstance();
           SceneProtocol current = sceneManager.getCurrentScene();
 
-          if (current != SceneProtocol.GAME) {
+          if (current != SceneProtocol.GAME && current != SceneProtocol.END) {
             sceneManager.showScene(SceneProtocol.LOBBY);
           }
 
