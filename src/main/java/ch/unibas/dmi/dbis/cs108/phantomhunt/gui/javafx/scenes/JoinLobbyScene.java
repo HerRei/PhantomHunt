@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManag
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 /**
@@ -49,12 +50,25 @@ public class JoinLobbyScene extends AbstractInputScene {
     root.getChildren().add(2, waitingListView);
     root.getChildren().add(3, new Label("Running Games:"));
     root.getChildren().add(4, runningListView);
+
+    // Add double-click event handler
+    waitingListView.setOnMouseClicked(this::handleLobbyClick);
+  }
+
+  private void handleLobbyClick(MouseEvent event) {
+    if (event.getClickCount() != 2) return;
+
+    String selectedLobby = waitingListView.getSelectionModel().getSelectedItem();
+    if (selectedLobby == null || selectedLobby.isEmpty()) return;
+
+    inputField.setText(selectedLobby);
+    confirmButton.fire();
   }
 
   @Override
   protected void setupTexts() {
     descriptionLabel.setText("Lobby Browser");
-    inputField.setPromptText("Enter LobbyName...");
+    inputField.setPromptText("Double-click a lobby or enter its name");
     confirmButton.setText("Join Lobby");
   }
 
