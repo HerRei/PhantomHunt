@@ -313,6 +313,20 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Was gemacht:**
 - Die Ability funktioniert jetzt über "Q" und Geister spawnen beim Fangen an zufälliger Stelle.
 
+## 2026-04-20 - Ismail
+**Dauer:** ~8h
+**Ziel:** Implementieren der neuen Map, zeichnen und implementieren der Skins zur optischen Differenzierung der Spieler.
+**Was gemacht:** 
+- Alle Böden einen Buchstaben zugeordnet und ein 2D Array mit diesen Buchstaben für die Map definiert.
+- Zeichnen von verschiedenen Sprites für Geister und Menschen (unterschiedliche Farben/Designs), um jedem Spieler einzigartig zu machen.
+
+## 2026-04-21 - Alle ##
+**Dauer:** ~1h
+**Ziel:** Debrefing für MS4 & Aufgabenverteilung MS5
+**Was gemacht:**
+- Wir haben die Resultate des MS4 besprochen. Welche Prozesse gut funktioneirt haben und welche noch zu verbessern sind.
+- Wir haben die Aufgaben für den MS5 verteilt.
+
 ## 2026-04-21 — Hermes ##
 **Dauer:** ~1h
 **Ziel:** Highscore im Spiel einbauen.
@@ -330,13 +344,6 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Was gemacht:**
 - Ich konnte eine Funktion implementieren welche die Lobby mehr oder weniger sauber schliesst jedoch immer noch nicht komplett sauber.
 - Gewinner wird in der Endscene richtig angezeigt
-
-## 2026-04-20 - Ismail
-**Dauer:** ~8h
-**Ziel:** Implementieren der neuen Map, zeichnen und implementieren der Skins zur optischen Differenzierung der Spieler.
-**Was gemacht:** 
-- Alle Böden einen Buchstaben zugeordnet und ein 2D Array mit diesen Buchstaben für die Map definiert.
-- Zeichnen von verschiedenen Sprites für Geister und Menschen (unterschiedliche Farben/Designs), um jedem Spieler einzigartig zu machen.
 
 ## 2026-04-22 - Ismail
 **Dauer:** ~6h
@@ -358,13 +365,6 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Was gemacht:**
 - Ich konnte das Ziel umsetzen.
 
-## 2026-04-21 - Alle ##
-**Dauer:** ~1h
-**Ziel:** Debrefing für MS4 & Aufgabenverteilung MS5
-**Was gemacht:**
-- Wir haben die Resultate des MS4 besprochen. Welche Prozesse gut funktioneirt haben und welche noch zu verbessern sind.
-- Wir haben die Aufgaben für den MS5 verteilt.
-
 ## 2026-04-25/26 — Ismail
 **Dauer:** ~7h
 **Ziel:** Aktivierung der Fähigkeit von einem Tastendruck auf ein Item umstellen, welches sich auf der Map befindet und visuell die Geister während der Fähigkeit darstellen. Lobbybeitritt per Doppelklick
@@ -381,17 +381,16 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - **Pipeline-Fix:** Die Pipeline repariert, indem die kaputten Tests korrigiert wurden.
 - **Registry-Reset:** Einen Reset für die Registry hinzugefügt, um die Tests stabiler zu machen.
 
-## 2026-04-19 bis 2026-04-26 — Vera ##
-**Dauer:** ~25h
-**Ziel:** Erweiterung und Verbesserung der Unit Tests.
+## 2026-04-24 bis 2026-04-27 - Jan ##
+**Dauer:** ~12h
+**Ziel:** Lobbys Überarbeiten - Sauberes schliessen implementieren
 **Was gemacht:**
-- Umfangreiche Unit Tests implementiert und bestehende Tests erweitert.
-- Testabdeckung gezielt verbessert und zentrale Komponenten systematisch getestet.
-- Struktur und Organisation der Tests überarbeitet.
-
-**Nächstes:**
-- Weitere Unit Tests implementieren, um die Abdeckung zu erhöhen.
-- QA-Dokumentation vervollständigen und präzisieren.
-
+- **In EndScene.java:** Der Lobby button ist nun für alle sichtbar.
+- **In ServerHandler:** Bug gefixt, welcher alle Player in die Lobby wirft, nachdem ein Player die GameEnd Scene verlässt.
+- **In ClientHandler:** Alle Player können nun zürck in die Lobby.
+- **In LobbyHandler:** Nun wird das beenden der Runde korrekt gehandhabt
+    - Falls ein Player in die Lobby zurück geht (respektive in der Lobby bleibt), wird die Lobby wider auf den Status "Lobby_Waiting" gesetzt.
+    - Falls kein Player in der Lobby zurück bleibt, wird die Lobby korrekt geschlossen. Der Name wird wider freigegeben.
+- **Unit Tests:** Updaten kapputter Unit Tests.
 
 
