@@ -313,6 +313,14 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Was gemacht:**
 - Die Ability funktioniert jetzt über "Q" und Geister spawnen beim Fangen an zufälliger Stelle.
 
+## 2026-04-21 — Hermes ##
+**Dauer:** ~1h
+**Ziel:** Highscore im Spiel einbauen.
+**Was gemacht:**
+- **Highscore-Befehl:** Einen neuen Befehl für den Highscore hinzugefügt.
+- **Registry:** Die Registry so erweitert, dass sie die Highscores speichern kann.
+- **Client-Handler:** Den Client-Handler so angepasst, dass er die Highscores verarbeiten kann.
+
 ## 2026-04-21 — Silas ##
 **Dauer:** ~4h
 **Ziele:** 
@@ -322,6 +330,13 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Was gemacht:**
 - Ich konnte eine Funktion implementieren welche die Lobby mehr oder weniger sauber schliesst jedoch immer noch nicht komplett sauber.
 - Gewinner wird in der Endscene richtig angezeigt
+
+## 2026-04-23 — Hermes ##
+**Dauer:** ~7h
+**Ziel:** Soundeffekte im Spiel einbauen.
+**Was gemacht:**
+- **Soundeffekte:** Die Soundeffekte, die schon im Projekt waren, wurden ins Spiel eingebaut.
+- **Bugfix:** Ein Fehler wurde behoben, bei dem die Schritt-Sounds weiter abgespielt wurden, obwohl der Spieler schon gefangen war.
 
 ## 2026-04-24 — Silas ##
 **Dauer:** ~1h
@@ -335,6 +350,14 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Was gemacht:**
 - Wir haben die Resultate des MS4 besprochen. Welche Prozesse gut funktioneirt haben und welche noch zu verbessern sind.
 - Wir haben die Aufgaben für den MS5 verteilt.
+
+## 2026-04-26 — Hermes ##
+**Dauer:** ~4h
+**Ziel:** Unit-Tests reparieren.
+**Was gemacht:**
+- **Fehlerbehebung:** Kaputte Unit-Tests repariert.
+- **Pipeline-Fix:** Die Pipeline repariert, indem die kaputten Tests korrigiert wurden.
+- **Registry-Reset:** Einen Reset für die Registry hinzugefügt, um die Tests stabiler zu machen.
 
 ## 2026-04-19 bis 2026-04-26 — Vera ##
 **Dauer:** ~25h
