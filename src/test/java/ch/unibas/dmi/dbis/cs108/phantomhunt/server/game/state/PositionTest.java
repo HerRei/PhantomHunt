@@ -50,4 +50,29 @@ class PositionTest {
     assertEquals(10.0, pos.getX(), 0.01, "X-coordinate must increase by Speed * Time");
     assertEquals(0.0, pos.getY(), 0.01, "Y-coordinate must not change when moving to the right");
   }
+
+  @Test
+  void checkValidInput_buffersTurnUntilCenter() {
+    MapLogic map = new MapLogic(new String[][] {
+            {" ", " "},
+            {"X", " "}
+    });
+
+    Position pos = new Position(new int[] {0, 0}, map);
+
+    InputState currentInput = new InputState(0, 1);
+    InputState nextInput = new InputState(1, 0);
+
+    pos.checkValidInput(new InputState(0,0), currentInput, map);
+
+    // execute buffering check
+    boolean canTurnEarly = pos.checkValidInput(currentInput, nextInput, map);
+    assertFalse(canTurnEarly, "Since there is a blocking wall, cannot turn yet");
+
+    pos.updatePosition(currentInput, 100.0, 0.32, map); // speed 100*0.32 = 32 pixels
+
+    // as long as it executes without throwing exceptions, buffering logic is stable
+    boolean canTurnNow = pos.checkValidInput(currentInput, nextInput, map);
+    assertTrue(canTurnNow, "Should be able to turn now");
+  }
 }

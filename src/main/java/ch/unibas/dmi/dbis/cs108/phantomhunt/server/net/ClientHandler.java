@@ -282,6 +282,11 @@ public class ClientHandler implements Runnable {
    * @param p packet containing whisper target and message text
    */
   private void handleWhisper(Packet p) {
+    if (p.argc() < 1) {
+      sendMessage(Packet.of(Command.REJECT, "Invalid whisper format"));
+      return;
+    }
+
     String[] args = p.args().get(0).split(" ", 2);
     if (args.length < 2) {
       sendMessage(

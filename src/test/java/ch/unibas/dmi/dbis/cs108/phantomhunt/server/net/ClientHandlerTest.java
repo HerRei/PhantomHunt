@@ -85,4 +85,23 @@ class ClientHandlerTest {
     // since Lobby "123" doesn't exist, CHECKIN must be handled with REJECT
     assertTrue(sentData.contains("REJECT Lobby not found"));
   }
+
+  @Test
+  void run_handlesCorruptInputsGracefully() {
+    // intentionally sends broken commands
+    String garbageCommands =
+            "INPUT a b\n" + // expects number, receives letters
+            "WHISPER\n" + // expects target and message, receives nothing
+            "CHECKIN\n" + // expects LobbyID, receives nothing
+            "LOGOUT\n";
+
+    FakeSocket socket = new FakeSocket(garbageCommands);
+    ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+
+    // thread must not crash
+    assertDoesNotThrow(() -> handler.run(), "ClientHandler must catch exceptions and not crash on bad input");
+
+    String sentData = socket.getSentData();
+    assertTrue(sentData.contains("REJECT"), "Server should respond to bad commands with REJECT");
+  }
 }

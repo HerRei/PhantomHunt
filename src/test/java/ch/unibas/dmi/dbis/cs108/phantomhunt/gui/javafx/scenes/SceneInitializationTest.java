@@ -64,25 +64,25 @@ class SceneInitializationTest {
     }
 
     @Test
-    void joinLobbyScene_initializesWithCrashing() throws InterruptedException {
+    void joinLobbyScene_initializesWithoutCrashing() throws InterruptedException {
         SceneInterface scene = createSceneSafely(JoinLobbyScene::new);
         assertNotNull(scene.getScene(), "JoinLobbyScene should create a valid JavaFX Scene");
     }
 
     @Test
-    void nicknameScene_initializesWithCrashing() throws InterruptedException {
+    void nicknameScene_initializesWithoutCrashing() throws InterruptedException {
         SceneInterface scene = createSceneSafely(NicknameScene::new);
         assertNotNull(scene.getScene(), "NicknameScene should create a valid JavaFX Scene");
     }
 
     @Test
-    void createLobbyScene_initializesWithCrashing() throws InterruptedException {
+    void createLobbyScene_initializesWithoutCrashing() throws InterruptedException {
         SceneInterface scene = createSceneSafely(LobbyScene::new);
         assertNotNull(scene.getScene(), "LobbyScene should create a valid JavaFX Scene");
     }
 
     @Test
-    void lobbyScene_initializesWithCrashing() throws InterruptedException {
+    void lobbyScene_initializesWithoutCrashing() throws InterruptedException {
         SceneInterface scene = createSceneSafely(LobbyScene::new);
         assertNotNull(scene.getScene(), "LobbyScene should create a valid JavaFX Scene");
     }
@@ -94,7 +94,7 @@ class SceneInitializationTest {
     }
 
     @Test
-    void gameScene_initializesWithCrashing() throws InterruptedException {
+    void gameScene_initializesWithoutCrashing() throws InterruptedException {
         // class checks a lot of images. test checks if all assets arte correct and accessible in build environment
         SceneInterface scene = createSceneSafely(GameScene::new);
         assertNotNull(scene.getScene(), "GameScene should create a valid JavaFX Scene");
