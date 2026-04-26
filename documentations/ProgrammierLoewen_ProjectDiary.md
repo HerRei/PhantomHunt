@@ -223,7 +223,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - isWalkable()-Methode für zukünftige Bewegungsabfragen via Kollisionskarte in der GameScene bereitgestellt.
 - Skalierung der Karte hinzugefügt, damit sie sich an die Bildschirmgröße der User anpasst.
 
-## 2026-04-8 bis 2026-04-09 — Vera ##
+## 2026-04-08 bis 2026-04-09 — Vera ##
 **Dauer:** ~7h
 **Ziel:** Grundlage für das QA-Konzept erarbeiten und erste Ausformulierung erstellen.
 **Was gemacht:**
@@ -268,14 +268,24 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - Struktur verbessert, damit der Aufbau logischer ist.
 - Javadoc überarbeitet und allgemeines Housekeeping im Code durchgeführt (Kommentare verbessert, kleinere Unsauberkeiten behoben).
 
-## 2026-04-13 — Silas & Hermes##
+## 2026-04-13 — Silas & Hermes ##
 **Dauer:** ~14h(pro Person)
 **Ziel:** GUI implementierung und erstellen prototyps
 **Was gemacht:**
 - Alle Schnittstellen wurden vereint und ein funktionierender prototyp erstellt.
 - Gui Wurde komplett neu erstellt so das man Spiel versteht.
 
+## 2026-04-19 bis 2026-04-26 — Vera ##
+**Dauer:** ~25h
+**Ziel:** Erweiterung und Verbesserung der Unit Tests.
+**Was gemacht:**
+- Umfangreiche Unit Tests implementiert und bestehende Tests erweitert.
+- Testabdeckung gezielt verbessert und zentrale Komponenten systematisch getestet.
+- Struktur und Organisation der Tests überarbeitet.
 
+**Nächstes:**
+- Weitere Unit Tests implementieren, um die Abdeckung zu erhöhen.
+- QA-Dokumentation vervollständigen und präzisieren.
 
 
 
