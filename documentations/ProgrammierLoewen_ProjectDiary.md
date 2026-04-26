@@ -288,6 +288,19 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 **Was gemacht:**
 - Konzept von wie das movement und Kollisionen funktionieren sollte.
 
+## 2026-04-19 bis 2026-04-26 — Vera ##
+**Dauer:** ~25h
+**Ziel:** Erweiterung und Verbesserung der Unit Tests.
+**Was gemacht:**
+- Umfangreiche Unit Tests implementiert und bestehende Tests erweitert.
+- Testabdeckung gezielt verbessert und zentrale Komponenten systematisch getestet.
+- Struktur und Organisation der Tests überarbeitet.
+
+**Nächstes:**
+- Weitere Unit Tests implementieren, um die Abdeckung zu erhöhen.
+- QA-Dokumentation vervollständigen und präzisieren.
+
+
 ## 2026-04-19 — Silas ##
 **Dauer:** ~4h
 **Ziel:** Pacman-movement implementieren und Spawnpunkte random machen.
