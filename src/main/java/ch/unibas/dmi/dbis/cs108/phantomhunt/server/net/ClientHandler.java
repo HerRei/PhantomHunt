@@ -315,6 +315,10 @@ public class ClientHandler implements Runnable {
       return;
     }
 
+    if (gameHandler.findPlayer(getName()).isEmpty()) {
+      return;
+    }
+
     try {
       if (p.argc() < 1) {
         return;
@@ -354,6 +358,10 @@ public class ClientHandler implements Runnable {
 
     GameHandler gameHandler = lobby.getActiveGame().orElse(null);
     if (gameHandler == null) {
+      return;
+    }
+
+    if (gameHandler.findPlayer(getName()).isEmpty()) {
       return;
     }
 

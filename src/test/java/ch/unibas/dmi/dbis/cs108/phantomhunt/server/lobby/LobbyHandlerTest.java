@@ -88,6 +88,25 @@ class LobbyHandlerTest {
   }
 
   @Test
+  void spectateLobby_runningGameSendsSpectatorToGame() throws Exception {
+    FakeClientHandler host = new FakeClientHandler("Host");
+    Lobby lobby = handler.createLobby("RunningLobby", host);
+
+    GameHandler gameHandler = mock(GameHandler.class);
+    lobby.attachGame(gameHandler);
+    getVectorField("waitingLobbies").remove(lobby);
+    getVectorField("playingLobbies").add(lobby);
+
+    FakeClientHandler spec = new FakeClientHandler("Spec");
+    handler.spectateLobby("RunningLobby", spec);
+
+    assertEquals(lobby, spec.getCurrentLobby());
+    assertTrue(lobby.getSpectators().get().contains(spec));
+    assertTrue(spec.receivedPackets.stream().anyMatch(p -> p.cmd() == Command.GAME_START));
+    verify(gameHandler).broadcastGameState();
+  }
+
+  @Test
   void startGame_rejectsIfNotHost() throws Exception {
     FakeClientHandler host = new FakeClientHandler("Host");
     FakeClientHandler p2 = new FakeClientHandler("P2");

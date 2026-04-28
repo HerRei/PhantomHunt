@@ -183,6 +183,11 @@ public class LobbyHandler {
     Lobby lobby = lobbyOpt.get();
     if (lobby.addSpectator(player)) {
       player.setCurrentLobby(lobby);
+      GameHandler gameHandler = lobby.getActiveGame().orElse(null);
+      if (gameHandler != null) {
+        player.sendMessage(Packet.of(Command.GAME_START));
+        gameHandler.broadcastGameState();
+      }
     }
   }
 

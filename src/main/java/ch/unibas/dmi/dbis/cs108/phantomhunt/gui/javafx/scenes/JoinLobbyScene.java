@@ -39,9 +39,6 @@ public class JoinLobbyScene extends AbstractInputScene {
     waitingListView.setPrefHeight(150);
     runningListView.setPrefHeight(100);
 
-    // Running lobbies are usually not joinable
-    runningListView.setDisable(true);
-
     // Inject lists into the existing VBox layout (from AbstractInputScene)
     VBox root = (VBox) scene.getRoot();
 
@@ -53,6 +50,7 @@ public class JoinLobbyScene extends AbstractInputScene {
 
     // Add double-click event handler
     waitingListView.setOnMouseClicked(this::handleLobbyClick);
+    runningListView.setOnMouseClicked(this::handleRunningLobbyClick);
   }
 
   private void handleLobbyClick(MouseEvent event) {
@@ -63,6 +61,15 @@ public class JoinLobbyScene extends AbstractInputScene {
 
     inputField.setText(selectedLobby);
     confirmButton.fire();
+  }
+
+  private void handleRunningLobbyClick(MouseEvent event) {
+    if (event.getClickCount() != 2) return;
+
+    String selectedLobby = runningListView.getSelectionModel().getSelectedItem();
+    if (selectedLobby == null || selectedLobby.isEmpty()) return;
+
+    EventHandlers.getInstance().sendMessage(Command.SPEC, selectedLobby);
   }
 
   @Override
