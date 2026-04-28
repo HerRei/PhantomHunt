@@ -100,3 +100,9 @@ tasks.register('build-cs108'){
     description = 'cs108 build task'
     dependsOn 'clean', 'jar', 'javadoc'
 }
+
+tasks.register('build-cs108') {
+    group = 'custom'
+    description = 'cd108 build task'
+    dependsOn 'build-cs108'
+}
