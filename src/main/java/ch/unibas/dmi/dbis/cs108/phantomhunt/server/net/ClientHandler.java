@@ -4,7 +4,6 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
@@ -18,7 +17,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -217,9 +215,10 @@ public class ClientHandler implements Runnable {
     String msg = String.join(" ", p.args());
     LOGGER.info("YAP from {}: {}", name, msg);
     if ("jens67".equals(msg.trim())) {
-      currentLobby
-          .getActiveGame()
-          .ifPresent(gameHandler -> gameHandler.tryLobbyChatAbility(getName()));
+      GameHandler gameHandler = currentLobby.getActiveGame().orElse(null);
+      if (gameHandler != null) {
+        gameHandler.tryLobbyChatAbility(getName());
+      }
     }
     registry.yapping(this, Packet.of(Command.YAP, getName() + ": " + msg));
   }
