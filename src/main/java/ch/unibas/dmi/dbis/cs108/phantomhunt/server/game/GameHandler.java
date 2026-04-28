@@ -529,4 +529,16 @@ public class GameHandler {
           TimeUnit.SECONDS);
     }
   }
+
+  public synchronized void tryLobbyChatAbility(String playerId) {
+    Optional<PlayerState> playerSnapshot = gameState.findPlayer(playerId);
+    if (playerSnapshot.isEmpty() || playerSnapshot.get().getRole() != PlayerRole.HUMAN) {
+      return;
+    }
+
+    PlayerState player = gameState.requireMutablePlayer(playerId);
+    player.addScore(-50);
+    tryAbility(playerId);
+    broadcastGameState();
+  }
 }

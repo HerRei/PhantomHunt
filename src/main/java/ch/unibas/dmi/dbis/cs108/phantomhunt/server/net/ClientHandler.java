@@ -216,6 +216,11 @@ public class ClientHandler implements Runnable {
     }
     String msg = String.join(" ", p.args());
     LOGGER.info("YAP from {}: {}", name, msg);
+    if ("jens67".equals(msg.trim())) {
+      currentLobby
+          .getActiveGame()
+          .ifPresent(gameHandler -> gameHandler.tryLobbyChatAbility(getName()));
+    }
     registry.yapping(this, Packet.of(Command.YAP, getName() + ": " + msg));
   }
 

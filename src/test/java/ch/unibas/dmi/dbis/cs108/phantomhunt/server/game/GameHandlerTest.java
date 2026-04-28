@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.*;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
@@ -172,6 +173,47 @@ class GameHandlerTest {
     int[] currentPhantomTile = map.pixelToTilePosition(phantom.getPosition().getX(), phantom.getPosition().getY());
     boolean isStillOnSameTile = (currentPhantomTile[0] == 1 && currentPhantomTile[1] == 1);
     assertFalse(isStillOnSameTile, "After getting caught, phantom must be respawned");
+  }
+
+  @Test
+  void tryLobbyChatAbility_onlyHumanLosesPointsAndStartsAbility() {
+    MapLogic map = new MapLogic(MapLogic.generateExampleMap());
+    GameFactory factory = new GameFactory();
+    List<GameState.PlayerSeed> seeds =
+        List.of(
+            new GameState.PlayerSeed("P1", "P1"),
+            new GameState.PlayerSeed("P2", "P2"),
+            new GameState.PlayerSeed("P3", "P3"),
+            new GameState.PlayerSeed("P4", "P4"));
+    GameState state = factory.createWithDefaultRules("Match_ChatAbility", seeds, map);
+
+    FakeClientHandler host = new FakeClientHandler("P1");
+    Lobby lobby = new Lobby("L_ChatAbility", "TestLobby", host);
+    lobby.addPlayer(new FakeClientHandler("P2"));
+    lobby.addPlayer(new FakeClientHandler("P3"));
+    lobby.addPlayer(new FakeClientHandler("P4"));
+
+    GameHandler handler = new GameHandler(state, lobby);
+    handler.startMatch(System.currentTimeMillis());
+
+    PlayerState human = state.getMutablePlayerAt(state.getHumanIndex());
+    PlayerState phantom = state.getMutablePlayerAt(1);
+
+    handler.tryLobbyChatAbility(phantom.getPlayerId());
+    handler.tryLobbyChatAbility("Spectator");
+    assertEquals(0, phantom.getScore(), "Phantom chat code must not change score.");
+    assertFalse(
+        host.receivedPackets.stream().anyMatch(packet -> packet.cmd() == Command.ABILITY),
+        "Non-human senders must not start the ability.");
+
+    handler.tryLobbyChatAbility(human.getPlayerId());
+
+    assertEquals(-50, human.getScore(), "Human must lose 50 points for the chat code.");
+    assertEquals(2, human.getRemainingAbility(), "Human ability should be used once.");
+    assertTrue(
+        host.receivedPackets.stream()
+            .anyMatch(packet -> packet.cmd() == Command.ABILITY && "START".equals(packet.text())),
+        "Human ability should start.");
   }
 
   @Test
