@@ -45,6 +45,7 @@ public class TcpClient {
    */
   public ServerHandler connect(String host, int port) throws IOException {
     this.socket = new Socket(host, port);
+    this.socket.setTcpNoDelay(true); //this should add major performacne!
     // Start the counterpart to the ClientHandler
     return new ServerHandler(this.socket);
   }
