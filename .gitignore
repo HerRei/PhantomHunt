@@ -23,5 +23,6 @@ build/
 *.log
 hs_err_pid*
 replay_pid*.classpath
+highscores.csv
 .project
 *.eml

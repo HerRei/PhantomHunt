@@ -8,10 +8,13 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.Scanner;
 
 /**
  * Manages all connected clients and their nicknames. It provides methods to broadcast messages to
@@ -23,6 +26,7 @@ public final class Registry {
   // threadsafe.
 
   private static final Logger log = LogManager.getLogger(Registry.class);
+  private static final String HIGHSCORE_FILE = "highscores.csv";
   private static Registry instance;
   private final Vector<ClientHandler> sessions =
       new Vector<>(); // zwar O(n) for get but easier to work with than the hashMap with a dummy.
@@ -37,7 +41,9 @@ public final class Registry {
     return instance;
   }
 
-  private Registry() {}
+  private Registry() {
+    loadHighscores();
+  }
 
   void resetForTests() {
     sessions.clear();
@@ -77,6 +83,7 @@ public final class Registry {
     }
 
     highscores.add(i, newHighscore);
+    saveHighscores();
     log.info("New highscore added for {}: {}", playerName, score);
   }
 
@@ -87,6 +94,35 @@ public final class Registry {
       highscoreBoard.append(i + 1).append(". ").append(highscores.get(i)).append("|");
     }
     return highscoreBoard.toString();
+  }
+
+  private void loadHighscores() {
+    File file = new File(HIGHSCORE_FILE);
+    if (!file.exists()) {
+      return;
+    }
+
+    try (Scanner scanner = new Scanner(file)) {
+      while (scanner.hasNextLine()) {
+        String[] data = scanner.nextLine().split(",");
+        if (data.length == 2) {
+          highscores.add(new Highscore(data[0], Integer.parseInt(data[1].trim())));
+        }
+      }
+      highscores.sort(Comparator.comparingInt(Highscore::getScore).reversed());
+    } catch (Exception e) {
+      log.warn("Could not load highscores.csv", e);
+    }
+  }
+
+  private void saveHighscores() {
+    try (FileWriter writer = new FileWriter(HIGHSCORE_FILE)) {
+      for (Highscore highscore : highscores) {
+        writer.write(highscore.getPlayerName() + "," + highscore.getScore() + "\n");
+      }
+    } catch (IOException e) {
+      log.warn("Could not save highscores.csv", e);
+    }
   }
 
   /**
