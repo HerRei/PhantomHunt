@@ -34,7 +34,7 @@ public class HubScene implements SceneInterface {
   private static final String QOTD_HOST = "djxmmx.net";
   private static final int QOTD_PORT = 17;
   private static final String FALLBACK_QUOTE =
-      "\"Your mind is like water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.\"";
+      "\"Your mind is like water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.\" \n - Master Oogway";
 
   public HubScene() {
     createScene();
