@@ -41,7 +41,6 @@ public class ClientHandler implements Runnable {
   private long lastSeen = System.currentTimeMillis();
   private ScheduledExecutorService scheduler;
   private static final long WISDOM_REQUIRED_OPEN_MILLIS = 15_000L;
-  private static final double WISDOM_SCORE_MULTIPLIER = 1.2D;
   private Long wisdomOpenedAtMillis;
   private boolean wisdomBonusReady;
 
@@ -445,11 +444,11 @@ public class ClientHandler implements Runnable {
     return wisdomBonusReady;
   }
 
-  public synchronized double consumeWisdomScoreMultiplier() {
-    double scoreMultiplier = wisdomBonusReady ? WISDOM_SCORE_MULTIPLIER : 1.0D;
+  public synchronized boolean consumeWisdomRoundBonus() {
+    boolean hasRoundBonus = wisdomBonusReady;
     wisdomBonusReady = false;
     wisdomOpenedAtMillis = null;
-    return scoreMultiplier;
+    return hasRoundBonus;
   }
 
   /**
