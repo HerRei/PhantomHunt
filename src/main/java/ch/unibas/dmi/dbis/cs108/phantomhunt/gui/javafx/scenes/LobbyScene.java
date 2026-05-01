@@ -20,6 +20,7 @@ public class LobbyScene implements SceneInterface {
   private ListView<String> playerList;
   private Button startGameButton;
   private Button backButton;
+  private Button wisdomButton;
   private String id;
   private ListView<String> chatArea;
   private TextField chatInput;
@@ -32,12 +33,14 @@ public class LobbyScene implements SceneInterface {
     playerList = new ListView<>();
     startGameButton = new Button("Start Game");
     backButton = new Button("Leave Lobby");
+    wisdomButton = new Button("Daily Wisdom");
     chatArea = new ListView<>();
     chatInput = new TextField();
     chatInput.setPromptText("Type your message here");
 
     root.getChildren()
-        .addAll(lobbyIdLabel, playerList, startGameButton, backButton, chatArea, chatInput);
+        .addAll(
+            lobbyIdLabel, playerList, startGameButton, wisdomButton, backButton, chatArea, chatInput);
 
     setupEvents();
     bindChat();
@@ -59,6 +62,8 @@ public class LobbyScene implements SceneInterface {
           SceneManager.getInstance().showScene(SceneProtocol.HOME);
         });
 
+    wisdomButton.setOnAction(e -> openWisdom());
+
     chatInput.setOnAction(
         e -> {
           String message = chatInput.getText();
@@ -78,6 +83,14 @@ public class LobbyScene implements SceneInterface {
                 c -> {
                   Platform.runLater(() -> chatArea.scrollTo(chatArea.getItems().size() - 1));
                 });
+  }
+
+  private void openWisdom() {
+    WisdomScene wisdomScene = (WisdomScene) SceneManager.getInstance().getScene(SceneProtocol.WISDOM);
+    if (wisdomScene != null) {
+      wisdomScene.openFrom(SceneProtocol.LOBBY);
+      SceneManager.getInstance().showScene(SceneProtocol.WISDOM);
+    }
   }
 
   /**

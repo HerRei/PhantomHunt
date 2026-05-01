@@ -32,6 +32,8 @@ public class GameModel {
   private final IntegerProperty playerScore = new SimpleIntegerProperty();
   private final IntegerProperty remainingTime = new SimpleIntegerProperty();
   private final IntegerProperty round = new SimpleIntegerProperty();
+  private final BooleanProperty wisdomBonusReady = new SimpleBooleanProperty(false);
+  private final StringProperty wisdomStatus = new SimpleStringProperty("");
   private final ObservableList<String> chatMessages = FXCollections.observableArrayList();
   private final ObservableList<String> availableLobbies = FXCollections.observableArrayList();
   private final ObservableList<String> runningLobbies = FXCollections.observableArrayList();
@@ -312,9 +314,25 @@ public class GameModel {
     return isAbilityVisible;
   }
 
+  public BooleanProperty wisdomBonusReadyProperty() {
+    return wisdomBonusReady;
+  }
+
+  public StringProperty wisdomStatusProperty() {
+    return wisdomStatus;
+  }
+
   // ---SETTERS---
   public void setName(String name) {
     playerName.set(name);
+  }
+
+  public void setWisdomBonusReady(boolean value) {
+    wisdomBonusReady.set(value);
+  }
+
+  public void setWisdomStatus(String value) {
+    wisdomStatus.set(value == null ? "" : value);
   }
 
   public void setAbility(Boolean value) {

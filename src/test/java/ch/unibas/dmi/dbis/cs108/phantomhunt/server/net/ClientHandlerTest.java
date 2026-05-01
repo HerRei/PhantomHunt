@@ -104,4 +104,20 @@ class ClientHandlerTest {
     String sentData = socket.getSentData();
     assertTrue(sentData.contains("REJECT"), "Server should respond to bad commands with REJECT");
   }
+
+  @Test
+  void wisdomUnlock_requiresFifteenSecondsAndIsConsumedOnce() {
+    ClientHandler handler = new ClientHandler(new FakeSocket(""), realRegistry, realLobbyHandler);
+
+    handler.startWisdomUnlock(1_000L);
+
+    assertFalse(handler.claimWisdomUnlock(15_999L), "Wisdom cannot unlock before 15 seconds.");
+    assertFalse(handler.hasWisdomBonusReady());
+
+    assertTrue(handler.claimWisdomUnlock(16_000L), "Wisdom must unlock after 15 seconds.");
+    assertTrue(handler.hasWisdomBonusReady());
+
+    assertTrue(handler.consumeWisdomRoundBonus(), "Ready wisdom bonus should be consumed.");
+    assertFalse(handler.consumeWisdomRoundBonus(), "Wisdom bonus can only be consumed once.");
+  }
 }

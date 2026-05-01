@@ -11,8 +11,8 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -36,7 +36,7 @@ public class GameHandler {
   private static final int TICKS_PER_SECOND = 20;
   private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
   private static final long ROUND_END_WAIT_MS = 3000;
-  private static final int WISDOM_ROUND_SCORE_BONUS = 5;
+  private static final int WISDOM_ROUND_SCORE_BONUS = 20;
   private final Set<String> wisdomBonusPlayerIds;
 
   public GameHandler(GameState gs, Lobby lobby) {
