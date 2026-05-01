@@ -10,6 +10,7 @@ class CommandTest {
     void valueOf_validString_returnsEnum(){
         assertEquals(Command.PING, Command.valueOf("PING"));
         assertEquals(Command.WHISPER, Command.valueOf("WHISPER"));
+        assertEquals(Command.WISDOM, Command.valueOf("WISDOM"));
     }
 
     @Test

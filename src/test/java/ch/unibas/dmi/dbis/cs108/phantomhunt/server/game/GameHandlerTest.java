@@ -217,6 +217,39 @@ class GameHandlerTest {
   }
 
   @Test
+  void wisdomRoundBonus_addsFiveAfterEachRoundForInspiredPlayer() {
+    MapLogic map = new MapLogic(MapLogic.generateExampleMap());
+    GameFactory factory = new GameFactory();
+    List<GameState.PlayerSeed> seeds =
+        List.of(
+            new GameState.PlayerSeed("P1", "P1"),
+            new GameState.PlayerSeed("P2", "P2"),
+            new GameState.PlayerSeed("P3", "P3"),
+            new GameState.PlayerSeed("P4", "P4"));
+    GameState state = factory.createWithDefaultRules("Match_Wisdom", seeds, map);
+
+    FakeClientHandler host = new FakeClientHandler("P1");
+    host.setWisdomRoundBonus(true);
+    Lobby lobby = new Lobby("L_Wisdom", "TestLobby", host);
+    lobby.addPlayer(new FakeClientHandler("P2"));
+    lobby.addPlayer(new FakeClientHandler("P3"));
+    lobby.addPlayer(new FakeClientHandler("P4"));
+
+    GameHandler handler = new GameHandler(state, lobby);
+    handler.startMatch(1_000L);
+
+    handler.endRoundHumanCaught("P2", 1_000L);
+    assertEquals(5, state.getMutablePlayerAt(0).getScore(), "Inspired player gets +5 after round 1.");
+    assertEquals(20, state.getMutablePlayerAt(1).getScore(), "Normal catcher score is unchanged.");
+    assertFalse(host.consumeWisdomRoundBonus(), "Wisdom bonus is consumed when the game starts.");
+
+    handler.advanceToNextRound(2_000L);
+    handler.endRoundHumanCaught("P1", 2_000L);
+
+    assertEquals(30, state.getMutablePlayerAt(0).getScore(), "Inspired player gets +5 each round.");
+  }
+
+  @Test
   void tick_timeRunsOut_humanSurvives() {
     MapLogic map = new MapLogic(MapLogic.generateExampleMap());
     GameFactory factory = new GameFactory();

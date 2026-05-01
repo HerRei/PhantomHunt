@@ -135,6 +135,9 @@ public class ServerHandler implements Runnable {
       case ABILITY:
         handleAbility(packet);
         break;
+      case WISDOM:
+        handleWisdom(packet);
+        break;
       case SHOW_HIGHSCORE:
         handleShowHighscore(packet);
         break;
@@ -158,6 +161,29 @@ public class ServerHandler implements Runnable {
         LOGGER.error("Wrong format for Abilitycommand");
         break;
     }
+  }
+
+  private void handleWisdom(Packet packet) {
+    if (packet.argc() < 1) {
+      return;
+    }
+
+    String text = packet.text();
+    Platform.runLater(
+        () -> {
+          GameModel model = GameModel.getInstance();
+          if ("CLAIMED".equals(text) || "ACTIVE".equals(text)) {
+            model.setWisdomBonusReady(true);
+            model.setWisdomStatus("Thankyou and enjoy >.<");
+          } else if ("STARTED".equals(text)) {
+            model.setWisdomStatus("Reflecting...");
+          } else if (text.startsWith("TOO_EARLY")) {
+            model.setWisdomStatus("Stay with the wisdom a little longer.");
+          } else if ("CANCELED".equals(text)) {
+            model.setWisdomBonusReady(false);
+            model.setWisdomStatus("");
+          }
+        });
   }
 
   public void handleShowHighscore(Packet p) {
@@ -216,6 +242,8 @@ public class ServerHandler implements Runnable {
     SoundManager.getInstance().play(SoundEffect.WIND_OUTSIDE_ROOM_TONE);
     Platform.runLater(
         () -> {
+          GameModel.getInstance().setWisdomBonusReady(false);
+          GameModel.getInstance().setWisdomStatus("");
           SceneManager.getInstance().showScene(SceneProtocol.GAME);
           GameModel.getInstance().clearChat();
         });

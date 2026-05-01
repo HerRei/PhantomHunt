@@ -54,6 +54,18 @@ public class EventHandlers {
     serverHandler.sendMessage(Packet.of(Command.ABILITY));
   }
 
+  public void sendWisdomStart() {
+    sendMessage(Command.WISDOM, "START");
+  }
+
+  public void sendWisdomClaim() {
+    sendMessage(Command.WISDOM, "CLAIM");
+  }
+
+  public void sendWisdomCancel() {
+    sendMessage(Command.WISDOM, "CANCEL");
+  }
+
   /**
    * Sets the ServerHandler used for network communication. Synchronizes the GameModel nickname if
    * one is already set.

@@ -28,13 +28,7 @@ public class HubScene implements SceneInterface {
   private TextField whisperTargetInput;
   private ComboBox<String> chatMode;
   private Label nicknameLabel;
-  private Label wisdomLabel;
   private Scene localScene;
-
-  private static final String QOTD_HOST = "djxmmx.net";
-  private static final int QOTD_PORT = 17;
-  private static final String FALLBACK_QUOTE =
-      "\"Your mind is like water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.\" \n - Master Oogway";
 
   public HubScene() {
     createScene();
@@ -66,8 +60,8 @@ public class HubScene implements SceneInterface {
     Button btnJoin = new Button("Join Lobby");
     Button btnCreate = new Button("Create Lobby");
     Button btnHighscore = new Button("Show Highscores");
+    Button btnWisdom = new Button("Daily Wisdom");
     Button btnKeyBinding = new Button("Key Binding");
-    Button btnWisdom = new Button("Get Wisdom");
 
     btnJoin.setMaxWidth(Double.MAX_VALUE);
     btnNickname.setMaxWidth(Double.MAX_VALUE);
@@ -80,10 +74,6 @@ public class HubScene implements SceneInterface {
     btnKeyBinding.setPrefHeight(40);
     btnHighscore.setPrefHeight(40);
     btnWisdom.setPrefHeight(40);
-
-    wisdomLabel = new Label(FALLBACK_QUOTE);
-    wisdomLabel.setWrapText(true);
-    wisdomLabel.setMaxWidth(Double.MAX_VALUE);
 
     // Player List Section (replacing Volume)
     Label onlineLabel = new Label("Players Online:");
@@ -105,7 +95,6 @@ public class HubScene implements SceneInterface {
             btnKeyBinding,
             btnHighscore,
             btnWisdom,
-            wisdomLabel,
             new Separator(),
             onlineLabel,
             playerListDisplay);
@@ -154,7 +143,7 @@ public class HubScene implements SceneInterface {
           EventHandlers.getInstance().updateHighscore();
         });
     btnKeyBinding.setOnAction(e ->SceneManager.getInstance().showScene(SceneProtocol.KEY_BINDING));
-    btnWisdom.setOnAction(e -> loadWisdom());
+    btnWisdom.setOnAction(e -> openWisdom(SceneProtocol.HOME));
     btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
     btnJoin.setOnAction(
         e -> {
@@ -196,37 +185,12 @@ public class HubScene implements SceneInterface {
     }
   }
 
-  private void loadWisdom() {
-    wisdomLabel.setText("Loading wisdom...");
-    new Thread(
-            () -> {
-              String quote = FALLBACK_QUOTE;
-              try (Socket socket = new Socket()) {
-                socket.connect(new InetSocketAddress(QOTD_HOST, QOTD_PORT), 3000);
-                socket.setSoTimeout(3000);
-                BufferedReader reader =
-                    new BufferedReader(
-                        new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-                StringBuilder wisdom = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                  if (!line.isBlank()) {
-                    if (wisdom.length() > 0) {
-                      wisdom.append(" ");
-                    }
-                    wisdom.append(line.trim());
-                  }
-                }
-                if (wisdom.length() > 0) {
-                  quote = wisdom.toString();
-                }
-              } catch (Exception ignored) {
-                quote = FALLBACK_QUOTE;
-              }
-              String finalQuote = quote;
-              Platform.runLater(() -> wisdomLabel.setText(finalQuote));
-            })
-        .start();
+  private void openWisdom(SceneProtocol returnScene) {
+    WisdomScene wisdomScene = (WisdomScene) SceneManager.getInstance().getScene(SceneProtocol.WISDOM);
+    if (wisdomScene != null) {
+      wisdomScene.openFrom(returnScene);
+      SceneManager.getInstance().showScene(SceneProtocol.WISDOM);
+    }
   }
 
   @Override

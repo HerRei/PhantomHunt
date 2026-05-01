@@ -11,9 +11,11 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +36,8 @@ public class GameHandler {
   private static final int TICKS_PER_SECOND = 20;
   private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
   private static final long ROUND_END_WAIT_MS = 3000;
+  private static final int WISDOM_ROUND_SCORE_BONUS = 5;
+  private final Set<String> wisdomBonusPlayerIds;
 
   public GameHandler(GameState gs, Lobby lobby) {
     this.lobby = lobby;
@@ -41,6 +45,7 @@ public class GameHandler {
     this.lobbyHandler =
         Objects.requireNonNull(LobbyHandler.getInstance(), "lobbyHandler must not be null");
     this.humanCatchesGhosts = false;
+    this.wisdomBonusPlayerIds = consumeWisdomBonuses(lobby);
     instance = this;
   }
 
@@ -501,6 +506,33 @@ public class GameHandler {
                   gameState
                       .requireMutablePlayer(catcherId)
                       .addScore(gameState.getRules().phantomCatchBonus()));
+    }
+
+    applyWisdomRoundBonuses();
+  }
+
+  private Set<String> consumeWisdomBonuses(Lobby lobby) {
+    Set<String> playerIds = new HashSet<>();
+    lobby.getPlayers()
+        .ifPresent(
+            players -> {
+              for (var player : players) {
+                if (player.consumeWisdomRoundBonus()) {
+                  playerIds.add(player.getName());
+                }
+              }
+            });
+    return playerIds;
+  }
+
+  private void applyWisdomRoundBonuses() {
+    if (wisdomBonusPlayerIds.isEmpty()) {
+      return;
+    }
+    for (PlayerState player : gameState.getPlayers()) {
+      if (wisdomBonusPlayerIds.contains(player.getPlayerId())) {
+        player.addScore(WISDOM_ROUND_SCORE_BONUS);
+      }
     }
   }
 

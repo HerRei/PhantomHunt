@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +40,9 @@ public class ClientHandler implements Runnable {
   private String name;
   private long lastSeen = System.currentTimeMillis();
   private ScheduledExecutorService scheduler;
+  private static final long WISDOM_REQUIRED_OPEN_MILLIS = 15_000L;
+  private Long wisdomOpenedAtMillis;
+  private boolean wisdomBonusReady;
 
   // ---------------------------------------------------------------------------------------------
   // Constructor
@@ -368,6 +372,85 @@ public class ClientHandler implements Runnable {
     gameHandler.tryAbility(getName());
   }
 
+  private void handleWisdom(Packet p) {
+    if (p.argc() < 1) {
+      sendMessage(Packet.of(Command.REJECT, "Wisdom action is required."));
+      return;
+    }
+
+    String action = p.text().trim().toUpperCase(Locale.ROOT);
+    long nowMillis = System.currentTimeMillis();
+
+    switch (action) {
+      case "START" -> {
+        startWisdomUnlock(nowMillis);
+        sendMessage(Packet.of(Command.WISDOM, hasWisdomBonusReady() ? "ACTIVE" : "STARTED"));
+      }
+      case "CLAIM" -> {
+        if (claimWisdomUnlock(nowMillis)) {
+          sendMessage(Packet.of(Command.WISDOM, "CLAIMED"));
+        } else {
+          long remainingSeconds = (long) Math.ceil(getWisdomRemainingMillis(nowMillis) / 1000.0D);
+          sendMessage(Packet.of(Command.WISDOM, "TOO_EARLY " + remainingSeconds));
+        }
+      }
+      case "CANCEL" -> {
+        cancelWisdomUnlock();
+        sendMessage(Packet.of(Command.WISDOM, hasWisdomBonusReady() ? "ACTIVE" : "CANCELED"));
+      }
+      default -> sendMessage(Packet.of(Command.REJECT, "Unsupported wisdom action: " + action));
+    }
+  }
+
+  synchronized void startWisdomUnlock(long nowMillis) {
+    if (!wisdomBonusReady) {
+      wisdomOpenedAtMillis = nowMillis;
+    }
+  }
+
+  synchronized boolean claimWisdomUnlock(long nowMillis) {
+    if (wisdomBonusReady) {
+      return true;
+    }
+    if (wisdomOpenedAtMillis == null) {
+      return false;
+    }
+    if (nowMillis - wisdomOpenedAtMillis >= WISDOM_REQUIRED_OPEN_MILLIS) {
+      wisdomBonusReady = true;
+      wisdomOpenedAtMillis = null;
+      return true;
+    }
+    return false;
+  }
+
+  synchronized void cancelWisdomUnlock() {
+    if (!wisdomBonusReady) {
+      wisdomOpenedAtMillis = null;
+    }
+  }
+
+  private synchronized long getWisdomRemainingMillis(long nowMillis) {
+    if (wisdomBonusReady) {
+      return 0L;
+    }
+    if (wisdomOpenedAtMillis == null) {
+      return WISDOM_REQUIRED_OPEN_MILLIS;
+    }
+    long elapsedMillis = Math.max(0L, nowMillis - wisdomOpenedAtMillis);
+    return Math.max(0L, WISDOM_REQUIRED_OPEN_MILLIS - elapsedMillis);
+  }
+
+  public synchronized boolean hasWisdomBonusReady() {
+    return wisdomBonusReady;
+  }
+
+  public synchronized boolean consumeWisdomRoundBonus() {
+    boolean hasRoundBonus = wisdomBonusReady;
+    wisdomBonusReady = false;
+    wisdomOpenedAtMillis = null;
+    return hasRoundBonus;
+  }
+
   /**
    * Applies a nickname change request and ensures the assigned nickname is unique.
    *
@@ -459,6 +542,7 @@ public class ClientHandler implements Runnable {
             }
             case INPUT -> handleInput(p);
             case ABILITY -> handleAbility();
+            case WISDOM -> handleWisdom(p);
             case NICK -> handleNickChange(p);
             case WHISPER -> handleWhisper(p);
             case CHECKIN -> handleCheckin(p);

@@ -40,6 +40,7 @@ public class GUI extends Application {
     manager.addScene(SceneProtocol.END, new EndScene());
     manager.addScene(SceneProtocol.HIGHSCORE, new HighscoreScene());
     manager.addScene(SceneProtocol.KEY_BINDING, new KeyBindingScene());
+    manager.addScene(SceneProtocol.WISDOM, new WisdomScene());
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
