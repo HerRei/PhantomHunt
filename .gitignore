@@ -13,16 +13,22 @@ out/
 build/
 **/build/
 
-# Keep the Jar (wird auf der webseite so verlangr dass alle das genau gleich bauen kénnen)
+# Keep the Jar (wird auf der Webseite so verlangt, damit alle das genau gleich bauen können)
 !gradle/wrapper/gradle-wrapper.jar
 
-#soll keine .class files haben im repo
+# Keine Binaries oder kompilierte Files
 *.class
 
-# ignore log files
+# Ignore log files
 *.log
 hs_err_pid*
-replay_pid*.classpath
-highscores.csv
+replay_pid*
+
+# Project specific files
+.classpath
 .project
 *.eml
+
+# Persistence & Data (Wichtig: Verhindert, dass HighScores.txt gepusht wird)
+highscores.csv
+*.txt

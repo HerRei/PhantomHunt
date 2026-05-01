@@ -1,0 +1,9 @@
+Silas,300
+weber2,64
+coban,63
+weber1,48
+weber,47
+weber2,43
+coban,36
+weber,35
+weber1,35

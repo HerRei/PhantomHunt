@@ -3,38 +3,38 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.session;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Comparator;
-import java.util.Scanner;
-
 /**
- * Manages all connected clients and their nicknames. It provides methods to broadcast messages to
- * everyone, send lobby messages, or send private whispers.
+ * Manages all connected clients, their nicknames, and persistent highscores.
+ * Provides methods for broadcasting, whispering, and leaderboard management.
  */
 public final class Registry {
 
-  // hash map that is thread safe as we dont want a O(n) lookup with e.g. vector that is also
-  // threadsafe.
-
   private static final Logger log = LogManager.getLogger(Registry.class);
-  private static final String HIGHSCORE_FILE = "highscores.csv";
+  private static final String HIGHSCORE_FILE = "HighScores.txt";
   private static Registry instance;
-  private final Vector<ClientHandler> sessions =
-      new Vector<>(); // zwar O(n) for get but easier to work with than the hashMap with a dummy.
-  private final ConcurrentHashMap<String, ClientHandler> byName =
-      new ConcurrentHashMap<>(); // Nickname handling
+
+  private final Vector<ClientHandler> sessions = new Vector<>();
+  private final ConcurrentHashMap<String, ClientHandler> byName = new ConcurrentHashMap<>();
   private final Vector<Highscore> highscores = new Vector<>();
 
-  public static Registry getInstance() {
+  /**
+   * Returns the singleton instance of the Registry.
+   */
+  public static synchronized Registry getInstance() {
     if (instance == null) {
       instance = new Registry();
     }
@@ -45,12 +45,18 @@ public final class Registry {
     loadHighscores();
   }
 
+  /**
+   * Resets all sessions and highscores. Primarily used for testing purposes.
+   */
   void resetForTests() {
     sessions.clear();
     byName.clear();
     highscores.clear();
   }
 
+  /**
+   * Inner class to represent a single highscore entry.
+   */
   private static class Highscore {
     private final String playerName;
     private final int score;
@@ -74,157 +80,153 @@ public final class Registry {
     }
   }
 
+  /**
+   * Adds a new highscore and saves it persistently to the text file.
+   * Maintains descending order by score.
+   */
   public void addHighscore(String playerName, int score) {
     Highscore newHighscore = new Highscore(playerName, score);
 
+    // Insert into the list while maintaining descending order
     int i = 0;
     while (i < highscores.size() && highscores.get(i).getScore() >= score) {
       i++;
     }
-
     highscores.add(i, newHighscore);
+
     saveHighscores();
-    log.info("New highscore added for {}: {}", playerName, score);
+    log.info("New highscore added and saved for {}: {}", playerName, score);
   }
 
+  /**
+   * Returns a string representation of the top 10 highscores.
+   * Entries are separated by the '|' character.
+   */
   public String getHighscoreBoard() {
-    log.info(highscores.size());
-    StringBuilder highscoreBoard = new StringBuilder("");
+    StringBuilder highscoreBoard = new StringBuilder();
     for (int i = 0; i < highscores.size() && i < 10; i++) {
       highscoreBoard.append(i + 1).append(". ").append(highscores.get(i)).append("|");
     }
     return highscoreBoard.toString();
   }
 
+  /**
+   * Loads highscores from the HighScores.txt file into memory.
+   */
   private void loadHighscores() {
     File file = new File(HIGHSCORE_FILE);
     if (!file.exists()) {
+      log.info("No highscore file found. Creating new list.");
       return;
     }
 
-    try (Scanner scanner = new Scanner(file)) {
-      while (scanner.hasNextLine()) {
-        String[] data = scanner.nextLine().split(",");
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        String[] data = line.split(",");
         if (data.length == 2) {
-          highscores.add(new Highscore(data[0], Integer.parseInt(data[1].trim())));
+          try {
+            highscores.add(new Highscore(data[0], Integer.parseInt(data[1].trim())));
+          } catch (NumberFormatException e) {
+            log.warn("Skipping invalid score format in line: {}", line);
+          }
         }
       }
+      // Ensure data is sorted correctly after loading
       highscores.sort(Comparator.comparingInt(Highscore::getScore).reversed());
-    } catch (Exception e) {
-      log.warn("Could not load highscores.csv", e);
-    }
-  }
-
-  private void saveHighscores() {
-    try (FileWriter writer = new FileWriter(HIGHSCORE_FILE)) {
-      for (Highscore highscore : highscores) {
-        writer.write(highscore.getPlayerName() + "," + highscore.getScore() + "\n");
-      }
     } catch (IOException e) {
-      log.warn("Could not save highscores.csv", e);
+      log.error("Could not load HighScores.txt", e);
     }
   }
 
   /**
-   * Assign a requested nickname to a client. If the name is taken, it appends a number to ensure
-   * uniqueness.
-   *
-   * @param requestedName Name the player wants
-   * @param h Client handler requesting the name
-   * @return final unique nickname
+   * Writes all current highscores to the HighScores.txt file.
+   */
+  private void saveHighscores() {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(HIGHSCORE_FILE))) {
+      for (Highscore highscore : highscores) {
+        writer.write(highscore.getPlayerName() + "," + highscore.getScore());
+        writer.newLine();
+      }
+    } catch (IOException e) {
+      log.error("Could not save HighScores.txt", e);
+    }
+  }
+
+  /**
+   * Assigns a unique nickname. Appends a counter if the name is already taken.
    */
   public String claimName(String requestedName, ClientHandler h) {
     String attempt = requestedName;
     int counter = 1;
 
-    // putIfAbsent returns null, if key didn't exist before and was successfully added.
     while (byName.putIfAbsent(attempt, h) != null) {
-      // If this ClientHandler already has a name, return it directly
       if (byName.get(attempt) == h) {
         return attempt;
       }
-
       attempt = requestedName + counter;
       counter++;
     }
-    log.info("Client claimed anem: {}", attempt);
+    log.info("Client claimed name: {}", attempt);
     return attempt;
   }
 
   /**
-   * Returns a string representation of all currently registered nicknames.
-   *
-   * @return a list of all names as a string
+   * Returns a space-separated list of all currently active nicknames.
    */
   public String names() {
-    return String.join(
-        " ", byName.keySet()); // this should return all the people that are in the registry
+    return String.join(" ", byName.keySet());
   }
 
   /**
-   * Makes nickname available.
-   *
-   * @param name Nickname to release.
-   * @param h Client handler with this nickname.
+   * Releases a nickname so it can be claimed by others.
    */
   public void releaseName(String name, ClientHandler h) {
-    if (name != null & !name.isBlank()) {
+    if (name != null && !name.isBlank()) {
       byName.remove(name, h);
-      log.debug("Nickname: {} released.", name); // remove name
+      log.debug("Nickname: {} released.", name);
     }
   }
 
   /**
-   * Registers a new client handler.
-   *
-   * @param h Client handler to add.
+   * Registers a client session.
    */
   public void register(ClientHandler h) {
     sessions.add(h);
-    log.info("New client registered. size is: {}", sessions.size());
+    log.info("New client registered. Current count: {}", sessions.size());
   }
 
   /**
-   * Removes client from the registry when disconnected.
-   *
-   * @param h Client handler to remove.
+   * Unregisters a client session and releases their name.
    */
   public void unregister(ClientHandler h) {
     sessions.remove(h);
-    byName.remove(h.getName());
-    log.info("Client unregistered. size: {}", sessions.size());
+    if (h.getName() != null) {
+      byName.remove(h.getName());
+    }
+    log.info("Client unregistered. Current count: {}", sessions.size());
   }
 
   /**
-   * Send messages to all connected clients.
-   *
-   * @param sender Client who send the broadcast.
-   * @param p message to send.
+   * Broadcasts a packet to all connected clients.
    */
   public void broadcast(ClientHandler sender, Packet p) {
-    log.debug("Registry broadcast packet from {}: {}", sender.getName(), p.cmd());
-    String str = Protocol.encode(p);
+    log.debug("Registry broadcast from {}: {}", sender.getName(), p.cmd());
     for (ClientHandler h : sessions) {
-      // if (h == sender) continue; //this will lead to errors later as the sender doesn't get its
-      // own packages again...!
-      // section should be unnecessary, the sender will always receive his own messages as well
       h.sendMessage(p);
     }
   }
 
   /**
-   * Sends a message to all clients within the same lobby as the sender.
-   *
-   * @param sender Client who sent the yap.
-   * @param p message to send.
+   * Sends a packet to all clients within the same lobby as the sender.
    */
   public void yapping(ClientHandler sender, Packet p) {
-    log.debug("registry yapping packet from {}: {}", sender.getName(), p.cmd());
+    log.debug("Registry lobby-broadcast from {}: {}", sender.getName(), p.cmd());
     Lobby senderLobby = sender.getCurrentLobby();
 
     if (senderLobby == null) {
       sender.sendMessage(
-          Packet.of(Command.REJECT, "You are not in a lobby, what are you \" yapping \""));
+              Packet.of(Command.REJECT, "You are not in a lobby."));
       return;
     }
 
@@ -236,12 +238,9 @@ public final class Registry {
   }
 
   /**
-   * Sends a private message from one client to another.
+   * Sends a private whisper message.
    *
-   * @param sender Client handler sending the message.
-   * @param targetName Nickname of the receiver.
-   * @param message The text.
-   * @return true if the whisper was successfully sent, false if the target was not found.
+   * @return true if target was found and message sent, false otherwise.
    */
   public boolean whisper(ClientHandler sender, String targetName, String message) {
     ClientHandler recipient = byName.get(targetName);
@@ -249,8 +248,7 @@ public final class Registry {
       return false;
     }
 
-    // all of this needs to be tested at some point!!!!
-    log.info("Whisper: {} -> {}: [message hidden]", sender.getName(), targetName);
+    log.info("Whisper: {} -> {}", sender.getName(), targetName);
 
     String attributed = "[Whisper from " + sender.getName() + "]: " + message;
     recipient.sendMessage(Packet.of(Command.WHISPER, attributed));
