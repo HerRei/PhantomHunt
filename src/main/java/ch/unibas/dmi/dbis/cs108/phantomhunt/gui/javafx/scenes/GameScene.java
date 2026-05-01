@@ -5,7 +5,6 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandl
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.Player;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -42,7 +41,8 @@ public class GameScene implements SceneInterface {
   private final Map<Player, ImageView> playerSprites = new HashMap<>();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
-  private boolean w, a, s, d; // INPUTS
+  // Movement state flags, keyed by action name for easy lookup
+  private boolean up, down, left, right;
   private final double mapScale;
   private final Map<String, Image> floorImageMap = new HashMap<>();
   private final Map<String, Image[]> humanSprites = new HashMap<>();
@@ -58,25 +58,25 @@ public class GameScene implements SceneInterface {
     // Load floor tiles
     floorImageMap.put("Q", new Image(getClass().getResourceAsStream("/assets/floors/quadra.png")));
     floorImageMap.put(
-        "L", new Image(getClass().getResourceAsStream("/assets/floors/top_left.png")));
+            "L", new Image(getClass().getResourceAsStream("/assets/floors/top_left.png")));
     floorImageMap.put(
-        "V", new Image(getClass().getResourceAsStream("/assets/floors/vertical.png")));
+            "V", new Image(getClass().getResourceAsStream("/assets/floors/vertical.png")));
     floorImageMap.put(
-        "D", new Image(getClass().getResourceAsStream("/assets/floors/down_left.png")));
+            "D", new Image(getClass().getResourceAsStream("/assets/floors/down_left.png")));
     floorImageMap.put(
-        "R", new Image(getClass().getResourceAsStream("/assets/floors/top_right.png")));
+            "R", new Image(getClass().getResourceAsStream("/assets/floors/top_right.png")));
     floorImageMap.put(
-        "A", new Image(getClass().getResourceAsStream("/assets/floors/down_right.png")));
+            "A", new Image(getClass().getResourceAsStream("/assets/floors/down_right.png")));
     floorImageMap.put(
-        "H", new Image(getClass().getResourceAsStream("/assets/floors/horizontal.png")));
+            "H", new Image(getClass().getResourceAsStream("/assets/floors/horizontal.png")));
     floorImageMap.put(
-        "T", new Image(getClass().getResourceAsStream("/assets/floors/triple_top.png")));
+            "T", new Image(getClass().getResourceAsStream("/assets/floors/triple_top.png")));
     floorImageMap.put(
-        "B", new Image(getClass().getResourceAsStream("/assets/floors/triple_down.png")));
+            "B", new Image(getClass().getResourceAsStream("/assets/floors/triple_down.png")));
     floorImageMap.put(
-        "C", new Image(getClass().getResourceAsStream("/assets/floors/triple_left.png")));
+            "C", new Image(getClass().getResourceAsStream("/assets/floors/triple_left.png")));
     floorImageMap.put(
-        "E", new Image(getClass().getResourceAsStream("/assets/floors/triple_right.png")));
+            "E", new Image(getClass().getResourceAsStream("/assets/floors/triple_right.png")));
 
     // Load player images
     loadSprites();
@@ -128,7 +128,7 @@ public class GameScene implements SceneInterface {
     model.humanAbilityProperty().addListener((obs, oldVal, newVal) -> {
       if (newVal) {
         playerSprites.forEach((player, sprite) ->
-            updatePlayerSprite(player, sprite)
+                updatePlayerSprite(player, sprite)
         );
       }
     });
@@ -154,10 +154,10 @@ public class GameScene implements SceneInterface {
       for (String direction : phantomDirections) {
         String key = color + direction + "_ghost";
         phantomSprites.put(
-            key, new Image(getClass().getResourceAsStream("/assets/ghosts/" + key + ".png")));
+                key, new Image(getClass().getResourceAsStream("/assets/ghosts/" + key + ".png")));
         String glitchKey = color + direction + "_glitch";
         phantomGlitchedSprites.put(
-            glitchKey, new Image(getClass().getResourceAsStream("/assets/ghosts/" + glitchKey + ".png")));
+                glitchKey, new Image(getClass().getResourceAsStream("/assets/ghosts/" + glitchKey + ".png")));
       }
     }
   }
@@ -246,15 +246,15 @@ public class GameScene implements SceneInterface {
     chatInput.setOnAction(e -> sendMessage());
 
     box.getChildren()
-        .addAll(
-            statusBox,
-            new Separator(),
-            scoreBox,
-            tableLabel,
-            table,
-            chatLabel,
-            chatArea,
-            chatInput);
+            .addAll(
+                    statusBox,
+                    new Separator(),
+                    scoreBox,
+                    tableLabel,
+                    table,
+                    chatLabel,
+                    chatArea,
+                    chatInput);
     VBox.setVgrow(chatArea, Priority.ALWAYS);
 
     return box;
@@ -264,17 +264,17 @@ public class GameScene implements SceneInterface {
 
   private void setupChatBinding() {
     GameModel.getInstance()
-        .lobbyChatMessagesProperty()
-        .addListener(
-            (ListChangeListener<String>)
-                c -> {
-                  StringBuilder sb = new StringBuilder();
-                  for (String msg : GameModel.getInstance().lobbyChatMessagesProperty()) {
-                    sb.append(msg).append("\n");
-                  }
-                  chatArea.setText(sb.toString());
-                  chatArea.setScrollTop(Double.MAX_VALUE);
-                });
+            .lobbyChatMessagesProperty()
+            .addListener(
+                    (ListChangeListener<String>)
+                            c -> {
+                              StringBuilder sb = new StringBuilder();
+                              for (String msg : GameModel.getInstance().lobbyChatMessagesProperty()) {
+                                sb.append(msg).append("\n");
+                              }
+                              chatArea.setText(sb.toString());
+                              chatArea.setScrollTop(Double.MAX_VALUE);
+                            });
   }
 
   private void sendMessage() {
@@ -291,54 +291,45 @@ public class GameScene implements SceneInterface {
     scene.setOnKeyReleased(e -> handleKeyReleased(e.getCode()));
   }
 
+  /**
+   * Handles a key-press event by comparing {@code code} against the current key bindings stored in
+   * {@link GameModel}. Only one direction is active at a time; pressing a new direction cancels the
+   * previous one.
+   *
+   * @param code The key that was pressed.
+   */
   private void handleKeyPress(KeyCode code) {
     if (chatInput.isFocused()) return;
 
-    int horizontal = 0, vertical = 0;
+    GameModel model = GameModel.getInstance();
+    int horizontal = 0;
+    int vertical = 0;
     boolean changed = false;
 
-    switch (code) {
-      case W -> {
-        if (!w) {
-          w = true;
-          a = false;
-          s = false;
-          d = false;
-          vertical = -1;
-          changed = true;
-        }
+    if (code.equals(model.getKeyBinding(GameModel.KEY_UP))) {
+      if (!up) {
+        up = true; down = false; left = false; right = false;
+        vertical = -1;
+        changed = true;
       }
-      case S -> {
-        if (!s) {
-          w = false;
-          a = false;
-          s = true;
-          d = false;
-          vertical = 1;
-          changed = true;
-        }
+    } else if (code.equals(model.getKeyBinding(GameModel.KEY_DOWN))) {
+      if (!down) {
+        up = false; down = true; left = false; right = false;
+        vertical = 1;
+        changed = true;
       }
-      case A -> {
-        if (!a) {
-          w = false;
-          a = true;
-          s = false;
-          d = false;
-          horizontal = -1;
-          changed = true;
-        }
+    } else if (code.equals(model.getKeyBinding(GameModel.KEY_LEFT))) {
+      if (!left) {
+        up = false; down = false; left = true; right = false;
+        horizontal = -1;
+        changed = true;
       }
-      case D -> {
-        if (!d) {
-          w = false;
-          a = false;
-          s = false;
-          d = true;
-          horizontal = 1;
-          changed = true;
-        }
+    } else if (code.equals(model.getKeyBinding(GameModel.KEY_RIGHT))) {
+      if (!right) {
+        up = false; down = false; left = false; right = true;
+        horizontal = 1;
+        changed = true;
       }
-      default -> {}
     }
 
     if (changed) {
@@ -354,15 +345,15 @@ public class GameScene implements SceneInterface {
 
   private void setupPlayerTracking() {
     GameModel.getInstance()
-        .getPlayers()
-        .addListener(
-            (ListChangeListener<Player>)
-                c -> {
-                  while (c.next()) {
-                    if (c.wasAdded()) c.getAddedSubList().forEach(this::addPlayer);
-                    if (c.wasRemoved()) c.getRemoved().forEach(this::removePlayer);
-                  }
-                });
+            .getPlayers()
+            .addListener(
+                    (ListChangeListener<Player>)
+                            c -> {
+                              while (c.next()) {
+                                if (c.wasAdded()) c.getAddedSubList().forEach(this::addPlayer);
+                                if (c.wasRemoved()) c.getRemoved().forEach(this::removePlayer);
+                              }
+                            });
     GameModel.getInstance().getPlayers().forEach(this::addPlayer);
   }
 
@@ -374,38 +365,38 @@ public class GameScene implements SceneInterface {
 
     // Listen for position changes to update direction and animation
     player
-        .xPosition()
-        .addListener(
-            (obs, oldX, newX) -> {
-              double deltaX = newX.doubleValue() - oldX.doubleValue();
-              if (deltaX == 0) return;
+            .xPosition()
+            .addListener(
+                    (obs, oldX, newX) -> {
+                      double deltaX = newX.doubleValue() - oldX.doubleValue();
+                      if (deltaX == 0) return;
 
-              if (deltaX > 0) {
-                GameModel.getInstance().setMyPlayerDirection("right");
-              } else {
-                GameModel.getInstance().setMyPlayerDirection("left");
-              }
-              handlePositionChange(player, sprite);
-            });
-
-    player
-        .yPosition()
-        .addListener(
-            (obs, oldY, newY) -> {
-              double deltaY = newY.doubleValue() - oldY.doubleValue();
-              if (deltaY == 0) return;
-
-              if (deltaY > 0) {
-                GameModel.getInstance().setMyPlayerDirection("front");
-              } else {
-                GameModel.getInstance().setMyPlayerDirection("back");
-              }
-              handlePositionChange(player, sprite);
-            });
+                      if (deltaX > 0) {
+                        GameModel.getInstance().setMyPlayerDirection("right");
+                      } else {
+                        GameModel.getInstance().setMyPlayerDirection("left");
+                      }
+                      handlePositionChange(player, sprite);
+                    });
 
     player
-        .skinProperty()
-        .addListener((obs, oldSkin, newSkin) -> updatePlayerSprite(player, sprite));
+            .yPosition()
+            .addListener(
+                    (obs, oldY, newY) -> {
+                      double deltaY = newY.doubleValue() - oldY.doubleValue();
+                      if (deltaY == 0) return;
+
+                      if (deltaY > 0) {
+                        GameModel.getInstance().setMyPlayerDirection("front");
+                      } else {
+                        GameModel.getInstance().setMyPlayerDirection("back");
+                      }
+                      handlePositionChange(player, sprite);
+                    });
+
+    player
+            .skinProperty()
+            .addListener((obs, oldSkin, newSkin) -> updatePlayerSprite(player, sprite));
     updatePlayerSprite(player, sprite);
 
     sprite.layoutXProperty().bind(player.xPosition().multiply(mapScale));
@@ -433,7 +424,7 @@ public class GameScene implements SceneInterface {
     String direction = player.getPlayerDirection();
     String[] phantomColors = {"b", "g", "r", "v"};
     Map<String, String> phantomDirections =
-        Map.of("front", "d", "back", "u", "left", "l", "right", "r");
+            Map.of("front", "d", "back", "u", "left", "l", "right", "r");
 
     int frame = frameIndex.getOrDefault(player, 0);
 
