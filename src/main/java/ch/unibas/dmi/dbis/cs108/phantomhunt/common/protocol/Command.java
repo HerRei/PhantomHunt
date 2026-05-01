@@ -83,6 +83,9 @@ public enum Command {
   /** Client want to use Ability */
   ABILITY,
 
+  /** Client opens or claims the daily wisdom bonus. */
+  WISDOM,
+
   /** Request to show the highscore. */
   SHOW_HIGHSCORE
 }
