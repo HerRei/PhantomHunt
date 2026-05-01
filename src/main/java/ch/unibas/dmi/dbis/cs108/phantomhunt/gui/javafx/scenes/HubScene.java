@@ -66,15 +66,18 @@ public class HubScene implements SceneInterface {
     Button btnJoin = new Button("Join Lobby");
     Button btnCreate = new Button("Create Lobby");
     Button btnHighscore = new Button("Show Highscores");
+    Button btnKeyBinding = new Button("Key Binding");
     Button btnWisdom = new Button("Get Wisdom");
 
     btnJoin.setMaxWidth(Double.MAX_VALUE);
     btnNickname.setMaxWidth(Double.MAX_VALUE);
+    btnKeyBinding.setMaxWidth(Double.MAX_VALUE);
     btnCreate.setMaxWidth(Double.MAX_VALUE);
     btnHighscore.setMaxWidth(Double.MAX_VALUE);
     btnWisdom.setMaxWidth(Double.MAX_VALUE);
     btnJoin.setPrefHeight(40);
     btnCreate.setPrefHeight(40);
+    btnKeyBinding.setPrefHeight(40);
     btnHighscore.setPrefHeight(40);
     btnWisdom.setPrefHeight(40);
 
@@ -99,6 +102,7 @@ public class HubScene implements SceneInterface {
             new Separator(),
             btnJoin,
             btnCreate,
+            btnKeyBinding,
             btnHighscore,
             btnWisdom,
             wisdomLabel,
@@ -149,6 +153,7 @@ public class HubScene implements SceneInterface {
           SceneManager.getInstance().showScene(SceneProtocol.HIGHSCORE);
           EventHandlers.getInstance().updateHighscore();
         });
+    btnKeyBinding.setOnAction(e ->SceneManager.getInstance().showScene(SceneProtocol.KEY_BINDING));
     btnWisdom.setOnAction(e -> loadWisdom());
     btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
     btnJoin.setOnAction(

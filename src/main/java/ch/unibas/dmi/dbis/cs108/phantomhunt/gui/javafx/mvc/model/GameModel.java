@@ -8,6 +8,7 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,15 +40,30 @@ public class GameModel {
   private final Ability ability = new Ability(100, 100);
   private final BooleanProperty isAbilityVisible = new SimpleBooleanProperty(false);
 
-
   // Map properties
   private final ObjectProperty<Image> gameMap = new SimpleObjectProperty<>();
   private final ObjectProperty<Image> collisionMap = new SimpleObjectProperty<>();
+
+  // Key Binding
+  public static final String KEY_UP = "up";
+  public static final String KEY_DOWN = "down";
+  public static final String KEY_LEFT = "left";
+  public static final String KEY_RIGHT = "right";
+  private final Map<String, KeyCode> keyBindings = new LinkedHashMap<>();
 
   private GameModel() { // NOSONAR
     loadMaps();
     humanAbility.set(false);
     playerScore.set(0);
+    initDefaultKeyBindings();
+  }
+
+  /** Initialises WASD as the default key bindings. */
+  private void initDefaultKeyBindings() {
+    keyBindings.put(KEY_UP, KeyCode.W);
+    keyBindings.put(KEY_DOWN, KeyCode.S);
+    keyBindings.put(KEY_LEFT, KeyCode.A);
+    keyBindings.put(KEY_RIGHT, KeyCode.D);
   }
 
   /**
@@ -60,6 +76,43 @@ public class GameModel {
       instance = new GameModel();
     }
     return instance;
+  }
+
+  /**
+   * Returns the current key bindings map. Keys are action names (see {@code KEY_*} constants),
+   * values are the assigned {@link KeyCode}s.
+   *
+   * @return Mutable map of action → KeyCode.
+   */
+  public Map<String, KeyCode> getKeyBindings() {
+    return keyBindings;
+  }
+
+  /**
+   * Returns the {@link KeyCode} bound to the given action.
+   *
+   * @param action One of the {@code KEY_*} constants.
+   * @return The assigned KeyCode, or {@code null} if the action is unknown.
+   */
+  public KeyCode getKeyBinding(String action) {
+    return keyBindings.get(action);
+  }
+
+  /**
+   * Binds a new key to the given action. The previous binding is overwritten.
+   *
+   * @param action One of the {@code KEY_*} constants.
+   * @param code The new {@link KeyCode} to assign.
+   */
+  public void setKeyBinding(String action, KeyCode code) {
+    keyBindings.put(action, code);
+  }
+
+  /**
+   * Resets all key bindings to the default WASD layout.
+   */
+  public void resetKeyBindings() {
+    initDefaultKeyBindings();
   }
 
   /**
@@ -119,18 +172,18 @@ public class GameModel {
   private void updateOrAddPlayer(String name, String role, double x, double y, int score) {
     // Search for player by nickname
     Player player =
-        lobbyPlayers.stream()
-            .filter(p -> p.nameProperty().get().equals(name))
-            .findFirst()
-            .orElse(null);
+            lobbyPlayers.stream()
+                    .filter(p -> p.nameProperty().get().equals(name))
+                    .findFirst()
+                    .orElse(null);
 
     if (player != null) {
 
       // sound logic - this should not be here - but i dont see why this becoems an issue...
       boolean wasMoving = player.getMoved();
       boolean moved =
-          Double.compare(player.getXPosition(), x) != 0
-              || Double.compare(player.getYPosition(), y) != 0;
+              Double.compare(player.getXPosition(), x) != 0
+                      || Double.compare(player.getYPosition(), y) != 0;
 
       String currentName = playerName.get();
       boolean isLocalPlayer = currentName != null && name.equals(currentName);
@@ -169,7 +222,7 @@ public class GameModel {
       Image gameMapImage = new Image(getClass().getResourceAsStream("/assets/map_concept.png"));
       setGameMap(gameMapImage);
       Image collisionMapImage =
-          new Image(getClass().getResourceAsStream("/assets/map_collision_concept.png"));
+              new Image(getClass().getResourceAsStream("/assets/map_collision_concept.png"));
       setCollisionMap(collisionMapImage);
       LOGGER.info("Maps loaded successfully.");
     } catch (Exception e) {
