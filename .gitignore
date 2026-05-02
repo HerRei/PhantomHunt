@@ -32,3 +32,11 @@ replay_pid*
 # Persistence & Data (Wichtig: Verhindert, dass HighScores.txt gepusht wird)
 highscores.csv
 *.txt
+
+# Ignore lwjgl files
+.lwjgl/
+*.dll
+*.so
+*.dylib
+*.jnilib
+
