@@ -5,10 +5,14 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.util.FakeClientHandler;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +21,25 @@ import static org.mockito.Mockito.*;
 
 class RegistryTest {
 
+  private static final Path HIGHSCORE_PATH = Path.of("highscores.csv");
+
   private Registry registry;
+  private boolean originalHighscoresExisted;
+  private byte[] originalHighscoresContent;
 
   // This method is automatically used before each test
   @BeforeEach
-  void setUp() {
+  void setUp() throws Exception {
+    backupHighscoresFile();
+    resetRegistrySingleton();
     registry = Registry.getInstance();
     registry.resetForTests();
+  }
+
+  @AfterEach
+  void tearDown() throws Exception {
+    restoreHighscoresFile();
+    resetRegistrySingleton();
   }
 
   // Domain-management
@@ -168,5 +184,40 @@ class RegistryTest {
     assertTrue(board.contains("1. Bob: 200"), "Bob has the most points and must be in first place");
     assertTrue(board.contains("2. Charlie: 150"), "Charlie must be in second place");
     assertTrue(board.contains("3. Alice: 50"), "Alice must be in third place");
+  }
+
+  @Test
+  void highscores_persistAfterRegistryReload() throws Exception {
+    registry.addHighscore("Restarted", 321);
+    registry.addHighscore("Kept", 123);
+
+    assertTrue(Files.exists(HIGHSCORE_PATH), "Highscore file must be written to disk");
+
+    resetRegistrySingleton();
+    Registry reloadedRegistry = Registry.getInstance();
+    String board = reloadedRegistry.getHighscoreBoard();
+
+    assertTrue(board.contains("1. Restarted: 321"), "Best score must reload after restart");
+    assertTrue(board.contains("2. Kept: 123"), "Second score must reload after restart");
+  }
+
+  private void backupHighscoresFile() throws Exception {
+    originalHighscoresExisted = Files.exists(HIGHSCORE_PATH);
+    originalHighscoresContent =
+        originalHighscoresExisted ? Files.readAllBytes(HIGHSCORE_PATH) : new byte[0];
+  }
+
+  private void restoreHighscoresFile() throws Exception {
+    if (originalHighscoresExisted) {
+      Files.write(HIGHSCORE_PATH, originalHighscoresContent);
+    } else {
+      Files.deleteIfExists(HIGHSCORE_PATH);
+    }
+  }
+
+  private void resetRegistrySingleton() throws Exception {
+    Field instance = Registry.class.getDeclaredField("instance");
+    instance.setAccessible(true);
+    instance.set(null, null);
   }
 }

@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 public final class Registry {
 
   private static final Logger log = LogManager.getLogger(Registry.class);
-  private static final String HIGHSCORE_FILE = "HighScores.txt";
+  private static final String HIGHSCORE_FILE = "highscores.csv";
   private static Registry instance;
 
   private final Vector<ClientHandler> sessions = new Vector<>();
@@ -81,7 +81,7 @@ public final class Registry {
   }
 
   /**
-   * Adds a new highscore and saves it persistently to the text file.
+   * Adds a new highscore and saves it persistently to the CSV file.
    * Maintains descending order by score.
    */
   public void addHighscore(String playerName, int score) {
@@ -111,7 +111,7 @@ public final class Registry {
   }
 
   /**
-   * Loads highscores from the HighScores.txt file into memory.
+   * Loads highscores from the highscores.csv file into memory.
    */
   private void loadHighscores() {
     File file = new File(HIGHSCORE_FILE);
@@ -135,12 +135,12 @@ public final class Registry {
       // Ensure data is sorted correctly after loading
       highscores.sort(Comparator.comparingInt(Highscore::getScore).reversed());
     } catch (IOException e) {
-      log.error("Could not load HighScores.txt", e);
+      log.error("Could not load highscores.csv", e);
     }
   }
 
   /**
-   * Writes all current highscores to the HighScores.txt file.
+   * Writes all current highscores to the highscores.csv file.
    */
   private void saveHighscores() {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(HIGHSCORE_FILE))) {
@@ -149,7 +149,7 @@ public final class Registry {
         writer.newLine();
       }
     } catch (IOException e) {
-      log.error("Could not save HighScores.txt", e);
+      log.error("Could not save highscores.csv", e);
     }
   }
 

@@ -1,7 +1,0 @@
-Bob,200
-JJ,180
-Charlie,150
-janva2,120
-Alice,50
-janva,20
-janva1,17

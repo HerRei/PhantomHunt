@@ -29,9 +29,8 @@ replay_pid*
 .project
 *.eml
 
-# Persistence & Data (Wichtig: Verhindert, dass HighScores.txt gepusht wird)
+# Persistence & Data (runtime highscores stay local)
 highscores.csv
-*.txt
 
 # Ignore lwjgl files
 .lwjgl/
@@ -39,4 +38,3 @@ highscores.csv
 *.so
 *.dylib
 *.jnilib
-
