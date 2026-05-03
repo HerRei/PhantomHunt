@@ -40,7 +40,7 @@ public class HubScene implements SceneInterface {
   private ListView<String> chatDisplay;
   private ListView<String> playerListDisplay;
   private TextField chatInput;
-  private TextField whisperTargetInput;
+  private ComboBox<String> whisperTargetSelector;
   private ComboBox<String> chatMode;
   private Label nicknameLabel;
   private Scene localScene;
@@ -123,23 +123,18 @@ public class HubScene implements SceneInterface {
     chatMode.setValue("Global");
     chatMode.setPrefWidth(110);
     chatMode.setStyle(INPUT_STYLE);
-    chatMode.setButtonCell(new ListCell<>() {
-      @Override
-      protected void updateItem(String item, boolean empty) {
-        super.updateItem(item, empty);
-        setText(empty ? null : item);
-        setStyle("-fx-text-fill: white;");
-      }
-    });
+    styleComboBox(chatMode);
 
-    whisperTargetInput = new TextField();
-    whisperTargetInput.setPromptText("To whom?");
-    whisperTargetInput.setPrefWidth(110);
-    whisperTargetInput.setStyle(INPUT_STYLE);
-    whisperTargetInput
+    whisperTargetSelector = new ComboBox<>();
+    whisperTargetSelector.setItems(model.players);
+    whisperTargetSelector.setPromptText("To whom?");
+    whisperTargetSelector.setPrefWidth(140);
+    whisperTargetSelector.setStyle(INPUT_STYLE);
+    styleComboBox(whisperTargetSelector);
+    whisperTargetSelector
         .visibleProperty()
         .bind(Bindings.equal("Whisper", chatMode.valueProperty()));
-    whisperTargetInput.managedProperty().bind(whisperTargetInput.visibleProperty());
+    whisperTargetSelector.managedProperty().bind(whisperTargetSelector.visibleProperty());
 
     chatInput = new TextField();
     chatInput.setPromptText("Type a message...");
@@ -150,7 +145,7 @@ public class HubScene implements SceneInterface {
     btnSend.setStyle(BUTTON_STYLE);
     btnSend.setPrefWidth(80);
 
-    HBox inputArea = new HBox(8, chatMode, whisperTargetInput, chatInput, btnSend);
+    HBox inputArea = new HBox(8, chatMode, whisperTargetSelector, chatInput, btnSend);
     inputArea.setAlignment(Pos.CENTER_LEFT);
 
     chatBox.getChildren().addAll(chatTitle, chatDisplay, inputArea);
@@ -200,6 +195,22 @@ public class HubScene implements SceneInterface {
     return b;
   }
 
+  private void styleComboBox(ComboBox<String> comboBox) {
+    comboBox.setButtonCell(createComboBoxCell());
+    comboBox.setCellFactory(listView -> createComboBoxCell());
+  }
+
+  private ListCell<String> createComboBoxCell() {
+    return new ListCell<String>() {
+      @Override
+      protected void updateItem(String item, boolean empty) {
+        super.updateItem(item, empty);
+        setText(empty ? null : item);
+        setStyle("-fx-background-color: #3c3f41; -fx-text-fill: white;");
+      }
+    };
+  }
+
   private void handleSendMessage() {
     String message = chatInput.getText().trim();
     String mode = chatMode.getValue();
@@ -209,12 +220,12 @@ public class HubScene implements SceneInterface {
       EventHandlers.getInstance().sendMessage(Command.UNICOM, message);
       chatInput.clear();
     } else {
-      String target = whisperTargetInput.getText().trim();
-      if (target.isEmpty()) {
+      String target = whisperTargetSelector.getValue();
+      if (target == null || target.isBlank()) {
         GameModel.getInstance().addChatMessage("SYSTEM: You need to enter a target");
         return;
       }
-      EventHandlers.getInstance().sendMessage(Command.WHISPER, target, message);
+      EventHandlers.getInstance().sendMessage(Command.WHISPER, target.trim(), message);
       chatInput.clear();
     }
   }
