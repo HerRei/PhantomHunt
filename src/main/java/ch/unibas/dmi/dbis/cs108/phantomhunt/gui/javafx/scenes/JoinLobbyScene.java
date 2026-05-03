@@ -63,7 +63,7 @@ public class JoinLobbyScene extends AbstractInputScene {
     if (event.getClickCount() != 2) return;
     String selectedLobby = waitingListView.getSelectionModel().getSelectedItem();
     if (selectedLobby == null || selectedLobby.isEmpty()) return;
-    inputField.setText(selectedLobby);
+    inputField.setText(extractLobbyId(selectedLobby));
     confirmButton.fire();
   }
 
@@ -71,7 +71,7 @@ public class JoinLobbyScene extends AbstractInputScene {
     if (event.getClickCount() != 2) return;
     String selectedLobby = runningListView.getSelectionModel().getSelectedItem();
     if (selectedLobby == null || selectedLobby.isEmpty()) return;
-    EventHandlers.getInstance().sendMessage(Command.SPEC, selectedLobby);
+    EventHandlers.getInstance().sendMessage(Command.SPEC, extractLobbyId(selectedLobby));
   }
 
   @Override
@@ -84,7 +84,7 @@ public class JoinLobbyScene extends AbstractInputScene {
   @Override
   protected void setupEvents() {
     confirmButton.setOnAction(e -> {
-      String lobbyId = inputField.getText().trim();
+      String lobbyId = extractLobbyId(inputField.getText().trim());
       if (!lobbyId.isEmpty()) {
         EventHandlers.getInstance().sendMessage(Command.CHECKIN, lobbyId);
       }
@@ -92,5 +92,13 @@ public class JoinLobbyScene extends AbstractInputScene {
 
     backButton.setOnAction(
         e -> SceneManager.getInstance().showScene(SceneProtocol.HOME));
+  }
+
+  private String extractLobbyId(String lobbyEntry) {
+    int countSuffixStart = lobbyEntry.lastIndexOf(" (");
+    if (countSuffixStart < 0) {
+      return lobbyEntry;
+    }
+    return lobbyEntry.substring(0, countSuffixStart);
   }
 }

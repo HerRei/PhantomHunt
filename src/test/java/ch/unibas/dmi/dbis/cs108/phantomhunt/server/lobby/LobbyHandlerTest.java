@@ -173,13 +173,19 @@ class LobbyHandlerTest {
 
     String lobbiesString = handler.getLobbies();
 
-        // if this fails, gitlab logs string
-        assertTrue(lobbiesString.contains("SuperLobby"), "Lobby-Name fehlt im String");
-        assertTrue(lobbiesString.contains(";"), "Semikolon fehlt");
-    }
+    // if this fails, gitlab logs string
+    assertTrue(lobbiesString.contains("SuperLobby (1/4)"), "Lobby count fehlt im String");
+    assertTrue(lobbiesString.contains(";"), "Semikolon fehlt");
 
-    @Test
-    void leaveLobby_onFinishedLobbyWithRemainingPlayers_resetsLobbyAndAllowsRejoin() throws Exception {
+    FakeClientHandler p2 = new FakeClientHandler("P2");
+    handler.joinLobby("SuperLobby", p2);
+
+    lobbiesString = handler.getLobbies();
+    assertTrue(lobbiesString.contains("SuperLobby (2/4)"), "Lobby count should update");
+  }
+
+  @Test
+  void leaveLobby_onFinishedLobbyWithRemainingPlayers_resetsLobbyAndAllowsRejoin() throws Exception {
         FakeClientHandler host = new FakeClientHandler("Host");
         FakeClientHandler p2 = new FakeClientHandler("P2");
         Lobby lobby = handler.createLobby("LobbyReset", host);
