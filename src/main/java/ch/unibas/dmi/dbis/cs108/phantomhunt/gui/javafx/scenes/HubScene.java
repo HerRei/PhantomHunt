@@ -196,11 +196,23 @@ public class HubScene implements SceneInterface {
   }
 
   private void styleComboBox(ComboBox<String> comboBox) {
-    comboBox.setButtonCell(createComboBoxCell());
-    comboBox.setCellFactory(listView -> createComboBoxCell());
+    comboBox.setButtonCell(createComboBoxButtonCell(comboBox));
+    comboBox.setCellFactory(listView -> createComboBoxListCell());
   }
 
-  private ListCell<String> createComboBoxCell() {
+  private ListCell<String> createComboBoxButtonCell(ComboBox<String> comboBox) {
+    return new ListCell<String>() {
+      @Override
+      protected void updateItem(String item, boolean empty) {
+        super.updateItem(item, empty);
+        setText(empty ? comboBox.getPromptText() : item);
+        setStyle(
+            "-fx-background-color: #3c3f41; -fx-text-fill: " + (empty ? "#888;" : "white;"));
+      }
+    };
+  }
+
+  private ListCell<String> createComboBoxListCell() {
     return new ListCell<String>() {
       @Override
       protected void updateItem(String item, boolean empty) {
