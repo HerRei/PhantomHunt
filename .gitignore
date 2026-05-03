@@ -38,3 +38,6 @@ highscores.csv
 *.so
 *.dylib
 *.jnilib
+
+# Ignores the jfr files
+*.jfr
