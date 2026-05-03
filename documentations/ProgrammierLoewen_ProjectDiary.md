@@ -393,4 +393,22 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
     - Falls kein Player in der Lobby zurück bleibt, wird die Lobby korrekt geschlossen. Der Name wird wider freigegeben.
 - **Unit Tests:** Updaten kapputter Unit Tests.
 
+## 2026-04-30 - Jan ##
+**Dauer:** ~5h
+**Ziel:** PPP - MS6 Implementation
+**Was gemacht:**
+- **Präsentations Draft:** Analyse der MS6 Anforderungen. Erstellen der V1 der PPP.
+- **Visualisierung standartisieren:** Alle Slides haben den selben Look.
+
+## 2026-05-01 - 2026-05-2 - Jan ##
+**Dauer:** ~8h
+**Ziel:** Patchy Librarian & Interesting Mechanic
+**Was gemacht:**
+- **Patchy Librarian:**
+    - .gitignore file analyse
+    - dependencies analyse & repo cleaning
+- **Interesting Mechanic:**
+    - Die Get Wisdom Funktion ist nun auf einem eigenen Fenster.
+    - Die Get Wisdom Funktion hat nun einen Timer, welcher nach 15 sek einen Bonus von +5 pt pro Runde gibt.
+
 
