@@ -486,7 +486,7 @@ public class GameScene implements SceneInterface {
             (obs, oldX, newX) -> {
               double dx = newX.doubleValue() - oldX.doubleValue();
               if (dx == 0) return;
-              GameModel.getInstance().setMyPlayerDirection(dx > 0 ? "right" : "left");
+              player.setPlayerDirection(dx > 0 ? "right" : "left");
               handlePositionChange(player, sprite);
             });
 
@@ -496,7 +496,7 @@ public class GameScene implements SceneInterface {
             (obs, oldY, newY) -> {
               double dy = newY.doubleValue() - oldY.doubleValue();
               if (dy == 0) return;
-              GameModel.getInstance().setMyPlayerDirection(dy > 0 ? "front" : "back");
+              player.setPlayerDirection(dy > 0 ? "front" : "back");
               handlePositionChange(player, sprite);
             });
 
