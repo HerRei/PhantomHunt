@@ -13,8 +13,7 @@ public class NicknameScene extends AbstractInputScene {
 
   @Override
   protected void setupTexts() {
-    descriptionLabel
-        .textProperty()
+    descriptionLabel.textProperty()
         .bind(Bindings.concat("Your name: ", GameModel.getInstance().getName()));
     inputField.setPromptText("Enter your new nickname...");
     confirmButton.setText("Update Name");
@@ -22,17 +21,12 @@ public class NicknameScene extends AbstractInputScene {
 
   @Override
   protected void setupEvents() {
-    // Handle the confirmation logic
-    confirmButton.setOnAction(
-        e -> {
-          EventHandlers.getInstance().handleNicknameUpdate(inputField.getText());
-          inputField.clear();
-        });
+    confirmButton.setOnAction(e -> {
+      EventHandlers.getInstance().handleNicknameUpdate(inputField.getText());
+      inputField.clear();
+    });
 
-    // Handle the back button logic
     backButton.setOnAction(
-        e -> {
-          SceneManager.getInstance().showScene(SceneProtocol.HOME);
-        });
+        e -> SceneManager.getInstance().showScene(SceneProtocol.HOME));
   }
 }

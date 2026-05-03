@@ -19,17 +19,12 @@ public class CreateLobbyScene extends AbstractInputScene {
 
   @Override
   protected void setupEvents() {
-    // Handle the confirmation logic
-    confirmButton.setOnAction(
-        e -> {
-          String lobbyName = inputField.getText();
-          EventHandlers.getInstance().sendMessage(Command.MKL, lobbyName);
-        });
+    confirmButton.setOnAction(e -> {
+      String lobbyName = inputField.getText();
+      EventHandlers.getInstance().sendMessage(Command.MKL, lobbyName);
+    });
 
-    // Handle the back button logic
     backButton.setOnAction(
-        e -> {
-          SceneManager.getInstance().showScene(SceneProtocol.HOME);
-        });
+        e -> SceneManager.getInstance().showScene(SceneProtocol.HOME));
   }
 }

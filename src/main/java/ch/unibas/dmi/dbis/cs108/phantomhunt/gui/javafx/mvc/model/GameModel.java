@@ -18,14 +18,17 @@ import java.util.Map;
 
 /**
  * Holds all the important data for the game. This includes the player list, chat messages, and game
- * maps. Operates as a Singleton
+ * maps. Operates as a Singleton.
  */
 @SuppressWarnings("java:S6548")
 public class GameModel {
+
   private static final Logger LOGGER = LogManager.getLogger(GameModel.class);
   private static GameModel instance;
+
   private Map<String, Integer> highscores = new LinkedHashMap<>();
   private final ObservableList<Player> lobbyPlayers = FXCollections.observableArrayList();
+  /** Flat list of online player name strings for hub display. */
   public final ObservableList<String> players = FXCollections.observableArrayList();
   private final BooleanProperty humanAbility = new SimpleBooleanProperty();
   private final StringProperty playerName = new SimpleStringProperty();
@@ -46,7 +49,7 @@ public class GameModel {
   private final ObjectProperty<Image> gameMap = new SimpleObjectProperty<>();
   private final ObjectProperty<Image> collisionMap = new SimpleObjectProperty<>();
 
-  // Key Binding
+  // Key bindings
   public static final String KEY_UP = "up";
   public static final String KEY_DOWN = "down";
   public static final String KEY_LEFT = "left";
@@ -54,7 +57,6 @@ public class GameModel {
   private final Map<String, KeyCode> keyBindings = new LinkedHashMap<>();
 
   private GameModel() { // NOSONAR
-    loadMaps();
     humanAbility.set(false);
     playerScore.set(0);
     initDefaultKeyBindings();
@@ -104,15 +106,13 @@ public class GameModel {
    * Binds a new key to the given action. The previous binding is overwritten.
    *
    * @param action One of the {@code KEY_*} constants.
-   * @param code The new {@link KeyCode} to assign.
+   * @param code   The new {@link KeyCode} to assign.
    */
   public void setKeyBinding(String action, KeyCode code) {
     keyBindings.put(action, code);
   }
 
-  /**
-   * Resets all key bindings to the default WASD layout.
-   */
+  /** Resets all key bindings to the default WASD layout. */
   public void resetKeyBindings() {
     initDefaultKeyBindings();
   }
@@ -120,43 +120,41 @@ public class GameModel {
   /**
    * Updates the local game state based on the server's broadcast.
    *
-   * @param payload The raw string from the GSU packet
+   * @param payload The raw string from the GSU packet.
    */
   public void updatePlayersFromServer(String payload) {
-    // 1. Split top-level components (Round, Time, Players)
+    // Split top-level components: Round Time Players abilityX abilityY abilityVisible
     String[] sections = payload.split(" ");
     if (sections.length < 6) return;
+
     int currentRound = Integer.parseInt(sections[0]);
     int timeRemaining = Integer.parseInt(sections[1]);
     remainingTime.set(timeRemaining / 1000);
+
     int previousRound = round.get();
     if (previousRound != 0 && currentRound != previousRound) {
       SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
       SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
     }
-
     round.set(currentRound);
-    String playersData = sections[2];
-    String[] playerEntries = playersData.split(";");
 
+    // Format per entry: "Name:Role:X:Y:Score"
+    String[] playerEntries = sections[2].split(";");
     for (String entry : playerEntries) {
-      // Format: "Name:Role:X:Y:Score"
       String[] data = entry.split(":");
       if (data.length < 5) continue;
 
-      String name = data[0];
-      String role = data[1];
-      double x = Double.parseDouble(data[2]);
-      double y = Double.parseDouble(data[3]);
-      int score = Integer.parseInt(data[4]);
+      String name  = data[0];
+      String role  = data[1];
+      double x     = Double.parseDouble(data[2]);
+      double y     = Double.parseDouble(data[3]);
+      int    score = Integer.parseInt(data[4]);
 
       String currentName = playerName.getValue();
       if (currentName != null && name.endsWith(currentName)) {
         playerScore.set(score);
         playerRole.set(role);
       }
-
-      // 3. Find existing player in our list or create a new one
       updateOrAddPlayer(name, role, x, y, score);
     }
 
@@ -165,27 +163,30 @@ public class GameModel {
     isAbilityVisible.set(Boolean.parseBoolean(sections[5]));
   }
 
-  /** Updates the local list of lobbies when the server sends new data */
+  /** Updates the local list of lobbies when the server sends new data. */
   public void updateLobbyList(List<String> runningLobbys, List<String> waitingLobbys) {
     this.availableLobbies.setAll(waitingLobbys);
     this.runningLobbies.setAll(runningLobbys);
   }
 
+  /**
+   * Finds an existing player by name and updates their state, or creates a new one.
+   * Player slot number (and therefore color) is based on insertion order.
+   */
   private void updateOrAddPlayer(String name, String role, double x, double y, int score) {
     // Search for player by nickname
     Player player =
-            lobbyPlayers.stream()
-                    .filter(p -> p.nameProperty().get().equals(name))
-                    .findFirst()
-                    .orElse(null);
+        lobbyPlayers.stream()
+            .filter(p -> p.nameProperty().get().equals(name))
+            .findFirst()
+            .orElse(null);
 
     if (player != null) {
-
-      // sound logic - this should not be here - but i dont see why this becoems an issue...
+      // sound logic - this should not be here - but i dont see why this becomes an issue...
       boolean wasMoving = player.getMoved();
       boolean moved =
-              Double.compare(player.getXPosition(), x) != 0
-                      || Double.compare(player.getYPosition(), y) != 0;
+          Double.compare(player.getXPosition(), x) != 0
+              || Double.compare(player.getYPosition(), y) != 0;
 
       String currentName = playerName.get();
       boolean isLocalPlayer = currentName != null && name.equals(currentName);
@@ -214,40 +215,18 @@ public class GameModel {
       player.setSkin(role);
       player.setMoved(moved);
     } else {
+      // Slot = insertion order (1-based); color is assigned inside the Player constructor.
       int playerNumber = lobbyPlayers.size() + 1;
       lobbyPlayers.add(new Player(name, role, role, score, x, y, playerNumber, "front"));
     }
   }
 
-  private void loadMaps() {
-    try {
-      Image gameMapImage = new Image(getClass().getResourceAsStream("/assets/map_concept.png"));
-      setGameMap(gameMapImage);
-      Image collisionMapImage =
-              new Image(getClass().getResourceAsStream("/assets/map_collision_concept.png"));
-      setCollisionMap(collisionMapImage);
-      LOGGER.info("Maps loaded successfully.");
-    } catch (Exception e) {
-      LOGGER.error("Failed to load maps.", e);
-    }
-  }
-
-  public boolean checkCollision(Player player) {
-    double playerX = player.getXPosition();
-    double playerY = player.getYPosition();
-    double abilityX = ability.getX();
-    double abilityY = ability.getY();
-    double distance = Math.sqrt(Math.pow(playerX - abilityX, 2) + Math.pow(playerY - abilityY, 2));
-    return distance < 20;
-  }
-
+  /** @return the ability object */
   public Ability getAbility() {
     return ability;
   }
 
-  /**
-   * @return The list of all players in the game.
-   */
+  /** @return The list of all players in the game. */
   public ObservableList<Player> getPlayers() {
     return lobbyPlayers;
   }
@@ -262,7 +241,7 @@ public class GameModel {
   }
 
   /**
-   * Adds a message to the lobby chat
+   * Adds a message to the lobby chat.
    *
    * @param msg the message to add.
    */
@@ -270,16 +249,12 @@ public class GameModel {
     Platform.runLater(() -> lobbyChatMessages.add(msg));
   }
 
-  /**
-   * @return The list of chat messages.
-   */
+  /** @return The list of chat messages. */
   public ObservableList<String> chatMessagesProperty() {
     return chatMessages;
   }
 
-  /**
-   * @return The list of lobby chat messages.
-   */
+  /** @return The list of lobby chat messages. */
   public ObservableList<String> lobbyChatMessagesProperty() {
     return lobbyChatMessages;
   }
@@ -296,6 +271,11 @@ public class GameModel {
 
   // ---GETTERS---
 
+  /**
+   * Determines the winner(s) by highest score.
+   *
+   * @return comma-separated name(s) of the winner(s)
+   */
   public String getWinner() {
     LOGGER.info(lobbyPlayers);
     int max = -1;
@@ -371,26 +351,23 @@ public class GameModel {
     return wisdomBonusReady;
   }
 
-  public StringProperty wisdomStatusProperty() {
-    return wisdomStatus;
-  }
+  public StringProperty wisdomStatusProperty() {return wisdomStatus;}
+
 
   // ---SETTERS---
+
   public void setName(String name) {
     playerName.set(name);
-  }
-
-  public void setWisdomBonusReady(boolean value) {
-    wisdomBonusReady.set(value);
-  }
-
-  public void setWisdomStatus(String value) {
-    wisdomStatus.set(value == null ? "" : value);
   }
 
   public void setAbility(Boolean value) {
     humanAbility.set(value);
   }
+
+  public void setWisdomBonusReady(boolean value) {wisdomBonusReady.set(value);}
+
+  public void setWisdomStatus(String value) {wisdomStatus.set(value == null ? "" : value);}
+
 
   public void setGameMap(Image gameMap) {
     this.gameMap.set(gameMap);
@@ -405,7 +382,7 @@ public class GameModel {
   }
 
   /**
-   * updates direction of the player
+   * Updates the facing direction of the local player.
    *
    * @param direction the direction to set (e.g. "front")
    */
@@ -421,6 +398,7 @@ public class GameModel {
     }
   }
 
+  /** Resets player list, score, and chat for a fresh game session. */
   public void resetModel() {
     this.lobbyPlayers.clear();
     this.playerScore.set(0);

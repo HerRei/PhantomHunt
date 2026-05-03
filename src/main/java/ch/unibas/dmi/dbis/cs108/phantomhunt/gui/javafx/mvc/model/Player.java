@@ -7,7 +7,15 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+/** Represents a single player with position, role, score, sprite, and color data. */
 public class Player {
+
+  /** Hex colors assigned by slot index (0 = Blue, 1 = Green, 2 = Red, 3 = Purple). */
+  public static final String[] PLAYER_COLORS = {"#5B9BF5", "#4CAF50", "#F44336", "#9C27B0"};
+
+  /** Human-readable color names matching {@link #PLAYER_COLORS}. */
+  public static final String[] PLAYER_COLOR_NAMES = {"Blue", "Green", "Red", "Purple"};
+
   private final StringProperty name;
   private final IntegerProperty score;
   private final StringProperty skin;
@@ -18,15 +26,23 @@ public class Player {
   private final StringProperty playerDirection;
   private boolean moved;
 
+  /** Hex color for this player's slot (e.g. {@code "#5B9BF5"}). */
+  private final String color;
+
+  /** Human-readable color name for this player's slot (e.g. {@code "Blue"}). */
+  private final String colorName;
+
   /**
    * Creates a new Player instance.
    *
-   * @param name The player's nickname
-   * @param skin The path to the image or enum name representing the player's appearance
-   * @param score The initial score
-   * @param x The X coordinate
-   * @param y The Y coordinate
-   * @param playerNumber The player's number
+   * @param name            the player's nickname
+   * @param skin            the sprite skin key
+   * @param role            the server role string (e.g. "HUMAN", "PHANTOM")
+   * @param score           the initial score
+   * @param x               the initial x coordinate
+   * @param y               the initial y coordinate
+   * @param playerNumber    the 1-based slot index used for sprite and color selection
+   * @param playerDirection the initial facing direction
    */
   public Player(
       String name,
@@ -46,6 +62,11 @@ public class Player {
     this.playerDirection = new SimpleStringProperty(playerDirection);
     this.role = new SimpleStringProperty(role);
     this.moved = false;
+
+    // Assign color by slot; clamp to avoid AIOBE with >4 players
+    int idx = Math.max(0, Math.min(playerNumber - 1, PLAYER_COLORS.length - 1));
+    this.color = PLAYER_COLORS[idx];
+    this.colorName = PLAYER_COLOR_NAMES[idx];
   }
 
   public void setMoved(Boolean didMove) {
@@ -155,5 +176,15 @@ public class Player {
 
   public StringProperty playerDirectionProperty() {
     return playerDirection;
+  }
+
+  /** @return hex color string for this player's slot */
+  public String getColor() {
+    return color;
+  }
+
+  /** @return human-readable color name for this player's slot */
+  public String getColorName() {
+    return colorName;
   }
 }

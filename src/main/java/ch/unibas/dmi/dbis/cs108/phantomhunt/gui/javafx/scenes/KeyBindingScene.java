@@ -50,18 +50,21 @@ public class KeyBindingScene implements SceneInterface {
     resetButton.setStyle(
         "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 13px;");
     hubButton.setStyle(
-            "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 13px;");
+        "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 13px;");
     hubButton.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.HOME));
     resetButton.setOnAction(e -> resetToDefaults());
 
     root.getChildren().addAll(title, hint, grid, resetButton, hubButton);
 
-    this.scene = new Scene(root, 400, 350);
+    this.scene = new Scene(root, 900, 640);
 
-    // Global key listener: only active while a button is in listen mode
+    // Global key listener: F11 toggles fullscreen, otherwise used for key-binding listen mode
     scene.setOnKeyPressed(
         e -> {
-          if (listeningAction != null) {
+          if (e.getCode() == KeyCode.F11) {
+            javafx.stage.Stage stage = (javafx.stage.Stage) scene.getWindow();
+            if (stage != null) stage.setFullScreen(!stage.isFullScreen());
+          } else if (listeningAction != null) {
             assignKey(listeningAction, e.getCode());
             listeningAction = null;
           }
@@ -138,7 +141,7 @@ public class KeyBindingScene implements SceneInterface {
    * Writes the chosen key to the model and updates the button label.
    *
    * @param action The action being rebound.
-   * @param code The newly pressed key.
+   * @param code   The newly pressed key.
    */
   private void assignKey(String action, KeyCode code) {
     GameModel.getInstance().setKeyBinding(action, code);

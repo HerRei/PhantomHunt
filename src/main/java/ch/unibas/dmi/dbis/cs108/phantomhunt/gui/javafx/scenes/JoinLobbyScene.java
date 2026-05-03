@@ -10,65 +10,67 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 /**
- * Enhanced JoinLobbyScene that displays available and running lobbies from the GameModel. Allows
- * joining via list selection or manual ID entry.
+ * Enhanced JoinLobbyScene that displays available and running lobbies from the GameModel.
+ * Allows joining via list selection or manual ID entry.
  */
 public class JoinLobbyScene extends AbstractInputScene {
 
   private ListView<String> waitingListView;
   private ListView<String> runningListView;
 
+  private static final String LIST_STYLE =
+      "-fx-background-color: #3c3f41; -fx-text-fill: white;";
+  private static final String LABEL_STYLE =
+      "-fx-text-fill: #aaaaaa; -fx-font-size: 12px; -fx-font-weight: bold;";
+
   public JoinLobbyScene() {
     super();
     setupLobbyLists();
   }
 
-  /** Initializes the ListViews and binds them to the GameModel's observable lists. */
   private void setupLobbyLists() {
     GameModel model = GameModel.getInstance();
 
-    // Initialize ListViews
     waitingListView = new ListView<>();
     runningListView = new ListView<>();
 
-    // Bind data from model
     waitingListView.setItems(model.getAvailableLobbies());
     runningListView.setItems(model.getRunningLobbies());
 
-    // Configure UI appearance
-    waitingListView.setPrefHeight(150);
+    waitingListView.setStyle(LIST_STYLE);
+    runningListView.setStyle(LIST_STYLE);
+
+    waitingListView.setPrefHeight(160);
     runningListView.setPrefHeight(100);
 
-    // Inject lists into the existing VBox layout (from AbstractInputScene)
     VBox root = (VBox) scene.getRoot();
 
-    // Inserting labels and lists before the input area
-    root.getChildren().add(1, new Label("Joinable Lobbies:"));
+    Label joinableLabel = new Label("Joinable Lobbies:");
+    joinableLabel.setStyle(LABEL_STYLE);
+    Label runningLabel = new Label("Running Games (Spectate):");
+    runningLabel.setStyle(LABEL_STYLE);
+
+    root.getChildren().add(1, joinableLabel);
     root.getChildren().add(2, waitingListView);
-    root.getChildren().add(3, new Label("Running Games:"));
+    root.getChildren().add(3, runningLabel);
     root.getChildren().add(4, runningListView);
 
-    // Add double-click event handler
     waitingListView.setOnMouseClicked(this::handleLobbyClick);
     runningListView.setOnMouseClicked(this::handleRunningLobbyClick);
   }
 
   private void handleLobbyClick(MouseEvent event) {
     if (event.getClickCount() != 2) return;
-
     String selectedLobby = waitingListView.getSelectionModel().getSelectedItem();
     if (selectedLobby == null || selectedLobby.isEmpty()) return;
-
     inputField.setText(selectedLobby);
     confirmButton.fire();
   }
 
   private void handleRunningLobbyClick(MouseEvent event) {
     if (event.getClickCount() != 2) return;
-
     String selectedLobby = runningListView.getSelectionModel().getSelectedItem();
     if (selectedLobby == null || selectedLobby.isEmpty()) return;
-
     EventHandlers.getInstance().sendMessage(Command.SPEC, selectedLobby);
   }
 
@@ -81,19 +83,14 @@ public class JoinLobbyScene extends AbstractInputScene {
 
   @Override
   protected void setupEvents() {
-    // Join logic
-    confirmButton.setOnAction(
-        e -> {
-          String lobbyId = inputField.getText().trim();
-          if (!lobbyId.isEmpty()) {
-            EventHandlers.getInstance().sendMessage(Command.CHECKIN, lobbyId);
-          }
-        });
+    confirmButton.setOnAction(e -> {
+      String lobbyId = inputField.getText().trim();
+      if (!lobbyId.isEmpty()) {
+        EventHandlers.getInstance().sendMessage(Command.CHECKIN, lobbyId);
+      }
+    });
 
-    // Navigation back
     backButton.setOnAction(
-        e -> {
-          SceneManager.getInstance().showScene(SceneProtocol.HOME);
-        });
+        e -> SceneManager.getInstance().showScene(SceneProtocol.HOME));
   }
 }
