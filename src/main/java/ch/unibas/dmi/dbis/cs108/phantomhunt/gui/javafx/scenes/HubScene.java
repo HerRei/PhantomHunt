@@ -123,6 +123,14 @@ public class HubScene implements SceneInterface {
     chatMode.setValue("Global");
     chatMode.setPrefWidth(110);
     chatMode.setStyle(INPUT_STYLE);
+    chatMode.setButtonCell(new ListCell<>() {
+      @Override
+      protected void updateItem(String item, boolean empty) {
+        super.updateItem(item, empty);
+        setText(empty ? null : item);
+        setStyle("-fx-text-fill: white;");
+      }
+    });
 
     whisperTargetInput = new TextField();
     whisperTargetInput.setPromptText("To whom?");
