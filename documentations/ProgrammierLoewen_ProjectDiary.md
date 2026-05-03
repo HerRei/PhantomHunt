@@ -411,4 +411,12 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
     - Die Get Wisdom Funktion ist nun auf einem eigenen Fenster.
     - Die Get Wisdom Funktion hat nun einen Timer, welcher nach 15 sek einen Bonus von +5 pt pro Runde gibt.
 
-
+## 2026-05-03 - Jan
+**Dauer:** ~1h  
+**Ziel:** Hub Chat UI verbessern
+**Was gemacht:**
+- **Chat Mode Styling:**
+  - Der Text im Chatselection Dropdown ist nun weiss statt schwarz.
+- **Whisper Dropdown:**
+  - Das Whisperziel ist nun ein Dropdown statt einem Textfeld.
+  - Das Dropdown wird automatisch mit allen verfügbaren Online Spielern gefüllt.
