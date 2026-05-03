@@ -181,6 +181,7 @@ public class GameHandler {
       if (dist < (radius * 2)) {
         if (state) {
           human.addScore(gameState.getHumanCatchBonus());
+          lobby.broadcast(Packet.of(Command.INFO, "__GHOST_EATEN__"));
           phantom.setPosition(
               new Position(
                   MapLogic.getInstance()

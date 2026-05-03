@@ -21,6 +21,16 @@ class SoundEffectTest {
     void enums_haveCorrectValues() {
         // check if enums exist
         assertNotNull(SoundEffect.valueOf("MAN_SCREAM"));
+        assertNotNull(SoundEffect.valueOf("UNIVERSFIELD_SLIME_IMPACT"));
         assertTrue(SoundEffect.values().length > 0);
+    }
+
+    @Test
+    void soundEffect_resourcesExistOnClasspath() {
+        for (SoundEffect soundEffect : SoundEffect.values()) {
+            assertNotNull(
+                    SoundEffect.class.getResource(soundEffect.resourcePath()),
+                    "Missing resource for " + soundEffect.name() + ": " + soundEffect.resourcePath());
+        }
     }
 }

@@ -353,6 +353,11 @@ public class ServerHandler implements Runnable {
       return;
     }
 
+    if ("__GHOST_EATEN__".equals(text)) {
+      SoundManager.getInstance().play(SoundEffect.UNIVERSFIELD_SLIME_IMPACT);
+      return;
+    }
+
     LOGGER.info("Info: {}", text);
     GameModel.getInstance().addChatMessage(text); // adds message to chat
   }
