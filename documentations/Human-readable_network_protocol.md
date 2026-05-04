@@ -165,6 +165,15 @@ Wenn ein Befehl keine Argumente braucht, besteht die Nachricht nur aus dem `<COM
 - **Payload:** Keiner.
 - **Beispiel:** `START`
 
+### GAME_SETTINGS
+- **Richtung:** Client -> Server
+- **Beschreibung:** Sendet die Spielregeln der aktuellen Lobby an den Server. Der Befehl darf nur vom Host gesendet werden und wird vor `START` verwendet. Der Server speichert diese Werte in der Lobby und verwendet sie beim Spielstart.
+- **Payload:** `<totalRounds> <roundDurationMillis> <playerRadius> <moveSpeedPerSecond> <humanPointsPerSecond> <humanRoundWinBonus> <phantomCatchBonus> <humanCatchBonus> <humanAbilitys> <phantomRoundWinBonus>`
+- **Beispiele:**
+  - **Client -> Server:** `GAME_SETTINGS 4 50000 6.0 100.0 1 50 10 10 3 10`
+  - **Server-Antwort (Erfolg):** `CLEARED Game settings updated.`
+  - **Server-Antwort (Fehler):** `REJECT Only the lobby host can change game settings.`
+
 ### GAME_START
 - **Richtung:** Server -> Client
 - **Beschreibung:** Signalisiert den Start eines Spiels und den Wechsel in die Spielszene.
@@ -192,6 +201,17 @@ Wenn ein Befehl keine Argumente braucht, besteht die Nachricht nur aus dem `<COM
   - **Client -> Server:** `ABILITY`
   - **Server -> Lobby:** `ABILITY START`
   - **Server -> Lobby:** `ABILITY END`
+
+### WISDOM
+- **Richtung:** Client <-> Server
+- **Beschreibung:** Öffnet, beansprucht oder bricht den täglichen Wisdom-Bonus ab. Der Server antwortet mit dem aktuellen Status des Bonus.
+- **Payload:** Clientseitig `START`, `CLAIM` oder `CANCEL`; serverseitig `STARTED`, `ACTIVE`, `CLAIMED`, `CANCELED` oder `TOO_EARLY <remainingSeconds>`.
+- **Beispiele:**
+  - **Client -> Server:** `WISDOM START`
+  - **Server -> Client:** `WISDOM STARTED`
+  - **Client -> Server:** `WISDOM CLAIM`
+  - **Server -> Client:** `WISDOM CLAIMED`
+  - **Server -> Client:** `WISDOM TOO_EARLY 8`
 
 ### GAME_FINISH
 - **Richtung:** Client <-> Server
