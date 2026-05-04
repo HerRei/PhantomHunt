@@ -49,7 +49,7 @@ public class LobbyHandler {
   }
 
   /**
-   * Returning a comma-separated string with the IDs of the lobbies across all states.
+   * Returning a semicolon-separated string with waiting and playing lobbies.
    *
    * @return a String with the formatted lobbies
    */
@@ -57,13 +57,13 @@ public class LobbyHandler {
     // Collect all names of waiting lobbies
     List<String> waitingNames = new ArrayList<>();
     for (Lobby lobby : waitingLobbies) {
-      waitingNames.add(lobby.getName());
+      waitingNames.add(formatLobbyListEntry(lobby));
     }
 
     // Collect all names of playing lobbies
     List<String> playingNames = new ArrayList<>();
     for (Lobby lobby : playingLobbies) {
-      playingNames.add(lobby.getName());
+      playingNames.add(formatLobbyListEntry(lobby));
     }
 
     // put together
@@ -301,5 +301,14 @@ public class LobbyHandler {
     waitingLobbies.remove(lobby);
     playingLobbies.remove(lobby);
     finishedLobbies.remove(lobby);
+  }
+
+  private String formatLobbyListEntry(Lobby lobby) {
+    return lobby.getName()
+        + " ("
+        + lobby.getPlayerCount()
+        + "/"
+        + GameState.REQUIRED_PLAYER_COUNT
+        + ")";
   }
 }

@@ -148,10 +148,10 @@ Wenn ein Befehl keine Argumente braucht, besteht die Nachricht nur aus dem `<COM
 ### LIST_LOBBY
 - **Richtung:** Client <-> Server
 - **Beschreibung:** Der Client fordert die aktuelle Lobby-Übersicht an. Der Server antwortet mit allen wartenden und laufenden Lobbies.
-- **Payload:** Serverseitig `<waitingLobby1>:<waitingLobby2>;<runningLobby1>:<runningLobby2>`
+- **Payload:** Serverseitig `<waitingLobby1 (players/4)>:<waitingLobby2 (players/4)>;<runningLobby1 (players/4)>`
 - **Beispiel:**
   - **Client -> Server:** `LIST_LOBBY`
-  - **Server -> Client:** `LIST_LOBBY lobby1:lobby2;lobby3`
+  - **Server -> Client:** `LIST_LOBBY lobby1 (2/4):lobby2 (1/4);lobby3 (4/4)`
 
 ### LOBBY_INFO
 - **Richtung:** Server -> Client

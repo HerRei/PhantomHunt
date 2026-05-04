@@ -90,6 +90,10 @@ public class Lobby {
     return Optional.of(players);
   }
 
+  public int getPlayerCount() {
+    return players.size();
+  }
+
   public Optional<Vector<ClientHandler>> getSpectators() {
     return Optional.of(spectators);
   }
