@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameFactory;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameRules;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
@@ -112,7 +113,8 @@ public class LobbyHandler {
     }
 
     MapLogic map = new MapLogic(MapLogic.generateExampleMap());
-    GameState gs = gameFactory.createWithDefaultRules(lobby.getId(), seeds, map);
+    GameRules rules = lobby.getGameRules();
+    GameState gs = gameFactory.create(lobby.getId(), seeds, rules, map);
     GameHandler gameHandler = new GameHandler(gs, lobby);
 
     lobby.attachGame(gameHandler);

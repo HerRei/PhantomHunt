@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameRules;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,7 @@ public class Lobby {
   private final String name;
   public ClientHandler host;
   private GameHandler activeGame;
+  private GameRules gameRules;
 
   // ---------------------------------------------------------------------------------------------
   // Constructor
@@ -49,6 +51,7 @@ public class Lobby {
     this.host = host;
     this.players.add(host);
     this.activeGame = null;
+    this.gameRules = GameRules.defaultRules();
     LOGGER.info("Lobby {} ({}) created by {}", name, id, host.getName());
   }
 
@@ -84,6 +87,14 @@ public class Lobby {
 
   public ClientHandler getHost() {
     return host;
+  }
+
+  public GameRules getGameRules() {
+    return gameRules;
+  }
+
+  public void setGameRules(GameRules gameRules) {
+    this.gameRules = gameRules;
   }
 
   public Optional<Vector<ClientHandler>> getPlayers() {

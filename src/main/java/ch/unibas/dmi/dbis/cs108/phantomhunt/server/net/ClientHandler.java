@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.GameHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameRules;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
@@ -494,6 +495,28 @@ public class ClientHandler implements Runnable {
     lobbyHandler.startGame(currentLobby.getId(), this);
   }
 
+  private void handleGameSettings(Packet p) {
+    if (currentLobby == null) {
+      sendMessage(Packet.of(Command.REJECT, "You are not in a lobby."));
+      return;
+    }
+    if (currentLobby.getHost() != this) {
+      sendMessage(Packet.of(Command.REJECT, "Only the lobby host can change game settings."));
+      return;
+    }
+    if (p.argc() < 1) {
+      sendMessage(Packet.of(Command.REJECT, "Game settings are required."));
+      return;
+    }
+
+    try {
+      currentLobby.setGameRules(GameRules.fromPayload(p.text()));
+      sendMessage(Packet.of(Command.CLEARED, "Game settings updated."));
+    } catch (IllegalArgumentException e) {
+      sendMessage(Packet.of(Command.REJECT, e.getMessage()));
+    }
+  }
+
   private void handleShowHighscore() {
     sendMessage(Packet.of(Command.SHOW_HIGHSCORE, registry.getHighscoreBoard()));
   }
@@ -551,6 +574,7 @@ public class ClientHandler implements Runnable {
             case YAP -> handleYap(p);
             case MKL -> handleMkl(p);
             case SPEC -> handleSpec(p);
+            case GAME_SETTINGS -> handleGameSettings(p);
             case START -> handleStart(p);
             case LOGOUT_LOBBY -> handleLobbyLogout();
             case SHOW_HIGHSCORE -> handleShowHighscore();

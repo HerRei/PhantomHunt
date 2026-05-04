@@ -65,6 +65,9 @@ public enum Command {
   /** Request from the lobby host to start the game. */
   START,
 
+  /** Lobby host sends game rule settings before starting the game. */
+  GAME_SETTINGS,
+
   /** Server notification to clients that the game is starting. */
   GAME_START,
 

@@ -11,6 +11,7 @@ class CommandTest {
         assertEquals(Command.PING, Command.valueOf("PING"));
         assertEquals(Command.WHISPER, Command.valueOf("WHISPER"));
         assertEquals(Command.WISDOM, Command.valueOf("WISDOM"));
+        assertEquals(Command.GAME_SETTINGS, Command.valueOf("GAME_SETTINGS"));
     }
 
     @Test

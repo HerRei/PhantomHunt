@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameRules;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -32,6 +33,8 @@ public class LobbyScene implements SceneInterface {
   private String id;
   private ListView<String> chatArea;
   private TextField chatInput;
+  private Label gameSettingsLabel;
+  private TextField gameSettingsInput;
 
   /** Constructs a new LobbyScene. Initializes UI components, binds the chat to the game model. */
   public LobbyScene() {
@@ -53,13 +56,21 @@ public class LobbyScene implements SceneInterface {
             + "-fx-font-weight: bold; -fx-padding: 10 28; -fx-background-radius: 6;");
     startGameButton.setMaxWidth(Double.MAX_VALUE);
 
+    gameSettingsLabel = new Label("Game Settings");
+    gameSettingsLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 12px; -fx-font-weight: bold;");
+
+    gameSettingsInput = new TextField(GameRules.defaultRules().toPayload());
+    gameSettingsInput.setPromptText("rounds duration radius speed humanScore humanWin phantomCatch humanCatch abilities phantomWin");
+    gameSettingsInput.setStyle(INPUT_STYLE);
+    gameSettingsInput.setMaxWidth(Double.MAX_VALUE);
+
     backButton = new Button("Leave Lobby");
     backButton.setStyle(BUTTON_STYLE);
     backButton.setMaxWidth(Double.MAX_VALUE);
 
     VBox leftPanel =
         new VBox(12, lobbyIdLabel, new Separator(), playersTitle, playerList,
-            startGameButton, backButton);
+            gameSettingsLabel, gameSettingsInput, startGameButton, backButton);
     leftPanel.setPadding(new Insets(25));
     leftPanel.setAlignment(Pos.TOP_CENTER);
     leftPanel.setPrefWidth(300);
@@ -103,7 +114,10 @@ public class LobbyScene implements SceneInterface {
 
   private void setupEvents() {
     startGameButton.setOnAction(
-        e -> EventHandlers.getInstance().sendMessage(Command.START, ""));
+        e -> {
+          EventHandlers.getInstance().sendMessage(Command.GAME_SETTINGS, gameSettingsInput.getText().trim());
+          EventHandlers.getInstance().sendMessage(Command.START);
+        });
 
     backButton.setOnAction(
         e -> {
@@ -143,8 +157,13 @@ public class LobbyScene implements SceneInterface {
     lobbyIdLabel.setText("Lobby ID: " + id);
     playerList.getItems().setAll(players);
     String currentPlayerName = GameModel.getInstance().getName().get();
-    startGameButton.setVisible(
-        players.length > 0 && players[0].equals(currentPlayerName));
+    boolean isHost = players.length > 0 && players[0].equals(currentPlayerName);
+    startGameButton.setVisible(isHost);
+    startGameButton.setManaged(isHost);
+    gameSettingsLabel.setVisible(isHost);
+    gameSettingsLabel.setManaged(isHost);
+    gameSettingsInput.setVisible(isHost);
+    gameSettingsInput.setManaged(isHost);
   }
 
   @Override
