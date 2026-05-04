@@ -10,6 +10,11 @@ build:
   script:
     - ./gradlew build-cs108
   artifacts:
+    when: always
+    reports:
+      junit: build/test-results/test/*.xml
     paths:
       - build/libs/phantom-hunt.jar
+      - build/reports/tests/test/
+      - build/reports/jacoco/test/html/
     expire_in: 2 weeks
