@@ -7,7 +7,7 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.sound;
 public enum SoundEffect {
 
   /** Continuous background wind noise. */
-  WIND_OUTSIDE_ROOM_TONE("/audio/wind-outside-room-tone.wav", true, 0.30f),
+  WIND_OUTSIDE_ROOM_TONE("/audio/wind-outside-room-tone.wav", true, 0.50f),
 
   /** A sudden, loud man's scream. */
   MAN_SCREAM("/audio/man-scream.wav", false, 0.85f),
