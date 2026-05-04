@@ -98,5 +98,5 @@ tasks.named('startScripts').configure { enabled = false }
 tasks.register('build-cs108'){
     group = 'custom'
     description = 'cs108 build task'
-    dependsOn 'clean', 'jar', 'javadoc'
+    dependsOn 'clean', 'test', 'jar', 'javadoc'
 }
