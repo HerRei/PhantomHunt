@@ -33,7 +33,7 @@ public class GameHandler {
   private final Lobby lobby;
   private ScheduledExecutorService gameLoopExecutor;
   private boolean humanCatchesGhosts;
-  private static final int TICKS_PER_SECOND = 20;
+  private static final int TICKS_PER_SECOND = 24;
   private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
   private static final long ROUND_END_WAIT_MS = 3000;
   private static final int WISDOM_ROUND_SCORE_BONUS = 5;
