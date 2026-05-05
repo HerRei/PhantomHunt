@@ -137,7 +137,13 @@ public class GameHandler {
   public void startGameLoop() {
     if (gameLoopExecutor != null) return;
 
-    gameLoopExecutor = Executors.newSingleThreadScheduledExecutor();
+    gameLoopExecutor =
+        Executors.newSingleThreadScheduledExecutor(
+            runnable -> {
+              Thread thread = new Thread(runnable, "phantom-hunt-game-loop");
+              thread.setPriority(Thread.NORM_PRIORITY + 1);
+              return thread;
+            });
 
     gameLoopExecutor.scheduleAtFixedRate(
         () -> {
