@@ -57,6 +57,7 @@ public class TcpServer {
             serverSocket
                 .accept(); // loops until successful connection, this is the last step of the server
                            // activation
+        socket.setTcpNoDelay(true);
         LOGGER.info(
             "Connection to server from client-adress: {}",
             socket.getRemoteSocketAddress()); // debug logs
