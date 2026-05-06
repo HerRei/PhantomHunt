@@ -19,8 +19,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,6 +38,7 @@ public class ClientHandler implements Runnable {
   private final Socket socket;
   private final Registry registry;
   private final LobbyHandler lobbyHandler;
+  private final ThreadPoolExecutor gameStateWriter;
   private BufferedWriter out;
   private Lobby currentLobby;
   private String name;
@@ -60,6 +63,7 @@ public class ClientHandler implements Runnable {
     this.socket = socket;
     this.registry = registry;
     this.lobbyHandler = lobbyHandler;
+    this.gameStateWriter = createGameStateWriter();
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -95,16 +99,42 @@ public class ClientHandler implements Runnable {
   // ---------------------------------------------------------------------------------------------
 
   /**
-   * Sends a packet to this client. This method is synchronized to safely allow other threads to
-   * send messages to this client.
+   * Sends a packet to this client. Frequent game-state updates are written asynchronously so a slow
+   * client cannot stall the game loop.
    *
    * @param p The packet to send.
    */
-  public synchronized void sendMessage(Packet p) {
+  public void sendMessage(Packet p) {
     if (p == null) {
       LOGGER.error("Server tried sending an empty packet");
       return;
     }
+
+    if (p.cmd() == Command.GSU) {
+      gameStateWriter.execute(() -> writeMessage(p));
+      return;
+    }
+
+    writeMessage(p);
+  }
+
+  private ThreadPoolExecutor createGameStateWriter() {
+    return new ThreadPoolExecutor(
+        1,
+        1,
+        0L,
+        TimeUnit.MILLISECONDS,
+        new ArrayBlockingQueue<>(1),
+        runnable -> {
+          Thread thread =
+              new Thread(runnable, "phantom-hunt-gsu-writer-" + socket.getRemoteSocketAddress());
+          thread.setDaemon(true);
+          return thread;
+        },
+        new ThreadPoolExecutor.DiscardOldestPolicy());
+  }
+
+  private synchronized void writeMessage(Packet p) {
     if (out == null) {
       LOGGER.error("Output stream is closed. Cannot send message to {}", getName());
       return;
@@ -126,6 +156,7 @@ public class ClientHandler implements Runnable {
 
   /** Unregisters the client and closes the underlying socket connection. */
   public void disconnect() {
+    gameStateWriter.shutdownNow();
     if (scheduler != null && !scheduler.isShutdown()) {
       scheduler.shutdownNow();
     }
