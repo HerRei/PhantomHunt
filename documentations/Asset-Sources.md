@@ -21,6 +21,7 @@ Pixabay license links:
 | `src/main/resources/audio/coin-up.wav` | `coin-up.aif` | `freesound_community` | https://pixabay.com/sound-effects/coin-upaif-14631/ | Pixabay Content License | Used for ability pickup / activation feedback. The file in the repo is stored as `.wav`. |
 | `src/main/resources/audio/descent-whoosh.wav` | `DESCENT Whoosh \| Cinematic Sound Effect` | `VIRALAUDIO` | https://pixabay.com/sound-effects/film-special-effects-descent-whoosh-cinematic-sound-effect-405935/ | Pixabay Content License | Used for scene/game transition effects. |
 | `src/main/resources/audio/dragging-chain.wav` | `Heavy Chains Dragging` | `DRAGON-STUDIO` | https://pixabay.com/sound-effects/film-special-effects-heavy-chains-dragging-515264/ | Pixabay Content License | Used for phantom movement sounds. |
+| `src/main/resources/audio/magiaz-scare.wav` | `Scare` | `MagiaZ` | https://pixabay.com/sound-effects/scare-407352/ | Pixabay Content License | Added as a short scare sting. The original MP3 was converted to `.wav`. |
 | `src/main/resources/audio/man-scream.wav` | `Man Scream` | `Universfield` | https://pixabay.com/sound-effects/man-scream-121085/ | Pixabay Content License | Used when the human is caught. |
 | `src/main/resources/audio/running-on-floor.wav` | `Footsteps running on the floor` | `Caitlin_100 (Freesound)` / `freesound_community` | https://pixabay.com/sound-effects/film-special-effects-footsteps-running-on-the-floor-81283/ | Pixabay Content License | Used for human movement sounds. |
 | `src/main/resources/audio/universfield-message.wav` | `Message` | `Universfield` | https://pixabay.com/sound-effects/film-special-effects-message-124468/ | Pixabay Content License | Used for whisper/message notification feedback. |
@@ -45,4 +46,3 @@ This includes:
 `outreach/video.mp4` was created by the group for the project trailer/gameplay
 submission. It should only contain the self-drawn game visuals and the sound
 effects listed above.
-

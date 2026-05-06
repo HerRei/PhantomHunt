@@ -28,7 +28,10 @@ public enum SoundEffect {
   UNIVERSFIELD_MESSAGE("/audio/universfield-message.wav", false, 0.75f),
 
   /** A wet slime impact sound for hit or collision feedback. */
-  UNIVERSFIELD_SLIME_IMPACT("/audio/universfield-slime-impact.wav", false, 0.80f);
+  UNIVERSFIELD_SLIME_IMPACT("/audio/universfield-slime-impact.wav", false, 0.80f),
+
+  /** A short scare sting for jump-scare or surprise feedback. */
+  MAGIAZ_SCARE("/audio/magiaz-scare.wav", false, 0.85f);
 
   private final String resourcePath;
   private final boolean loops;

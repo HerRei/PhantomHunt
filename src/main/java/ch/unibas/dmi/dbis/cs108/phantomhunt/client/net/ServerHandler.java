@@ -349,7 +349,7 @@ public class ServerHandler implements Runnable {
     if ("__HUMAN_CAUGHT__".equals(text)) {
       SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
       SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
-      SoundManager.getInstance().play(SoundEffect.MAN_SCREAM);
+      SoundManager.getInstance().play(SoundEffect.MAGIAZ_SCARE);
       return;
     }
 
