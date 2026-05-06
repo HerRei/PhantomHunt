@@ -39,7 +39,7 @@ public class ClientHandler implements Runnable {
   private final Registry registry;
   private final LobbyHandler lobbyHandler;
   private final ThreadPoolExecutor gameStateWriter;
-  private BufferedWriter out;
+  private volatile BufferedWriter out;
   private Lobby currentLobby;
   private String name;
   private long lastSeen = System.currentTimeMillis();
