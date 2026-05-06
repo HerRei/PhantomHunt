@@ -84,6 +84,12 @@ Wenn ein Befehl keine Argumente braucht, besteht die Nachricht nur aus dem `<COM
 - **Payload:** `<Player1> <Player2> ...`
 - **Beispiel:** `PLAYERS Alice Bob Charlie Dana`
 
+### MENU_MUSIC
+- **Richtung:** Server -> Client
+- **Beschreibung:** Synchronisiert die Menü-Musik aller verbundenen Clients. Der Client spielt die Musik nur in Menü-Szenen ab und stoppt sie in Lobby, Spiel und Endscreen.
+- **Payload:** `<SoundEffectName> <offsetMillis>`
+- **Beispiel:** `MENU_MUSIC WINTER_AT_THE_GATE 42150`
+
 ## 4. Chat-Befehle
 
 ### UNICOM

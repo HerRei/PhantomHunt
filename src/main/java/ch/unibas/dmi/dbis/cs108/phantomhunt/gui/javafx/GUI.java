@@ -44,7 +44,11 @@ public class GUI extends Application {
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
-    primaryStage.setOnCloseRequest(event -> soundManager.shutdown());
+    primaryStage.setOnCloseRequest(
+        event -> {
+          MenuMusicController.getInstance().shutdown();
+          soundManager.shutdown();
+        });
     manager.showScene(SceneProtocol.HOME);
 
     // We take address from Main and start Client

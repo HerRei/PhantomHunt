@@ -61,6 +61,7 @@ public class SceneManager {
     SceneInterface myScene = scenes.get(type);
     if (myScene != null) {
       this.currentScene = type;
+      MenuMusicController.getInstance().onSceneChanged(type);
       Platform.runLater(
           () -> {
             if (stageRef != null) {

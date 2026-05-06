@@ -132,9 +132,11 @@ public class GameModel {
     remainingTime.set(timeRemaining / 1000);
 
     int previousRound = round.get();
-    if (previousRound != 0 && currentRound != previousRound) {
+    if (currentRound > 0 && currentRound != previousRound) {
       SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
       SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
+      SoundManager.getInstance().stop(SoundEffect.THE_VILLAINS_MIDNIGHT_WALTZ);
+      SoundManager.getInstance().play(SoundEffect.THE_VILLAINS_MIDNIGHT_WALTZ);
     }
     round.set(currentRound);
 

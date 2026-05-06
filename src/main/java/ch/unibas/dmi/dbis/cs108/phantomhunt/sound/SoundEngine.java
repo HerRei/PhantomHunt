@@ -46,6 +46,7 @@ import static org.lwjgl.openal.AL10.alSourceRewind;
 import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
 import static org.lwjgl.openal.AL10.alSourcei;
+import static org.lwjgl.openal.AL11.AL_SEC_OFFSET;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
@@ -134,6 +135,25 @@ public final class SoundEngine {
     }
 
     alSourceRewind(sourceId);
+    alSourcePlay(sourceId);
+  }
+
+  /**
+   * Plays the specified sound effect from a playback offset. If it is already playing, it is
+   * stopped and restarted from that offset.
+   *
+   * @param effect the sound effect to play
+   * @param offsetSeconds playback offset in seconds
+   */
+  public void playSoundFrom(SoundEffect effect, float offsetSeconds) {
+    Integer sourceId = getSourceId(effect);
+    if (sourceId == null) {
+      return;
+    }
+
+    alSourceStop(sourceId);
+    alSourceRewind(sourceId);
+    alSourcef(sourceId, AL_SEC_OFFSET, Math.max(0.0f, offsetSeconds));
     alSourcePlay(sourceId);
   }
 

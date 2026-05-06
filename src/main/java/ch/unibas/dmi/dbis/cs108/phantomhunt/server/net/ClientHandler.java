@@ -8,6 +8,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameRules;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.MenuMusicPlaylist;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -509,6 +510,7 @@ public class ClientHandler implements Runnable {
       sendMessage(Packet.of(Command.REJECT, "Name was taken. You are now: " + this.name));
     }
     sendMessage(Packet.of(Command.WELCOME, this.name));
+    sendMenuMusicState();
     if (oldName != null) {
       registry.broadcast(
           this, Packet.of(Command.INFO, oldName + ": changed nickname to -> " + this.name));
@@ -550,6 +552,12 @@ public class ClientHandler implements Runnable {
 
   private void handleShowHighscore() {
     sendMessage(Packet.of(Command.SHOW_HIGHSCORE, registry.getHighscoreBoard()));
+  }
+
+  private void sendMenuMusicState() {
+    MenuMusicPlaylist.PlaybackState state =
+        MenuMusicPlaylist.currentState(System.currentTimeMillis());
+    sendMessage(Packet.of(Command.MENU_MUSIC, MenuMusicPlaylist.toPayload(state)));
   }
 
   /**
@@ -609,6 +617,7 @@ public class ClientHandler implements Runnable {
             case START -> handleStart(p);
             case LOGOUT_LOBBY -> handleLobbyLogout();
             case SHOW_HIGHSCORE -> handleShowHighscore();
+            case MENU_MUSIC -> sendMenuMusicState();
             default -> handleDefault(p);
           }
         } catch (IllegalArgumentException e) {

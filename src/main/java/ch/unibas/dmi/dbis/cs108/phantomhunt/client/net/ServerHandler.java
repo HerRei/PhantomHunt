@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.NameGenerator;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.MenuMusicController;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.EndScene;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.LobbyScene;
@@ -141,6 +142,9 @@ public class ServerHandler implements Runnable {
       case SHOW_HIGHSCORE:
         handleShowHighscore(packet);
         break;
+      case MENU_MUSIC:
+        handleMenuMusic(packet);
+        break;
       default:
         handleUnknown(packet);
         break;
@@ -238,8 +242,10 @@ public class ServerHandler implements Runnable {
    * the JavaFX Application Thread.
    */
   private void handleGameStart() {
+    MenuMusicController.getInstance().stop();
     SoundManager.getInstance().play(SoundEffect.DESCENT_WHOOSH);
-    SoundManager.getInstance().play(SoundEffect.WIND_OUTSIDE_ROOM_TONE);
+    SoundManager.getInstance().stop(SoundEffect.THE_VILLAINS_MIDNIGHT_WALTZ);
+    SoundManager.getInstance().play(SoundEffect.THE_VILLAINS_MIDNIGHT_WALTZ);
     Platform.runLater(
         () -> {
           GameModel.getInstance().setWisdomBonusReady(false);
@@ -323,6 +329,13 @@ public class ServerHandler implements Runnable {
         });
   }
 
+  private void handleMenuMusic(Packet packet) {
+    if (packet.argc() < 1) {
+      return;
+    }
+    MenuMusicController.getInstance().applyServerSync(packet.text());
+  }
+
   /** Responds to a server ping with a pong packet. */
   private void handlePing() {
     sendMessage(Packet.of(Command.PONG));
@@ -349,6 +362,7 @@ public class ServerHandler implements Runnable {
     if ("__HUMAN_CAUGHT__".equals(text)) {
       SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
       SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
+      SoundManager.getInstance().stop(SoundEffect.THE_VILLAINS_MIDNIGHT_WALTZ);
       SoundManager.getInstance().play(SoundEffect.MAGIAZ_SCARE);
       return;
     }

@@ -90,5 +90,8 @@ public enum Command {
   WISDOM,
 
   /** Request to show the highscore. */
-  SHOW_HIGHSCORE
+  SHOW_HIGHSCORE,
+
+  /** Server syncs the currently playing menu music track and offset. */
+  MENU_MUSIC
 }

@@ -31,7 +31,19 @@ public enum SoundEffect {
   UNIVERSFIELD_SLIME_IMPACT("/audio/universfield-slime-impact.wav", false, 0.80f),
 
   /** A short scare sting for jump-scare or surprise feedback. */
-  MAGIAZ_SCARE("/audio/magiaz-scare.wav", false, 0.85f);
+  MAGIAZ_SCARE("/audio/magiaz-scare.wav", false, 0.85f),
+
+  /** AI-generated villain waltz background music. */
+  THE_VILLAINS_MIDNIGHT_WALTZ("/audio/the-villains-midnight-waltz.wav", true, 0.45f),
+
+  /** AI-generated dungeon background music. */
+  DESCENT_INTO_THE_OUBLIETTE("/audio/descent-into-the-oubliette.wav", true, 0.45f),
+
+  /** AI-generated winter gate background music. */
+  WINTER_AT_THE_GATE("/audio/winter-at-the-gate.wav", true, 0.45f),
+
+  /** AI-generated Vor ta khei background music. */
+  VOR_TA_KHEI("/audio/vor-ta-khei.wav", true, 0.45f);
 
   private final String resourcePath;
   private final boolean loops;

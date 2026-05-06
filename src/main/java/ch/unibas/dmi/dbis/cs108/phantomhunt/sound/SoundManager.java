@@ -61,6 +61,19 @@ public final class SoundManager {
   }
 
   /**
+   * Plays the specified sound effect from a position in seconds.
+   *
+   * @param effect the sound effect to play
+   * @param offsetSeconds playback offset in seconds
+   */
+  public void playFrom(SoundEffect effect, float offsetSeconds) {
+    ensureInitialized();
+    if (initialized) {
+      soundEngine.playSoundFrom(effect, offsetSeconds);
+    }
+  }
+
+  /**
    * Stops the specified sound effect.
    *
    * @param effect the sound effect to stop

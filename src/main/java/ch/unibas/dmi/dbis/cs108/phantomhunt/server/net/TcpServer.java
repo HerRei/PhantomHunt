@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.net;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.MenuMusicBroadcaster;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,6 +52,8 @@ public class TcpServer {
 
       Registry registry = Registry.getInstance();
       LobbyHandler lobbyHandler = new LobbyHandler();
+      MenuMusicBroadcaster menuMusicBroadcaster = new MenuMusicBroadcaster(registry);
+      menuMusicBroadcaster.start();
 
       while (true) {
         Socket socket =

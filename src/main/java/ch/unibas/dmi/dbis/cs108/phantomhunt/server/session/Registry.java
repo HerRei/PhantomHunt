@@ -212,6 +212,12 @@ public final class Registry {
    */
   public void broadcast(ClientHandler sender, Packet p) {
     log.debug("Registry broadcast from {}: {}", sender.getName(), p.cmd());
+    broadcast(p);
+  }
+
+  /** Broadcasts a packet to all connected clients without attributing it to a sender. */
+  public void broadcast(Packet p) {
+    log.debug("Registry broadcast: {}", p.cmd());
     for (ClientHandler h : sessions) {
       h.sendMessage(p);
     }
