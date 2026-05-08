@@ -10,7 +10,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 
 import java.util.Map;
@@ -32,7 +31,6 @@ public class HighscoreScene implements SceneInterface {
 
   /** Builds or rebuilds the highscore scene (also called on refresh). */
   public void createScene() {
-    // ── Table ──────────────────────────────────────────────────────────────
     TableView<Map.Entry<String, Integer>> tableView = new TableView<>();
     tableView.setStyle("-fx-background-color: #3c3f41;");
 
@@ -51,13 +49,12 @@ public class HighscoreScene implements SceneInterface {
     tableView.setItems(entries);
     tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-    // ── Buttons ────────────────────────────────────────────────────────────
-    Button btnBack = new Button("← Back");
+    Button btnBack = new Button("Back");
     btnBack.setStyle(BUTTON_STYLE);
     btnBack.setPrefWidth(130);
     btnBack.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.HOME));
 
-    Button btnRefresh = new Button("🔄  Refresh");
+    Button btnRefresh = new Button("Refresh");
     btnRefresh.setStyle(BUTTON_STYLE);
     btnRefresh.setPrefWidth(130);
     btnRefresh.setOnAction(
@@ -69,7 +66,6 @@ public class HighscoreScene implements SceneInterface {
     HBox buttonBar = new HBox(15, btnBack, btnRefresh);
     buttonBar.setAlignment(Pos.CENTER);
 
-    // ── Layout ─────────────────────────────────────────────────────────────
     Label title = new Label("Highscores");
     title.setStyle("-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;");
 
@@ -81,16 +77,8 @@ public class HighscoreScene implements SceneInterface {
     layout.setStyle(DARK_BG);
     VBox.setVgrow(tableView, Priority.ALWAYS);
 
-    localScene = new Scene(layout, 900, 640);
-
-    // F11 toggles fullscreen
-    localScene.setOnKeyPressed(
-        e -> {
-          if (e.getCode() == KeyCode.F11) {
-            javafx.stage.Stage stage = (javafx.stage.Stage) localScene.getWindow();
-            if (stage != null) stage.setFullScreen(!stage.isFullScreen());
-          }
-        });
+    SceneManager sceneManager = SceneManager.getInstance();
+    localScene = new Scene(layout, sceneManager.getWidth(), sceneManager.getHeight());
   }
 
   @Override

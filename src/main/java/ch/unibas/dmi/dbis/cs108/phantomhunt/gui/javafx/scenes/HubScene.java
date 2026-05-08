@@ -11,7 +11,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 
 import java.io.BufferedReader;
@@ -35,7 +34,7 @@ public class HubScene implements SceneInterface {
   private static final int QOTD_PORT = 17;
   private static final String FALLBACK_QUOTE =
       "\"Your mind is like water, my friend. When it is agitated, it becomes difficult to see. "
-          + "But if you allow it to settle, the answer becomes clear.\"\n — Master Oogway";
+          + "But if you allow it to settle, the answer becomes clear.\"\n - Master Oogway";
 
   private ListView<String> chatDisplay;
   private ListView<String> playerListDisplay;
@@ -53,7 +52,6 @@ public class HubScene implements SceneInterface {
   public void createScene() {
     GameModel model = GameModel.getInstance();
 
-    // ── LEFT PANEL ─────────────────────────────────────────────────────────
     VBox leftMenu = new VBox(12);
     leftMenu.setPadding(new Insets(25));
     leftMenu.setAlignment(Pos.TOP_CENTER);
@@ -75,7 +73,7 @@ public class HubScene implements SceneInterface {
     Button btnCreate = navButton("Create Lobby");
     Button btnHighscore = navButton("Show Highscores");
     Button btnKeyBinding = navButton("Key Bindings");
-    Button btnWisdom = navButton("Get Wisdom 🔮");
+    Button btnWisdom = navButton("Get Wisdom");
 
     Label onlineLabel = new Label("Players Online");
     onlineLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 11px; -fx-font-weight: bold;");
@@ -96,7 +94,6 @@ public class HubScene implements SceneInterface {
             new Separator(),
             onlineLabel, playerListDisplay);
 
-    // ── RIGHT PANEL: Chat ──────────────────────────────────────────────────
     VBox chatBox = new VBox(10);
     chatBox.setPadding(new Insets(20));
     chatBox.setStyle(DARK_BG);
@@ -150,7 +147,6 @@ public class HubScene implements SceneInterface {
 
     chatBox.getChildren().addAll(chatTitle, chatDisplay, inputArea);
 
-    // ── Events ─────────────────────────────────────────────────────────────
     btnSend.setOnAction(e -> handleSendMessage());
     chatInput.setOnAction(e -> handleSendMessage());
     btnNickname.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.NICKNAME));
@@ -169,20 +165,11 @@ public class HubScene implements SceneInterface {
         });
     btnWisdom.setOnAction(e -> openWisdom(SceneProtocol.HOME));
 
-    // ── Main layout ────────────────────────────────────────────────────────
     HBox mainLayout = new HBox(
         leftMenu, new Separator(javafx.geometry.Orientation.VERTICAL), chatBox);
 
-    localScene = new Scene(mainLayout, 900, 640);
-
-    // F11 toggles fullscreen
-    localScene.setOnKeyPressed(
-        e -> {
-          if (e.getCode() == KeyCode.F11) {
-            javafx.stage.Stage stage = (javafx.stage.Stage) localScene.getWindow();
-            if (stage != null) stage.setFullScreen(!stage.isFullScreen());
-          }
-        });
+    SceneManager sceneManager = SceneManager.getInstance();
+    localScene = new Scene(mainLayout, sceneManager.getWidth(), sceneManager.getHeight());
   }
 
   private Button navButton(String text) {

@@ -74,7 +74,8 @@ public class WisdomScene implements SceneInterface {
     root.setAlignment(Pos.CENTER);
     root.setPadding(new Insets(40));
 
-    scene = new Scene(root, 700, 500);
+    SceneManager sceneManager = SceneManager.getInstance();
+    scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());
   }
 
   public void openFrom(SceneProtocol returnScene) {

@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.Player;
 import javafx.application.Platform;
@@ -13,7 +14,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -36,18 +36,15 @@ public class EndScene implements SceneInterface {
   public EndScene() {
     GameModel model = GameModel.getInstance();
 
-    // ── Title ──────────────────────────────────────────────────────────────
     Label titleLabel = new Label("Game Over");
     titleLabel.setStyle("-fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: bold;");
 
     Separator sep1 = new Separator();
     sep1.setMaxWidth(400);
 
-    // ── Winner ─────────────────────────────────────────────────────────────
     this.winnerText = new Label("The Winner is: ...");
     winnerText.setStyle("-fx-text-fill: #FFD700; -fx-font-size: 22px; -fx-font-weight: bold;");
 
-    // ── Score ──────────────────────────────────────────────────────────────
     Label yourScoreText = new Label("Your Final Score:");
     yourScoreText.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 15px;");
 
@@ -61,7 +58,6 @@ public class EndScene implements SceneInterface {
     Separator sep2 = new Separator();
     sep2.setMaxWidth(400);
 
-    // ── Ranking table ──────────────────────────────────────────────────────
     Label rankLabel = new Label("Final Rankings");
     rankLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 13px; -fx-font-weight: bold;");
 
@@ -80,7 +76,6 @@ public class EndScene implements SceneInterface {
     scoreCol.setSortType(TableColumn.SortType.DESCENDING);
     rankingTable.getSortOrder().add(scoreCol);
 
-    // ── Buttons ────────────────────────────────────────────────────────────
     lobbyButton = new Button("Back to Lobby");
     lobbyButton.setStyle(BUTTON_STYLE);
     lobbyButton.setVisible(false);
@@ -91,7 +86,6 @@ public class EndScene implements SceneInterface {
     HBox buttonBox = new HBox(20, lobbyButton, hubButton);
     buttonBox.setAlignment(Pos.CENTER);
 
-    // ── Layout ─────────────────────────────────────────────────────────────
     VBox root =
         new VBox(
             18,
@@ -105,19 +99,11 @@ public class EndScene implements SceneInterface {
     root.setPadding(new Insets(40));
     root.setStyle(DARK_BG);
 
-    this.scene = new Scene(root, 900, 640);
+    SceneManager sceneManager = SceneManager.getInstance();
+    this.scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());
 
     lobbyButton.setOnAction(e -> EventHandlers.getInstance().backToLobby());
     hubButton.setOnAction(e -> EventHandlers.getInstance().resetAndBackToHub());
-
-    // F11 toggles fullscreen
-    scene.setOnKeyPressed(
-        e -> {
-          if (e.getCode() == KeyCode.F11) {
-            javafx.stage.Stage stage = (javafx.stage.Stage) scene.getWindow();
-            if (stage != null) stage.setFullScreen(!stage.isFullScreen());
-          }
-        });
   }
 
   /**

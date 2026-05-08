@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.Player;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
@@ -30,8 +31,6 @@ public class GameScene implements SceneInterface {
 
   private static final int TILE_SIZE = 32;
   private static final int SIDEBAR_WIDTH = 250;
-  private static final int WINDOW_W = 900;
-  private static final int WINDOW_H = 640;
   private static final String DARK_BG = "-fx-background-color: #2b2b2b;";
   private static final String SIDEBAR_BG = "-fx-background-color: #313335;";
   private static final String INPUT_STYLE =
@@ -58,10 +57,8 @@ public class GameScene implements SceneInterface {
   // Unscaled pixel dimensions of the map
   private final double mapPixelWidth;
   private final double mapPixelHeight;
-  // Scale factor at the default 900×640 window size
   private final double baseScale;
 
-  // Fullscreen-aware layout nodes
   private final StackPane gameStack;
   private final javafx.scene.Group scaledTiles;
   private final Pane tilePane;
@@ -84,8 +81,8 @@ public class GameScene implements SceneInterface {
     mapPixelHeight = mapRows * TILE_SIZE;
     mapPixelWidth = mapCols * TILE_SIZE;
 
-    // Base scale: fit map height into the available window height
-    baseScale = WINDOW_H / mapPixelHeight;
+    SceneManager sceneManager = SceneManager.getInstance();
+    baseScale = sceneManager.getHeight() / mapPixelHeight;
 
     // Tile layer (unscaled)
     tilePane = buildTilePane(mapData);
@@ -107,7 +104,7 @@ public class GameScene implements SceneInterface {
     root.setCenter(gameStack);
     root.setRight(sidebar);
 
-    this.scene = new Scene(root, WINDOW_W, WINDOW_H);
+    this.scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());
 
     setupPlayerTracking();
     setupChatBinding();
@@ -125,22 +122,8 @@ public class GameScene implements SceneInterface {
     scene.widthProperty().addListener((obs, o, n) -> onSceneResized());
     scene.heightProperty().addListener((obs, o, n) -> onSceneResized());
 
-    // F11 toggles fullscreen; other keys go to movement handler
-    scene.setOnKeyPressed(e -> {
-      if (e.getCode() == KeyCode.F11) {
-        toggleFullscreen();
-      } else {
-        handleKeyPress(e.getCode());
-      }
-    });
+    scene.setOnKeyPressed(e -> handleKeyPress(e.getCode()));
     scene.setOnKeyReleased(e -> handleKeyReleased(e.getCode()));
-  }
-
-  // ── Fullscreen helpers ────────────────────────────────────────────────────
-
-  private void toggleFullscreen() {
-    javafx.stage.Stage stage = (javafx.stage.Stage) scene.getWindow();
-    if (stage != null) stage.setFullScreen(!stage.isFullScreen());
   }
 
   /**
@@ -175,7 +158,7 @@ public class GameScene implements SceneInterface {
   private void applyScale(double scale) {
     scaledTiles.setScaleX(scale);
     scaledTiles.setScaleY(scale);
-    // Group scales around its center — shift back so top-left stays at (0,0)
+    // Group scales around its center and is shifted so top-left stays at (0,0).
     scaledTiles.setTranslateX((mapPixelWidth * scale - mapPixelWidth) / 2.0);
     scaledTiles.setTranslateY((mapPixelHeight * scale - mapPixelHeight) / 2.0);
   }
@@ -201,8 +184,6 @@ public class GameScene implements SceneInterface {
     });
   }
 
-  // ── Asset loading ─────────────────────────────────────────────────────────
-
   private void loadFloorTiles() {
     String[] keys = {"Q", "L", "V", "D", "R", "A", "H", "T", "B", "C", "E"};
     String[] names = {
@@ -216,7 +197,6 @@ public class GameScene implements SceneInterface {
   }
 
   private void loadSprites() {
-    // Human sprites: 4 players × 4 directions × 2 frames
     String[] directions = {"front", "back", "left", "right"};
     for (int i = 1; i <= 4; i++) {
       for (String dir : directions) {
@@ -230,7 +210,6 @@ public class GameScene implements SceneInterface {
       }
     }
 
-    // Ghost sprites: 4 colors × 4 directions
     String[] phantomColors = {"b", "g", "r", "v"};
     String[] phantomDirections = {"d", "u", "l", "r"};
     for (String color : phantomColors) {
@@ -246,7 +225,7 @@ public class GameScene implements SceneInterface {
   }
 
   /**
-   * Builds a Pane populated with 32×32 tile ImageViews. Walls ("X") are left as transparent (black
+   * Builds a Pane populated with 32x32 tile ImageViews. Walls ("X") are left as transparent (black
    * background shows through). Others are walkable tiles.
    */
   private Pane buildTilePane(String[][] mapData) {
@@ -267,8 +246,6 @@ public class GameScene implements SceneInterface {
     }
     return pane;
   }
-
-  // ── Sidebar ───────────────────────────────────────────────────────────────
 
   private VBox createSidebar(GameModel model) {
     VBox box = new VBox(15);
@@ -330,8 +307,7 @@ public class GameScene implements SceneInterface {
     chatInput.setStyle(INPUT_STYLE);
     chatInput.setOnAction(e -> sendMessage());
 
-    // F11 hint
-    Label f11Hint = new Label("F11 — Toggle Fullscreen");
+    Label f11Hint = new Label("F11 - Toggle Fullscreen");
     f11Hint.setStyle("-fx-text-fill: #555; -fx-font-size: 10px;");
 
     box.getChildren()
@@ -381,8 +357,6 @@ public class GameScene implements SceneInterface {
         "-fx-text-fill: " + hex + "; -fx-font-size: 13px; -fx-font-weight: bold;");
   }
 
-  // ── Chat ──────────────────────────────────────────────────────────────────
-
   private void setupChatBinding() {
     GameModel.getInstance()
         .lobbyChatMessagesProperty()
@@ -407,8 +381,6 @@ public class GameScene implements SceneInterface {
     EventHandlers.getInstance().sendMessage(Command.YAP, msg);
     chatInput.clear();
   }
-
-  // ── Input ─────────────────────────────────────────────────────────────────
 
   /**
    * Handles a key-press event by comparing {@code code} against the current key bindings stored in
@@ -448,8 +420,6 @@ public class GameScene implements SceneInterface {
   private void handleKeyReleased(KeyCode code) {
     // Reserved for future use
   }
-
-  // ── Player tracking ───────────────────────────────────────────────────────
 
   private void setupPlayerTracking() {
     GameModel.getInstance()
@@ -554,8 +524,6 @@ public class GameScene implements SceneInterface {
     ImageView sprite = playerSprites.remove(player);
     if (sprite != null) gamePane.getChildren().remove(sprite);
   }
-
-  // ── Ability sprite ────────────────────────────────────────────────────────
 
   private void setupAbility() {
     Image image = new Image(getClass().getResourceAsStream("/assets/abilities/ability.png"));

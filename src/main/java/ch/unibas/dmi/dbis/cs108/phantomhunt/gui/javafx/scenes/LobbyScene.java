@@ -11,7 +11,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 
 /** Represents the lobby waiting area, displaying connected players and a lobby chat. */
@@ -38,8 +37,7 @@ public class LobbyScene implements SceneInterface {
 
   /** Constructs a new LobbyScene. Initializes UI components, binds the chat to the game model. */
   public LobbyScene() {
-    // ── Player list (left panel) ────────────────────────────────────────────
-    lobbyIdLabel = new Label("Lobby ID: —");
+    lobbyIdLabel = new Label("Lobby ID: -");
     lobbyIdLabel.setStyle(
         "-fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;");
 
@@ -50,7 +48,7 @@ public class LobbyScene implements SceneInterface {
     playerList.setStyle("-fx-background-color: #3c3f41; -fx-text-fill: white;");
     VBox.setVgrow(playerList, Priority.ALWAYS);
 
-    startGameButton = new Button("▶  Start Game");
+    startGameButton = new Button("Start Game");
     startGameButton.setStyle(
         "-fx-background-color: #007ACC; -fx-text-fill: white; -fx-font-size: 14px; "
             + "-fx-font-weight: bold; -fx-padding: 10 28; -fx-background-radius: 6;");
@@ -76,7 +74,6 @@ public class LobbyScene implements SceneInterface {
     leftPanel.setPrefWidth(300);
     leftPanel.setStyle("-fx-background-color: #313335;");
 
-    // ── Chat (right panel) ─────────────────────────────────────────────────
     Label chatTitle = new Label("Lobby Chat");
     chatTitle.setStyle("-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;");
 
@@ -93,23 +90,14 @@ public class LobbyScene implements SceneInterface {
     chatPanel.setStyle(DARK_BG);
     HBox.setHgrow(chatPanel, Priority.ALWAYS);
 
-    // ── Main layout ─────────────────────────────────────────────────────────
     HBox root =
         new HBox(leftPanel, new Separator(javafx.geometry.Orientation.VERTICAL), chatPanel);
 
-    this.scene = new Scene(root, 900, 640);
+    SceneManager sceneManager = SceneManager.getInstance();
+    this.scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());
 
     setupEvents();
     bindChat();
-
-    // F11 toggles fullscreen
-    scene.setOnKeyPressed(
-        e -> {
-          if (e.getCode() == KeyCode.F11) {
-            javafx.stage.Stage stage = (javafx.stage.Stage) scene.getWindow();
-            if (stage != null) stage.setFullScreen(!stage.isFullScreen());
-          }
-        });
   }
 
   private void setupEvents() {

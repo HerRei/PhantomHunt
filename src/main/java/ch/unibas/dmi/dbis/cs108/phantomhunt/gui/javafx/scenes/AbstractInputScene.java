@@ -1,18 +1,17 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes;
 
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
  * Abstract base class for scenes with a description, an input field, and confirmation/back buttons.
- * Applies the dark UI theme and exposes F11 fullscreen toggling.
  */
 public abstract class AbstractInputScene implements SceneInterface {
 
@@ -55,7 +54,7 @@ public abstract class AbstractInputScene implements SceneInterface {
     inputField.setPrefHeight(38);
     inputField.setStyle(INPUT_STYLE);
 
-    backButton = new Button("← Back");
+    backButton = new Button("Back");
     confirmButton = new Button("Confirm");
     backButton.setStyle(BUTTON_STYLE);
     confirmButton.setStyle(CONFIRM_STYLE);
@@ -70,16 +69,8 @@ public abstract class AbstractInputScene implements SceneInterface {
     root.setPadding(new Insets(60));
     root.setStyle(DARK_BG);
 
-    scene = new Scene(root, 900, 640);
-
-    // F11 toggles fullscreen
-    scene.setOnKeyPressed(
-        e -> {
-          if (e.getCode() == KeyCode.F11) {
-            javafx.stage.Stage stage = (javafx.stage.Stage) scene.getWindow();
-            if (stage != null) stage.setFullScreen(!stage.isFullScreen());
-          }
-        });
+    SceneManager sceneManager = SceneManager.getInstance();
+    scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());
   }
 
   /** Configures the specific text values for the UI components. */

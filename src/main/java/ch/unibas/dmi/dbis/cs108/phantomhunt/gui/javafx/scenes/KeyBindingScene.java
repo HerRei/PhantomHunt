@@ -56,15 +56,12 @@ public class KeyBindingScene implements SceneInterface {
 
     root.getChildren().addAll(title, hint, grid, resetButton, hubButton);
 
-    this.scene = new Scene(root, 900, 640);
+    SceneManager sceneManager = SceneManager.getInstance();
+    this.scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());
 
-    // Global key listener: F11 toggles fullscreen, otherwise used for key-binding listen mode
     scene.setOnKeyPressed(
         e -> {
-          if (e.getCode() == KeyCode.F11) {
-            javafx.stage.Stage stage = (javafx.stage.Stage) scene.getWindow();
-            if (stage != null) stage.setFullScreen(!stage.isFullScreen());
-          } else if (listeningAction != null) {
+          if (listeningAction != null) {
             assignKey(listeningAction, e.getCode());
             listeningAction = null;
           }
@@ -132,7 +129,7 @@ public class KeyBindingScene implements SceneInterface {
           // Enter listen mode for this action
           listeningAction = action;
           button.setStyle(listeningStyle());
-          button.setText("Press a key…");
+          button.setText("Press a key...");
         });
     return button;
   }
@@ -168,8 +165,6 @@ public class KeyBindingScene implements SceneInterface {
     KeyCode code = GameModel.getInstance().getKeyBinding(action);
     return code != null ? code.getName() : "?";
   }
-
-  // ── Styles ────────────────────────────────────────────────────────────────
 
   private String normalStyle() {
     return "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 13px;";
