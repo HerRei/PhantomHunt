@@ -18,11 +18,6 @@ public class JoinLobbyScene extends AbstractInputScene {
   private ListView<String> waitingListView;
   private ListView<String> runningListView;
 
-  private static final String LIST_STYLE =
-      "-fx-background-color: #3c3f41; -fx-text-fill: white;";
-  private static final String LABEL_STYLE =
-      "-fx-text-fill: #aaaaaa; -fx-font-size: 12px; -fx-font-weight: bold;";
-
   public JoinLobbyScene() {
     super();
     setupLobbyLists();
@@ -37,8 +32,8 @@ public class JoinLobbyScene extends AbstractInputScene {
     waitingListView.setItems(model.getAvailableLobbies());
     runningListView.setItems(model.getRunningLobbies());
 
-    waitingListView.setStyle(LIST_STYLE);
-    runningListView.setStyle(LIST_STYLE);
+    waitingListView.setStyle(SceneStyle.LIST);
+    runningListView.setStyle(SceneStyle.LIST);
 
     waitingListView.setPrefHeight(160);
     runningListView.setPrefHeight(100);
@@ -46,9 +41,9 @@ public class JoinLobbyScene extends AbstractInputScene {
     VBox root = (VBox) scene.getRoot();
 
     Label joinableLabel = new Label("Joinable Lobbies:");
-    joinableLabel.setStyle(LABEL_STYLE);
+    joinableLabel.setStyle(SceneStyle.SECTION_LABEL);
     Label runningLabel = new Label("Running Games (Spectate):");
-    runningLabel.setStyle(LABEL_STYLE);
+    runningLabel.setStyle(SceneStyle.SECTION_LABEL);
 
     root.getChildren().add(1, joinableLabel);
     root.getChildren().add(2, waitingListView);

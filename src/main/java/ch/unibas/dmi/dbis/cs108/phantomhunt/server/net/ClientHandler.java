@@ -172,7 +172,7 @@ public class ClientHandler implements Runnable {
     } catch (IOException e) {
       LOGGER.error("Error while closing socket for client {}", getName(), e);
     }
-    registry.broadcast(this, Packet.of(Command.INFO, getName() + ": left the Server"));
+    registry.broadcast(this, Packet.of(Command.INFO, getName() + " left the Server"));
     LOGGER.info("Client {} disconnected.", name);
     sendPlayers();
   }
@@ -513,7 +513,7 @@ public class ClientHandler implements Runnable {
     sendMenuMusicState();
     if (oldName != null) {
       registry.broadcast(
-          this, Packet.of(Command.INFO, oldName + ": changed nickname to -> " + this.name));
+          this, Packet.of(Command.INFO, oldName + " changed nickname to -> " + this.name));
     } else {
       registry.broadcast(this, Packet.of(Command.INFO, "Welcome to the Server: " + this.name));
     }

@@ -31,10 +31,6 @@ public class GameScene implements SceneInterface {
 
   private static final int TILE_SIZE = 32;
   private static final int SIDEBAR_WIDTH = 250;
-  private static final String DARK_BG = "-fx-background-color: #2b2b2b;";
-  private static final String SIDEBAR_BG = "-fx-background-color: #313335;";
-  private static final String INPUT_STYLE =
-      "-fx-background-color: #3c3f41; -fx-text-fill: white; -fx-prompt-text-fill: #888;";
 
   private final Scene scene;
   private final Pane gamePane = new Pane();
@@ -94,13 +90,13 @@ public class GameScene implements SceneInterface {
     // Game stack: tiles + player sprites
     gameStack = new StackPane(scaledTiles, gamePane);
     gameStack.setAlignment(Pos.TOP_LEFT);
-    gameStack.setStyle("-fx-background-color: black;");
+    gameStack.setStyle(SceneStyle.GAME_BACKGROUND);
     applyGameStackSize(baseScale);
 
     VBox sidebar = createSidebar(model);
 
     BorderPane root = new BorderPane();
-    root.setStyle(DARK_BG);
+    root.setStyle(SceneStyle.DARK_BACKGROUND);
     root.setCenter(gameStack);
     root.setRight(sidebar);
 
@@ -251,41 +247,39 @@ public class GameScene implements SceneInterface {
     VBox box = new VBox(15);
     box.setPadding(new Insets(15));
     box.setPrefWidth(SIDEBAR_WIDTH);
-    box.setStyle(SIDEBAR_BG);
+    box.setStyle(SceneStyle.PANEL_BACKGROUND);
 
     // Own name shown in black on a white badge
-    nameLabel.setStyle(
-        "-fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 13px; "
-            + "-fx-background-color: white; -fx-padding: 2 6; -fx-background-radius: 4;");
+    nameLabel.setStyle(SceneStyle.NAME_BADGE);
 
     // Role label color is applied dynamically in refreshStatusLabels()
-    roleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
+    roleLabel.setStyle(SceneStyle.ROLE_LABEL);
 
     Label roundLabel = new Label();
-    roundLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 13px;");
+    roundLabel.setStyle(SceneStyle.SUBTLE_TEXT);
     roundLabel.textProperty().bind(model.getRound().asString("Round: %d"));
 
     Label timeLabel = new Label();
-    timeLabel.setStyle("-fx-text-fill: #FFD700; -fx-font-weight: bold; -fx-font-size: 13px;");
+    timeLabel.setStyle(SceneStyle.TIME_TEXT);
     timeLabel.textProperty().bind(model.getTime().asString("Time: %d s"));
 
     VBox statusBox = new VBox(5, nameLabel, roleLabel, roundLabel, timeLabel);
 
     // Score
     Label scoreTitle = new Label("Your Score:");
-    scoreTitle.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 12px; -fx-font-weight: bold;");
+    scoreTitle.setStyle(SceneStyle.SECTION_LABEL);
     Label scoreValue = new Label();
-    scoreValue.setStyle("-fx-text-fill: #00FF00; -fx-font-size: 26px; -fx-font-weight: bold;");
+    scoreValue.setStyle(SceneStyle.SCORE_TEXT_SMALL);
     scoreValue.textProperty().bind(model.getScore().asString());
     VBox scoreBox = new VBox(2, scoreTitle, scoreValue);
 
     // Players table
     Label tableLabel = new Label("Players");
-    tableLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 12px; -fx-font-weight: bold;");
+    tableLabel.setStyle(SceneStyle.SECTION_LABEL);
 
     TableView<Player> table = new TableView<>(model.getPlayers());
     table.setPrefHeight(160);
-    table.setStyle("-fx-background-color: #3c3f41;");
+    table.setStyle(SceneStyle.TABLE);
     TableColumn<Player, String> nameCol = new TableColumn<>("Name");
     nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
     TableColumn<Player, Integer> scCol = new TableColumn<>("Score");
@@ -295,20 +289,20 @@ public class GameScene implements SceneInterface {
 
     // Chat
     Label chatLabel = new Label("Chat");
-    chatLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 12px; -fx-font-weight: bold;");
+    chatLabel.setStyle(SceneStyle.SECTION_LABEL);
 
     chatArea.setEditable(false);
     chatArea.setWrapText(true);
-    chatArea.setStyle("-fx-control-inner-background: #3c3f41; -fx-text-fill: white;");
+    chatArea.setStyle(SceneStyle.TEXT_AREA);
     chatArea.setPrefHeight(200);
     VBox.setVgrow(chatArea, Priority.ALWAYS);
 
     chatInput.setPromptText("Send message...");
-    chatInput.setStyle(INPUT_STYLE);
+    chatInput.setStyle(SceneStyle.INPUT);
     chatInput.setOnAction(e -> sendMessage());
 
     Label f11Hint = new Label("F11 - Toggle Fullscreen");
-    f11Hint.setStyle("-fx-text-fill: #555; -fx-font-size: 10px;");
+    f11Hint.setStyle(SceneStyle.HINT_TEXT);
 
     box.getChildren()
         .addAll(
@@ -335,7 +329,7 @@ public class GameScene implements SceneInterface {
 
     if (role == null || role.isBlank()) {
       roleLabel.setText("Waiting for role...");
-      roleLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 13px; -fx-font-weight: bold;");
+      roleLabel.setStyle(SceneStyle.ROLE_WAITING);
       return;
     }
 
@@ -353,8 +347,7 @@ public class GameScene implements SceneInterface {
     }
 
     roleLabel.setText("You are " + colorName + " and are " + role);
-    roleLabel.setStyle(
-        "-fx-text-fill: " + hex + "; -fx-font-size: 13px; -fx-font-weight: bold;");
+    roleLabel.setStyle(SceneStyle.roleColor(hex));
   }
 
   private void setupChatBinding() {

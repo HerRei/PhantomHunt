@@ -22,12 +22,6 @@ import java.util.Comparator;
 /** Scene shown when a game ends, displaying the winner and final rankings. */
 public class EndScene implements SceneInterface {
 
-  private static final String DARK_BG =
-      "-fx-background-color: #2b2b2b;";
-  private static final String BUTTON_STYLE =
-      "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 14px; "
-          + "-fx-font-weight: bold; -fx-padding: 10 28; -fx-background-radius: 6;";
-
   private final Scene scene;
   private Button lobbyButton;
   private Label winnerText;
@@ -37,20 +31,19 @@ public class EndScene implements SceneInterface {
     GameModel model = GameModel.getInstance();
 
     Label titleLabel = new Label("Game Over");
-    titleLabel.setStyle("-fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: bold;");
+    titleLabel.setStyle(SceneStyle.TITLE_HERO);
 
     Separator sep1 = new Separator();
     sep1.setMaxWidth(400);
 
     this.winnerText = new Label("The Winner is: ...");
-    winnerText.setStyle("-fx-text-fill: #FFD700; -fx-font-size: 22px; -fx-font-weight: bold;");
+    winnerText.setStyle(SceneStyle.GOLD_TEXT);
 
     Label yourScoreText = new Label("Your Final Score:");
-    yourScoreText.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 15px;");
+    yourScoreText.setStyle(SceneStyle.SUBTLE_TEXT);
 
     Label finalScoreLabel = new Label("0");
-    finalScoreLabel.setStyle(
-        "-fx-text-fill: #00FF00; -fx-font-size: 48px; -fx-font-weight: bold;");
+    finalScoreLabel.setStyle(SceneStyle.SCORE_TEXT);
     if (model.getName() != null) {
       finalScoreLabel.textProperty().bind(model.getScore().asString("%d"));
     }
@@ -59,12 +52,12 @@ public class EndScene implements SceneInterface {
     sep2.setMaxWidth(400);
 
     Label rankLabel = new Label("Final Rankings");
-    rankLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 13px; -fx-font-weight: bold;");
+    rankLabel.setStyle(SceneStyle.SECTION_LABEL);
 
     this.rankingTable = new TableView<>(model.getPlayers());
     rankingTable.setPrefHeight(180);
     rankingTable.setMaxWidth(340);
-    rankingTable.setStyle("-fx-background-color: #3c3f41; -fx-text-fill: white;");
+    rankingTable.setStyle(SceneStyle.TABLE);
 
     TableColumn<Player, String> nameCol = new TableColumn<>("Player");
     nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -77,11 +70,11 @@ public class EndScene implements SceneInterface {
     rankingTable.getSortOrder().add(scoreCol);
 
     lobbyButton = new Button("Back to Lobby");
-    lobbyButton.setStyle(BUTTON_STYLE);
+    lobbyButton.setStyle(SceneStyle.BUTTON_LARGE);
     lobbyButton.setVisible(false);
 
     Button hubButton = new Button("Back to Hub");
-    hubButton.setStyle(BUTTON_STYLE);
+    hubButton.setStyle(SceneStyle.BUTTON_LARGE);
 
     HBox buttonBox = new HBox(20, lobbyButton, hubButton);
     buttonBox.setAlignment(Pos.CENTER);
@@ -97,7 +90,7 @@ public class EndScene implements SceneInterface {
             buttonBox);
     root.setAlignment(Pos.CENTER);
     root.setPadding(new Insets(40));
-    root.setStyle(DARK_BG);
+    root.setStyle(SceneStyle.DARK_BACKGROUND);
 
     SceneManager sceneManager = SceneManager.getInstance();
     this.scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());

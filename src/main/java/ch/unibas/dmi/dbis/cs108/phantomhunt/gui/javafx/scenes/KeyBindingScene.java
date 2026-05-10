@@ -35,22 +35,20 @@ public class KeyBindingScene implements SceneInterface {
     VBox root = new VBox(20);
     root.setPadding(new Insets(30));
     root.setAlignment(Pos.CENTER);
-    root.setStyle("-fx-background-color: #2b2b2b;");
+    root.setStyle(SceneStyle.DARK_BACKGROUND);
 
     Label title = new Label("Key Bindings");
-    title.setStyle("-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;");
+    title.setStyle(SceneStyle.TITLE);
 
     Label hint = new Label("Click a button, then press the desired key.");
-    hint.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 13px;");
+    hint.setStyle(SceneStyle.SUBTLE_TEXT);
 
     GridPane grid = buildBindingGrid();
 
     Button resetButton = new Button("Reset to Defaults");
     Button hubButton = new Button("Back to Lobby");
-    resetButton.setStyle(
-        "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 13px;");
-    hubButton.setStyle(
-        "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 13px;");
+    resetButton.setStyle(SceneStyle.BUTTON_MUTED);
+    hubButton.setStyle(SceneStyle.BUTTON_MUTED);
     hubButton.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.HOME));
     resetButton.setOnAction(e -> resetToDefaults());
 
@@ -91,7 +89,7 @@ public class KeyBindingScene implements SceneInterface {
       String displayName = entry.getValue();
 
       Label actionLabel = new Label(displayName);
-      actionLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
+      actionLabel.setStyle(SceneStyle.BODY_TEXT_LARGE);
       actionLabel.setPrefWidth(100);
 
       Button keyButton = createKeyButton(action);
@@ -167,11 +165,11 @@ public class KeyBindingScene implements SceneInterface {
   }
 
   private String normalStyle() {
-    return "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 13px;";
+    return SceneStyle.BUTTON_COMPACT;
   }
 
   private String listeningStyle() {
-    return "-fx-background-color: #007ACC; -fx-text-fill: white; -fx-font-size: 13px;";
+    return SceneStyle.BUTTON_ACTIVE;
   }
 
   @Override

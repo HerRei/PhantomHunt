@@ -36,9 +36,12 @@ import org.apache.logging.log4j.Logger;
 public class ServerHandler implements Runnable {
 
   private static final Logger LOGGER = LogManager.getLogger(ServerHandler.class);
+  private static final String PLAYER_LEFT_ABORT_NOTICE =
+      "SYSTEM: Match aborted because a player left.";
   private final Socket socket;
   private BufferedWriter out;
   private String name;
+  private volatile boolean matchAbortedByPlayerLeave;
 
   /**
    * Creates a new handler for the server connection and starts the read thread immediately
@@ -214,6 +217,7 @@ public class ServerHandler implements Runnable {
   }
 
   public void handleGameFinish() {
+    matchAbortedByPlayerLeave = false;
     SoundManager.getInstance().play(SoundEffect.DESCENT_WHOOSH);
     Platform.runLater(
         () -> {
@@ -277,7 +281,10 @@ public class ServerHandler implements Runnable {
           SceneManager sceneManager = SceneManager.getInstance();
           SceneProtocol current = sceneManager.getCurrentScene();
 
-          if (current != SceneProtocol.GAME && current != SceneProtocol.END) {
+          if (matchAbortedByPlayerLeave) {
+            sceneManager.showScene(SceneProtocol.LOBBY);
+            matchAbortedByPlayerLeave = false;
+          } else if (current != SceneProtocol.GAME && current != SceneProtocol.END) {
             sceneManager.showScene(SceneProtocol.LOBBY);
           }
 
@@ -372,8 +379,43 @@ public class ServerHandler implements Runnable {
       return;
     }
 
-    LOGGER.info("Info: {}", text);
-    GameModel.getInstance().addChatMessage(text); // adds message to chat
+    if (isPlayerLeftAbort(text)) {
+      matchAbortedByPlayerLeave = true;
+      SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
+      SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
+      SoundManager.getInstance().stop(SoundEffect.THE_VILLAINS_MIDNIGHT_WALTZ);
+      GameModel.getInstance().addLobbyChatMessage(PLAYER_LEFT_ABORT_NOTICE);
+      LOGGER.info("Info: {}", PLAYER_LEFT_ABORT_NOTICE);
+      return;
+    }
+
+    String systemMessage = formatSystemInfo(text);
+    LOGGER.info("Info: {}", systemMessage);
+    GameModel.getInstance().addChatMessage(systemMessage); // adds message to chat
+  }
+
+  private boolean isPlayerLeftAbort(String text) {
+    if (text == null) {
+      return false;
+    }
+    String normalized = text.toLowerCase(Locale.ROOT);
+    return normalized.contains("abort")
+        && normalized.contains("player")
+        && normalized.contains("left");
+  }
+
+  private String formatSystemInfo(String text) {
+    String message = text == null ? "" : text.trim();
+    if (message.startsWith("SYSTEM:")) {
+      return message;
+    }
+
+    int colonIndex = message.indexOf(':');
+    if (colonIndex > 0 && !message.substring(0, colonIndex).contains(" ")) {
+      message = message.substring(0, colonIndex) + " " + message.substring(colonIndex + 1).trim();
+    }
+
+    return "SYSTEM: " + message;
   }
 
   /**

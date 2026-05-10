@@ -18,7 +18,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 /** Shows the daily quote and unlocks a small round-score bonus after reflection time. */
@@ -43,18 +42,18 @@ public class WisdomScene implements SceneInterface {
 
   public WisdomScene() {
     Label titleLabel = new Label("Daily Wisdom");
-    titleLabel.setFont(new Font("Arial", 32));
+    titleLabel.setStyle(SceneStyle.WISDOM_TITLE);
 
     Label sloganLabel = new Label("A little wisdom a day keeps the brainrot away.");
-    sloganLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: #555;");
+    sloganLabel.setStyle(SceneStyle.WISDOM_SLOGAN);
 
     quoteLabel = new Label();
     quoteLabel.setWrapText(true);
     quoteLabel.setMaxWidth(560);
-    quoteLabel.setStyle("-fx-font-size: 20px; -fx-font-style: italic;");
+    quoteLabel.setStyle(SceneStyle.WISDOM_QUOTE);
 
     timerLabel = new Label();
-    timerLabel.setStyle("-fx-font-size: 16px;");
+    timerLabel.setStyle(SceneStyle.WISDOM_TIMER);
 
     progressBar = new ProgressBar(0.0D);
     progressBar.setMaxWidth(420);
@@ -63,9 +62,10 @@ public class WisdomScene implements SceneInterface {
     statusLabel.textProperty().bind(GameModel.getInstance().wisdomStatusProperty());
     statusLabel.setWrapText(true);
     statusLabel.setMaxWidth(560);
-    statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #286b2a;");
+    statusLabel.setStyle(SceneStyle.WISDOM_STATUS);
 
     backButton = new Button("Back");
+    backButton.setStyle(SceneStyle.BUTTON);
     backButton.setOnAction(e -> closeWisdom());
 
     VBox root =
@@ -73,6 +73,7 @@ public class WisdomScene implements SceneInterface {
             18, titleLabel, sloganLabel, quoteLabel, timerLabel, progressBar, statusLabel, backButton);
     root.setAlignment(Pos.CENTER);
     root.setPadding(new Insets(40));
+    root.setStyle(SceneStyle.DARK_BACKGROUND);
 
     SceneManager sceneManager = SceneManager.getInstance();
     scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());

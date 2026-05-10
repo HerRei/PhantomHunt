@@ -16,78 +16,62 @@ import javafx.scene.layout.*;
 /** Represents the lobby waiting area, displaying connected players and a lobby chat. */
 public class LobbyScene implements SceneInterface {
 
-  private static final String DARK_BG =
-      "-fx-background-color: #2b2b2b;";
-  private static final String BUTTON_STYLE =
-      "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 13px; "
-          + "-fx-font-weight: bold; -fx-padding: 8 22; -fx-background-radius: 6;";
-  private static final String INPUT_STYLE =
-      "-fx-background-color: #3c3f41; -fx-text-fill: white; -fx-prompt-text-fill: #888;";
-
   private Scene scene;
   private Label lobbyIdLabel;
   private ListView<String> playerList;
   private Button startGameButton;
+  private Button gameSettingsButton;
   private Button backButton;
   private String id;
   private ListView<String> chatArea;
   private TextField chatInput;
-  private Label gameSettingsLabel;
-  private TextField gameSettingsInput;
 
   /** Constructs a new LobbyScene. Initializes UI components, binds the chat to the game model. */
   public LobbyScene() {
     lobbyIdLabel = new Label("Lobby ID: -");
-    lobbyIdLabel.setStyle(
-        "-fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;");
+    lobbyIdLabel.setStyle(SceneStyle.GOLD_LABEL);
 
     Label playersTitle = new Label("Players in Lobby");
-    playersTitle.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 12px; -fx-font-weight: bold;");
+    playersTitle.setStyle(SceneStyle.SECTION_LABEL);
 
     playerList = new ListView<>();
-    playerList.setStyle("-fx-background-color: #3c3f41; -fx-text-fill: white;");
+    playerList.setStyle(SceneStyle.LIST);
     VBox.setVgrow(playerList, Priority.ALWAYS);
 
     startGameButton = new Button("Start Game");
-    startGameButton.setStyle(
-        "-fx-background-color: #007ACC; -fx-text-fill: white; -fx-font-size: 14px; "
-            + "-fx-font-weight: bold; -fx-padding: 10 28; -fx-background-radius: 6;");
+    startGameButton.setStyle(SceneStyle.BUTTON_PRIMARY);
     startGameButton.setMaxWidth(Double.MAX_VALUE);
 
-    gameSettingsLabel = new Label("Game Settings");
-    gameSettingsLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 12px; -fx-font-weight: bold;");
-
-    gameSettingsInput = new TextField(GameRules.defaultRules().toPayload());
-    gameSettingsInput.setPromptText("rounds duration radius speed humanScore humanWin phantomCatch humanCatch abilities phantomWin");
-    gameSettingsInput.setStyle(INPUT_STYLE);
-    gameSettingsInput.setMaxWidth(Double.MAX_VALUE);
+    gameSettingsButton = new Button("Game Settings");
+    gameSettingsButton.setStyle(SceneStyle.BUTTON);
+    gameSettingsButton.setMaxWidth(Double.MAX_VALUE);
 
     backButton = new Button("Leave Lobby");
-    backButton.setStyle(BUTTON_STYLE);
+    backButton.setStyle(SceneStyle.BUTTON);
     backButton.setMaxWidth(Double.MAX_VALUE);
 
     VBox leftPanel =
         new VBox(12, lobbyIdLabel, new Separator(), playersTitle, playerList,
-            gameSettingsLabel, gameSettingsInput, startGameButton, backButton);
+            gameSettingsButton, startGameButton, backButton);
     leftPanel.setPadding(new Insets(25));
     leftPanel.setAlignment(Pos.TOP_CENTER);
     leftPanel.setPrefWidth(300);
-    leftPanel.setStyle("-fx-background-color: #313335;");
+    leftPanel.setStyle(SceneStyle.PANEL_BACKGROUND);
 
     Label chatTitle = new Label("Lobby Chat");
-    chatTitle.setStyle("-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;");
+    chatTitle.setStyle(SceneStyle.PANEL_TITLE);
 
     chatArea = new ListView<>();
-    chatArea.setStyle("-fx-background-color: #3c3f41; -fx-text-fill: white;");
+    chatArea.setStyle(SceneStyle.LIST);
     VBox.setVgrow(chatArea, Priority.ALWAYS);
 
     chatInput = new TextField();
     chatInput.setPromptText("Type your message here...");
-    chatInput.setStyle(INPUT_STYLE);
+    chatInput.setStyle(SceneStyle.INPUT);
 
     VBox chatPanel = new VBox(12, chatTitle, chatArea, chatInput);
     chatPanel.setPadding(new Insets(25));
-    chatPanel.setStyle(DARK_BG);
+    chatPanel.setStyle(SceneStyle.DARK_BACKGROUND);
     HBox.setHgrow(chatPanel, Priority.ALWAYS);
 
     HBox root =
@@ -103,9 +87,12 @@ public class LobbyScene implements SceneInterface {
   private void setupEvents() {
     startGameButton.setOnAction(
         e -> {
-          EventHandlers.getInstance().sendMessage(Command.GAME_SETTINGS, gameSettingsInput.getText().trim());
+          EventHandlers.getInstance().sendMessage(Command.GAME_SETTINGS, getGameSettingsPayload());
           EventHandlers.getInstance().sendMessage(Command.START);
         });
+
+    gameSettingsButton.setOnAction(
+        e -> SceneManager.getInstance().showScene(SceneProtocol.GAME_SETTINGS));
 
     backButton.setOnAction(
         e -> {
@@ -148,10 +135,16 @@ public class LobbyScene implements SceneInterface {
     boolean isHost = players.length > 0 && players[0].equals(currentPlayerName);
     startGameButton.setVisible(isHost);
     startGameButton.setManaged(isHost);
-    gameSettingsLabel.setVisible(isHost);
-    gameSettingsLabel.setManaged(isHost);
-    gameSettingsInput.setVisible(isHost);
-    gameSettingsInput.setManaged(isHost);
+    gameSettingsButton.setVisible(isHost);
+    gameSettingsButton.setManaged(isHost);
+  }
+
+  private String getGameSettingsPayload() {
+    SceneInterface settingsScene = SceneManager.getInstance().getScene(SceneProtocol.GAME_SETTINGS);
+    if (settingsScene instanceof GameSettingsScene gameSettingsScene) {
+      return gameSettingsScene.getSettingsPayload();
+    }
+    return GameRules.defaultRules().toPayload();
   }
 
   @Override

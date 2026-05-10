@@ -88,6 +88,12 @@ class SceneInitializationTest {
     }
 
     @Test
+    void gameSettingsScene_initializesWithoutCrashing() throws InterruptedException {
+        SceneInterface scene = createSceneSafely(GameSettingsScene::new);
+        assertNotNull(scene.getScene(), "GameSettingsScene should create a valid JavaFX Scene");
+    }
+
+    @Test
     void endScene_initializesWithCrashing() throws InterruptedException {
         SceneInterface scene = createSceneSafely(EndScene::new);
         assertNotNull(scene.getScene(), "EndScene should create a valid JavaFX Scene");

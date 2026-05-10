@@ -17,12 +17,6 @@ import java.util.Map;
 /** Scene displaying the global highscore leaderboard. */
 public class HighscoreScene implements SceneInterface {
 
-  private static final String DARK_BG =
-      "-fx-background-color: #2b2b2b;";
-  private static final String BUTTON_STYLE =
-      "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 13px; "
-          + "-fx-font-weight: bold; -fx-padding: 8 22; -fx-background-radius: 6;";
-
   private Scene localScene;
 
   public HighscoreScene() {
@@ -32,7 +26,7 @@ public class HighscoreScene implements SceneInterface {
   /** Builds or rebuilds the highscore scene (also called on refresh). */
   public void createScene() {
     TableView<Map.Entry<String, Integer>> tableView = new TableView<>();
-    tableView.setStyle("-fx-background-color: #3c3f41;");
+    tableView.setStyle(SceneStyle.TABLE);
 
     TableColumn<Map.Entry<String, Integer>, String> nameColumn = new TableColumn<>("Player");
     nameColumn.setCellValueFactory(
@@ -50,12 +44,12 @@ public class HighscoreScene implements SceneInterface {
     tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
     Button btnBack = new Button("Back");
-    btnBack.setStyle(BUTTON_STYLE);
+    btnBack.setStyle(SceneStyle.BUTTON);
     btnBack.setPrefWidth(130);
     btnBack.setOnAction(e -> SceneManager.getInstance().showScene(SceneProtocol.HOME));
 
     Button btnRefresh = new Button("Refresh");
-    btnRefresh.setStyle(BUTTON_STYLE);
+    btnRefresh.setStyle(SceneStyle.BUTTON);
     btnRefresh.setPrefWidth(130);
     btnRefresh.setOnAction(
         e -> {
@@ -67,14 +61,14 @@ public class HighscoreScene implements SceneInterface {
     buttonBar.setAlignment(Pos.CENTER);
 
     Label title = new Label("Highscores");
-    title.setStyle("-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;");
+    title.setStyle(SceneStyle.TITLE_LARGE);
 
     Separator sep = new Separator();
 
     VBox layout = new VBox(18, title, sep, tableView, buttonBar);
     layout.setPadding(new Insets(40));
     layout.setAlignment(Pos.TOP_CENTER);
-    layout.setStyle(DARK_BG);
+    layout.setStyle(SceneStyle.DARK_BACKGROUND);
     VBox.setVgrow(tableView, Priority.ALWAYS);
 
     SceneManager sceneManager = SceneManager.getInstance();

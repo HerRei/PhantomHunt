@@ -15,18 +15,6 @@ import javafx.scene.layout.VBox;
  */
 public abstract class AbstractInputScene implements SceneInterface {
 
-  private static final String DARK_BG =
-      "-fx-background-color: #2b2b2b;";
-  private static final String BUTTON_STYLE =
-      "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 13px; "
-          + "-fx-font-weight: bold; -fx-padding: 10 28; -fx-background-radius: 6;";
-  private static final String CONFIRM_STYLE =
-      "-fx-background-color: #007ACC; -fx-text-fill: white; -fx-font-size: 13px; "
-          + "-fx-font-weight: bold; -fx-padding: 10 28; -fx-background-radius: 6;";
-  private static final String INPUT_STYLE =
-      "-fx-background-color: #3c3f41; -fx-text-fill: white; "
-          + "-fx-prompt-text-fill: #888; -fx-font-size: 14px;";
-
   protected Label descriptionLabel;
   protected TextField inputField;
   protected Button confirmButton;
@@ -43,8 +31,7 @@ public abstract class AbstractInputScene implements SceneInterface {
   /** Creates the shared dark-themed layout structure. */
   private void buildBaseLayout() {
     descriptionLabel = new Label("Description Placeholder");
-    descriptionLabel.setStyle(
-        "-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;");
+    descriptionLabel.setStyle(SceneStyle.TITLE);
     descriptionLabel.setWrapText(true);
     descriptionLabel.setMaxWidth(420);
     descriptionLabel.setAlignment(Pos.CENTER);
@@ -52,12 +39,12 @@ public abstract class AbstractInputScene implements SceneInterface {
     inputField = new TextField();
     inputField.setMaxWidth(380);
     inputField.setPrefHeight(38);
-    inputField.setStyle(INPUT_STYLE);
+    inputField.setStyle(SceneStyle.INPUT_LARGE);
 
     backButton = new Button("Back");
     confirmButton = new Button("Confirm");
-    backButton.setStyle(BUTTON_STYLE);
-    confirmButton.setStyle(CONFIRM_STYLE);
+    backButton.setStyle(SceneStyle.BUTTON_LARGE);
+    confirmButton.setStyle(SceneStyle.BUTTON_PRIMARY_SMALL);
     backButton.setPrefWidth(120);
     confirmButton.setPrefWidth(160);
 
@@ -67,7 +54,7 @@ public abstract class AbstractInputScene implements SceneInterface {
     VBox root = new VBox(24, descriptionLabel, inputField, buttonBox);
     root.setAlignment(Pos.CENTER);
     root.setPadding(new Insets(60));
-    root.setStyle(DARK_BG);
+    root.setStyle(SceneStyle.DARK_BACKGROUND);
 
     SceneManager sceneManager = SceneManager.getInstance();
     scene = new Scene(root, sceneManager.getWidth(), sceneManager.getHeight());

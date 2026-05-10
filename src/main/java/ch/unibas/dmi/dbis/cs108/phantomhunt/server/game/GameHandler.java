@@ -37,6 +37,8 @@ public class GameHandler {
   private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
   private static final long ROUND_END_WAIT_MS = 3000;
   private static final int WISDOM_ROUND_SCORE_BONUS = 5;
+  private static final String PLAYER_LEFT_ABORT_REASON =
+      "Match aborted because a player left.";
   private final Set<String> wisdomBonusPlayerIds;
 
   public GameHandler(GameState gs, Lobby lobby) {
@@ -127,10 +129,6 @@ public class GameHandler {
 
   private double calculateDistance(Position p1, Position p2) {
     return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
-  }
-
-  private boolean isCollidingWithWall(double x, double y, double radius) {
-    return MapCollision.collidesWithWall(gameState.getMapSnapshot(), x, y, radius);
   }
 
   /** Starts the game loop. */
@@ -291,7 +289,7 @@ public class GameHandler {
         return;
       }
       LOGGER.warn("Not enough players in lobby {}, aborting match.", lobby.getId());
-      abortMatch("Match got aborted. Player Left.");
+      abortMatch(PLAYER_LEFT_ABORT_REASON);
     }
   }
 
@@ -436,7 +434,6 @@ public class GameHandler {
     assignRolesForCurrentRound();
     resetPlayersForNewRound();
     resetAllInputs();
-
     gameState.setAbilityPosition(new Position(MapLogic.getInstance().useRandomSpawnPoint(), MapLogic.getInstance()));
     gameState.setAbilityAvailable(true);
 

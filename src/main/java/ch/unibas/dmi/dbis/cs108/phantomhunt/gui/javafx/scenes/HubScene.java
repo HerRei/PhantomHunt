@@ -13,28 +13,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-
 /** The primary hub scene displaying the global chat, profile options, and lobby navigation. */
 public class HubScene implements SceneInterface {
-
-  private static final String DARK_BG = "-fx-background-color: #2b2b2b;";
-  private static final String PANEL_BG = "-fx-background-color: #313335;";
-  private static final String BUTTON_STYLE =
-      "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 13px; "
-          + "-fx-font-weight: bold; -fx-padding: 8 12; -fx-background-radius: 6;";
-  private static final String INPUT_STYLE =
-      "-fx-background-color: #3c3f41; -fx-text-fill: white; -fx-prompt-text-fill: #888;";
-
-  private static final String QOTD_HOST = "djxmmx.net";
-  private static final int QOTD_PORT = 17;
-  private static final String FALLBACK_QUOTE =
-      "\"Your mind is like water, my friend. When it is agitated, it becomes difficult to see. "
-          + "But if you allow it to settle, the answer becomes clear.\"\n - Master Oogway";
 
   private ListView<String> chatDisplay;
   private ListView<String> playerListDisplay;
@@ -56,14 +36,14 @@ public class HubScene implements SceneInterface {
     leftMenu.setPadding(new Insets(25));
     leftMenu.setAlignment(Pos.TOP_CENTER);
     leftMenu.setPrefWidth(290);
-    leftMenu.setStyle(PANEL_BG);
+    leftMenu.setStyle(SceneStyle.PANEL_BACKGROUND);
 
     // Profile
     Label headLabel = new Label("Logged in as:");
-    headLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 11px;");
+    headLabel.setStyle(SceneStyle.SUBTLE_TEXT);
     nicknameLabel = new Label();
     nicknameLabel.textProperty().bind(Bindings.concat(model.getName()));
-    nicknameLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;");
+    nicknameLabel.setStyle(SceneStyle.PROFILE_NAME);
     VBox profileBox = new VBox(4, headLabel, nicknameLabel);
     profileBox.setAlignment(Pos.CENTER);
 
@@ -76,11 +56,11 @@ public class HubScene implements SceneInterface {
     Button btnWisdom = navButton("Get Wisdom");
 
     Label onlineLabel = new Label("Players Online");
-    onlineLabel.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 11px; -fx-font-weight: bold;");
+    onlineLabel.setStyle(SceneStyle.SECTION_LABEL_SMALL);
 
     playerListDisplay = new ListView<>();
     playerListDisplay.setItems(model.players);
-    playerListDisplay.setStyle("-fx-background-color: #3c3f41; -fx-text-fill: white;");
+    playerListDisplay.setStyle(SceneStyle.LIST);
     VBox.setVgrow(playerListDisplay, Priority.ALWAYS);
 
     leftMenu
@@ -96,15 +76,15 @@ public class HubScene implements SceneInterface {
 
     VBox chatBox = new VBox(10);
     chatBox.setPadding(new Insets(20));
-    chatBox.setStyle(DARK_BG);
+    chatBox.setStyle(SceneStyle.DARK_BACKGROUND);
     HBox.setHgrow(chatBox, Priority.ALWAYS);
 
     Label chatTitle = new Label("Server Chat");
-    chatTitle.setStyle("-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;");
+    chatTitle.setStyle(SceneStyle.PANEL_TITLE);
 
     chatDisplay = new ListView<>();
     chatDisplay.setItems(model.chatMessagesProperty());
-    chatDisplay.setStyle("-fx-background-color: #3c3f41; -fx-text-fill: white;");
+    chatDisplay.setStyle(SceneStyle.LIST);
     VBox.setVgrow(chatDisplay, Priority.ALWAYS);
 
     model
@@ -119,14 +99,14 @@ public class HubScene implements SceneInterface {
     chatMode.getItems().addAll("Global", "Whisper");
     chatMode.setValue("Global");
     chatMode.setPrefWidth(110);
-    chatMode.setStyle(INPUT_STYLE);
+    chatMode.setStyle(SceneStyle.INPUT);
     styleComboBox(chatMode);
 
     whisperTargetSelector = new ComboBox<>();
     whisperTargetSelector.setItems(model.players);
     whisperTargetSelector.setPromptText("To whom?");
     whisperTargetSelector.setPrefWidth(140);
-    whisperTargetSelector.setStyle(INPUT_STYLE);
+    whisperTargetSelector.setStyle(SceneStyle.INPUT);
     styleComboBox(whisperTargetSelector);
     whisperTargetSelector
         .visibleProperty()
@@ -135,11 +115,11 @@ public class HubScene implements SceneInterface {
 
     chatInput = new TextField();
     chatInput.setPromptText("Type a message...");
-    chatInput.setStyle(INPUT_STYLE);
+    chatInput.setStyle(SceneStyle.INPUT);
     HBox.setHgrow(chatInput, Priority.ALWAYS);
 
     Button btnSend = new Button("Send");
-    btnSend.setStyle(BUTTON_STYLE);
+    btnSend.setStyle(SceneStyle.BUTTON);
     btnSend.setPrefWidth(80);
 
     HBox inputArea = new HBox(8, chatMode, whisperTargetSelector, chatInput, btnSend);
@@ -176,9 +156,7 @@ public class HubScene implements SceneInterface {
     Button b = new Button(text);
     b.setMaxWidth(Double.MAX_VALUE);
     b.setPrefHeight(36);
-    b.setStyle(
-        "-fx-background-color: #444; -fx-text-fill: white; -fx-font-size: 13px; "
-            + "-fx-font-weight: bold; -fx-background-radius: 6;");
+    b.setStyle(SceneStyle.BUTTON_COMPACT);
     return b;
   }
 
@@ -193,8 +171,7 @@ public class HubScene implements SceneInterface {
       protected void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
         setText(empty ? comboBox.getPromptText() : item);
-        setStyle(
-            "-fx-background-color: #3c3f41; -fx-text-fill: " + (empty ? "#888;" : "white;"));
+        setStyle(SceneStyle.comboBoxCell(empty));
       }
     };
   }
@@ -205,7 +182,7 @@ public class HubScene implements SceneInterface {
       protected void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
         setText(empty ? null : item);
-        setStyle("-fx-background-color: #3c3f41; -fx-text-fill: white;");
+        setStyle(SceneStyle.LIST);
       }
     };
   }
