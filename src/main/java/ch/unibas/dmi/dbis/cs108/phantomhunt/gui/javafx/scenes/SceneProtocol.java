@@ -13,5 +13,6 @@ public enum SceneProtocol {
   GAME_SETTINGS,
   KEY_BINDING,
   WISDOM,
-  HIGHSCORE;
+  HIGHSCORE,
+  Intro;
 }

@@ -135,6 +135,13 @@ public class SceneManager {
     }
   }
 
+  public void setFullscreen(boolean value) {
+    if (stageRef != null) {
+      fullscreen = value;
+      stageRef.setFullScreen(value);
+    }
+  }
+
   public void registerFullscreenShortcut(Scene scene) {
     if (scene == null || !managedScenes.add(scene)) {
       return;
