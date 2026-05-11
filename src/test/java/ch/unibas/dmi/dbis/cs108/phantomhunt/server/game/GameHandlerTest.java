@@ -359,4 +359,52 @@ class GameHandlerTest {
     assertTrue(handler.isRoundTimeExpired(endTime + 10L));
     assertEquals(0L, handler.getRemainingRoundTimeMillis(endTime + 10L));
   }
+
+  @Test
+  void checkAbilityCollision_humanPicksUpAbility() {
+    // 1. Setup
+    MapLogic map = new MapLogic(MapLogic.generateExampleMap());
+    GameFactory factory = new GameFactory();
+    List<GameState.PlayerSeed> seeds = List.of(
+        new GameState.PlayerSeed("P1", "HumanPlayer"),
+        new GameState.PlayerSeed("P2", "Phantom1"),
+        new GameState.PlayerSeed("P3", "Phantom2"),
+        new GameState.PlayerSeed("P4", "Phantom3")
+    );
+    GameState state = factory.createWithDefaultRules("Match_Ability", seeds, map);
+
+    FakeClientHandler host;
+    try {
+      host = new FakeClientHandler("P1");
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    Lobby lobby = new Lobby("L_Ability", "TestLobby", host);
+    try {
+      lobby.addPlayer(new FakeClientHandler("P2"));
+      lobby.addPlayer(new FakeClientHandler("P3"));
+      lobby.addPlayer(new FakeClientHandler("P4"));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+
+    GameHandler handler = new GameHandler(state, lobby);
+    handler.startMatch(System.currentTimeMillis());
+
+    // 2. Position human and ability
+    PlayerState human = state.getMutablePlayerAt(state.getHumanIndex());
+    Position abilityPos = new Position(new int[]{1, 1}, map);
+    human.setPosition(abilityPos);
+    state.setAbilityPosition(abilityPos);
+    state.setAbilityAvailable(true);
+
+    assertTrue(state.isAbilityAvailable(), "Ability should be available before collision");
+
+    // 3. Tick
+    handler.tick(0.1, System.currentTimeMillis());
+
+    // 4. Assertions
+    assertFalse(state.isAbilityAvailable(), "Ability should be unavailable after collision");
+  }
 }
