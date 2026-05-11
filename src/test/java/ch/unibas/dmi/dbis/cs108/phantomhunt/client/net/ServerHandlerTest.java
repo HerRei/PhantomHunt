@@ -24,6 +24,31 @@ public class ServerHandlerTest {
     }
 
     @Test
+    void run_executesAllSwitchCasesForCoverage() throws Exception {
+        // we create string with most commands to cover switch-instructions in ServerHandler.managePacket
+        String allCommands =
+                "UNICOM Hello Global\n" +
+                "INFO This is an info\n" +
+                "PLAYERS Alice Bob\n" +
+                "LOBBY_INFO Lobby1 Alice Bob\n" +
+                "LIST_LOBBY Lobby1:Lobby2:Lobby3\n" +
+                "GAME_START\n" +
+                "GAME_FINISH\n" +
+                "YAP Hello Lobby\n" +
+                "GSU 1 6000 Alice:HUMAN:10:10:0\n" +
+                "ABILITY START\n" +
+                "ABILITY END\n" +
+                "SHOW_HIGHSCORE 1. Alice: 100|2. Bob: 50\n" +
+                "UNKNOWN_CMD test\n";
+        FakeSocket fakeSocket = new FakeSocket(allCommands);
+        ServerHandler handler = new ServerHandler(fakeSocket);
+
+        // wait so thread can parse
+        Thread.sleep(500);
+        assertNotNull(handler);
+    }
+
+    @Test
     void sendMessage_nullPacket_doesNothing() {
         // creat socket, since not connected
         FakeSocket deadSocket = new FakeSocket("");

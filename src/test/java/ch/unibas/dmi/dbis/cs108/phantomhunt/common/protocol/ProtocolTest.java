@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProtocolTest {
@@ -58,5 +60,16 @@ class ProtocolTest {
         Packet p = new Packet(Command.PING, null);
         String encoded = Protocol.encode(p);
         assertEquals("PING", encoded);
+    }
+
+    @Test
+    void protocol_supportsAllCommands() {
+        for (Command command : Command.values()) {
+            Packet p = new Packet(command, List.of("testArg"));
+            String encoded = Protocol.encode(p);
+            Packet decoded = Protocol.decode(encoded);
+
+            assertEquals(command, decoded.cmd(), "Command " + command + " was not processed correctly");
+        }
     }
 }

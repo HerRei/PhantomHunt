@@ -16,16 +16,22 @@ class NameGeneratorTest {
     }
 
     @Test
-    void randomName_loopForCoverage_coversAllRandomBranches() {
-        // 100 Rounds for the two 50%-Chances
+    void randomName_followsStructuralRules() {
+        String name = NameGenerator.randomName();
+
+        // validation
+        assertNotNull(name, "Name cannot be null");
+        assertFalse(name.contains(" "), "Name cannot include empty-spaces");
+
+        // checking components
+        // since lists in NameGenerator are private, we check them logically
+        assertTrue(name.length() >= 4, "Name is to short for rules");
         int iterations = 100;
 
-        for (int i = 0; i < iterations; i++) {
-            String name = NameGenerator.randomName();
-
-            // We test if name stays valid over all rounds
-            assertNotNull(name);
-            assertFalse(name.trim().isEmpty());
+        // consistency
+        for (int i = 0; i < 50; i++) {
+            String n = NameGenerator.randomName();
+            assertTrue(n.matches("^[A-Z][a-z]+$"), "Name '" + n + "' is invalid");
         }
     }
 }

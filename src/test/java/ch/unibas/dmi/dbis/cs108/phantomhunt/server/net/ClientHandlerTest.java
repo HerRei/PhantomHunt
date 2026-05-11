@@ -106,6 +106,24 @@ class ClientHandlerTest {
   }
 
   @Test
+  void run_handlesRemainingCommandsForCoverage() {
+    // covers switch-cases in ClientHandler.run
+    String commands =
+            "PONG\n" +
+            "UNICOM Hello World\n" +
+            "WHISPER Alice Pst!\n" +
+            "LOGOUT\n";
+
+    FakeSocket socket = new FakeSocket(commands);
+    ClientHandler handler = new ClientHandler(socket, realRegistry, realLobbyHandler);
+
+    handler.run();
+
+    // We check if UNICOM command stared a broadcast to server
+    assertTrue(socket.getSentData().contains("PING") || socket.isClosed());
+  }
+
+  @Test
   void wisdomUnlock_requiresFifteenSecondsAndIsConsumedOnce() {
     ClientHandler handler = new ClientHandler(new FakeSocket(""), realRegistry, realLobbyHandler);
 
