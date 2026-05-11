@@ -2,9 +2,11 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.Main;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.client.net.TcpClient;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.*;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.*;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.MenuMusicController;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.*;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
 import javafx.application.Application;
 import javafx.stage.Stage;

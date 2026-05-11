@@ -4,14 +4,15 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.SceneProtocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.MenuMusicPlaylist;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundEffect;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /** Keeps menu music synchronized to the server playlist while the client is in menu scenes. */
 public final class MenuMusicController {

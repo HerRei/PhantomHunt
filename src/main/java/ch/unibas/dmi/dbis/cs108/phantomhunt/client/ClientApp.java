@@ -1,8 +1,8 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.client;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.client.net.TcpClient;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

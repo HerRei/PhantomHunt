@@ -1,12 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameRules;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.*;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameState.PlayerSeed;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.InputState;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerRole;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.Position;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 
 import java.util.ArrayList;

@@ -1,11 +1,11 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.client.net;
 
-import java.io.IOException;
-import java.net.Socket;
-
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.net.Socket;
 
 /**
  * Establishes the TCP connection to the game server. Enclose the socket and after establishing the

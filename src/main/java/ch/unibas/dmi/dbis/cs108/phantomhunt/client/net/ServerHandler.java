@@ -7,26 +7,20 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Protocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.MenuMusicController;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.EndScene;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.LobbyScene;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.SceneProtocol;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundEffect;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.sound.SoundManager;
 import javafx.application.Platform;
-
-import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.*;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * Manages the client's active network connection to the server. This class runs in its own thread,

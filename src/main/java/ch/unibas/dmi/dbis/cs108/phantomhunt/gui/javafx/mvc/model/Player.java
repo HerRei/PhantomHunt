@@ -1,11 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 /** Represents a single player with position, role, score, sprite, and color data. */
 public class Player {

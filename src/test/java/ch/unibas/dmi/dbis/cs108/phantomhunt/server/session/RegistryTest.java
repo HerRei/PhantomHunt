@@ -3,21 +3,16 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.session;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.Lobby;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.server.net.ClientHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.util.FakeClientHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class RegistryTest {
 

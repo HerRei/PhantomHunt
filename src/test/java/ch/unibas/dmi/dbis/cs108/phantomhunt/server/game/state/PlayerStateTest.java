@@ -3,7 +3,8 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 class PlayerStateTest {
 

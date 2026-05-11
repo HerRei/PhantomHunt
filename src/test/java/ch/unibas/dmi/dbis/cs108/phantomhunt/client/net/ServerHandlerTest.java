@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.client.net;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.util.FakeSocket;
 import org.junit.jupiter.api.Test;
 

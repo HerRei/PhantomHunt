@@ -11,7 +11,8 @@ import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 class SceneManagerTest {

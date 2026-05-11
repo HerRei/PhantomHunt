@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class LobbyHandlerTest {
   static class FakeClientHandler extends ClientHandler {

@@ -2,9 +2,6 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.GameRules;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Predicate;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,6 +12,10 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Predicate;
 
 /** Scene where the lobby host can configure game rules before starting the match. */
 public class GameSettingsScene implements SceneInterface {

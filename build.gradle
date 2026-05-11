@@ -33,7 +33,7 @@ javafx {
 
 dependencies {
     implementation 'org.apache.logging.log4j:log4j-api:2.25.3'
-    implementation 'org.apache.logging.log4j:log4j-core:2.25.3'
+    implementation 'org.apache.logging.log4j:log4j-core:2.25.4'
 
     // LWJGL dependencies for the sound engine
     implementation platform("org.lwjgl:lwjgl-bom:${lwjglVersion}")

@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.SceneProtocol;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.SceneInterface;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes.SceneProtocol;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -9,11 +9,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /** Singleton manager responsible for handling and switching between JavaFX scenes. */
 public class SceneManager {

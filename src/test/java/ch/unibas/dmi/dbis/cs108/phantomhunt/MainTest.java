@@ -2,7 +2,8 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MainTest {
 

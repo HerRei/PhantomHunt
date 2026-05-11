@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.server.net;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.lobby.LobbyHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.util.FakeSocket;

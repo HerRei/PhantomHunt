@@ -1,13 +1,10 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.client;
 
-import ch.unibas.dmi.dbis.cs108.phantomhunt.client.net.ServerHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.client.net.TcpClient;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
-import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Packet;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.util.FakeServerHandler;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;

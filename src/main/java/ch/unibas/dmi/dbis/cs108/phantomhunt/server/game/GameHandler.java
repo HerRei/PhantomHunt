@@ -11,11 +11,7 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.server.session.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -75,9 +71,13 @@ public class GameHandler {
   /** Main game loop iteration (tick). */
   public synchronized void tick(double deltaTime, long now) {
     if (gameState.getPhase() == GamePhase.ROUND_ENDED) {
-      long timeSinceRoundEnd = now - gameState.getLastRoundOutcome().get().getEndedAtMillis();
-      if (timeSinceRoundEnd >= ROUND_END_WAIT_MS) {
-        advanceToNextRound(now);
+
+      Optional<RoundOutcome> outcome = gameState.getLastRoundOutcome();
+      if (outcome.isPresent()) {
+        long timeSinceRoundEnd = now - outcome.get().getEndedAtMillis();
+        if (timeSinceRoundEnd >= ROUND_END_WAIT_MS) {
+          advanceToNextRound(now);
+        }
       }
       return;
     }

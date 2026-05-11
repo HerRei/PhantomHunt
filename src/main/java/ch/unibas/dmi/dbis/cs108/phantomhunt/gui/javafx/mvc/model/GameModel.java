@@ -281,16 +281,20 @@ public class GameModel {
   public String getWinner() {
     LOGGER.info(lobbyPlayers);
     int max = -1;
-    String winnerName = "";
+    StringBuilder winnerName = new StringBuilder(); // stringbuilder instead of string-concatenation
+
     for (Player p : getPlayers()) {
       if (p.getScore() > max) {
-        winnerName = p.getName();
+        winnerName = new StringBuilder(p.getName());
         max = p.getScore();
       } else if (p.getScore() == max) {
-        winnerName += ", " + p.getName();
+        if (!winnerName.isEmpty()) {
+          winnerName.append(", ");
+        }
+        winnerName.append(p.getName());
       }
     }
-    return winnerName;
+    return winnerName.toString();
   }
 
   public StringProperty getName() {
