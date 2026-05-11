@@ -2,7 +2,6 @@ package ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.PlayerState;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.state.Position;
-import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +17,6 @@ public final class MapLogic {
 
   private static final Logger LOGGER = LogManager.getLogger(MapLogic.class);
   private static MapLogic instance;
-  private static final String tileImage = "/assets/floor-test.png"; // path to tileImg
   private int tileSize;
   private ArrayList<int[]> possibleSpawnPoints;
   private Boolean[][] walkingMap;
@@ -27,13 +25,10 @@ public final class MapLogic {
   public MapLogic(String[][] map) {
     this.walkingMap = loadMapFromString(map);
     resetSpawnPoints();
-    try { // 1. Load the image file
-      Image imageFile = new Image(getClass().getResourceAsStream(tileImage));
-      this.tileSize = (int) imageFile.getHeight();
-      instance = this;
-    } catch (Exception e) {
-      LOGGER.error("Couldn't read the TileImage");
-    }
+    // architecture-fix: no ui-ressources in backend
+    // constant tile-size according to client-configuration
+    this.tileSize = 32;
+    instance = this;
   }
 
   public static MapLogic getInstance() {

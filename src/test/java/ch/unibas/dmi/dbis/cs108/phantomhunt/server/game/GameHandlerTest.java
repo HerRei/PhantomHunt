@@ -119,6 +119,38 @@ class GameHandlerTest {
   }
 
   @Test
+  void tick_abortsMatchIfPlayerLeaves() throws Exception {
+    MapLogic map = new MapLogic(MapLogic.generateExampleMap());
+    GameFactory factory = new GameFactory();
+    List<GameState.PlayerSeed> seeds = List.of(
+            new GameState.PlayerSeed("P1", "Alice"),
+            new GameState.PlayerSeed("P2", "Bob"),
+            new GameState.PlayerSeed("P3", "Charlie"),
+            new GameState.PlayerSeed("P4", "Dave")
+    );
+    GameState state = factory.createWithDefaultRules("MatchAbortTest", seeds, map);
+
+    FakeClientHandler host = new FakeClientHandler("P1");
+    Lobby lobby = new Lobby("L_Abort", "TestLobby", host);
+    FakeClientHandler p2 = new FakeClientHandler("P2");
+    lobby.addPlayer(p2);
+    lobby.addPlayer(new FakeClientHandler("P3"));
+    lobby.addPlayer(new FakeClientHandler("P4"));
+
+    GameHandler handler = new GameHandler(state, lobby);
+    handler.startMatch(1000L);
+
+    // simulate connection-loss: player 2 leaves lobby during the game
+    lobby.removePlayer(p2);
+
+    // next game-tick must register the loss
+    handler.tick(0.1, 1100L);
+
+    // Verify the decision: game must be stopped
+    assertEquals(GamePhase.ABORTED, handler.getPhase(), "Round must be aborted, if player lost connection");
+  }
+
+  @Test
   void tryAbility_humanCatchesPhantom() {
     MapLogic map = new MapLogic(MapLogic.generateExampleMap());
     GameFactory factory = new GameFactory();
@@ -293,5 +325,38 @@ class GameHandlerTest {
     assertEquals(RoundOutcomeType.HUMAN_SURVIVED, handler.getLastRoundOutcome().get().getType(), "Outcome must be HUMAN_SURVIVED");
 
     assertTrue(human.getScore() > initialScore, "Human should receive points for surviving");
+  }
+
+  @Test
+  void timeMethods_returnCorrectValues() throws Exception {
+    MapLogic map = new MapLogic(MapLogic.generateExampleMap());
+    GameFactory factory = new GameFactory();
+    List<GameState.PlayerSeed> seeds = List.of(
+            new GameState.PlayerSeed("P1", "A"),
+            new GameState.PlayerSeed("P2", "B"),
+            new GameState.PlayerSeed("P3", "C"),
+            new GameState.PlayerSeed("P4", "D")
+    );
+    GameState state = factory.createWithDefaultRules("TimeTest", seeds, map);
+
+    FakeClientHandler host = new FakeClientHandler("P1");
+    Lobby lobby = new Lobby("L_Time", "TestLobby", host);
+    lobby.addPlayer(new FakeClientHandler("P2"));
+    lobby.addPlayer(new FakeClientHandler("P3"));
+    lobby.addPlayer(new FakeClientHandler("P4"));
+
+    GameHandler handler = new GameHandler(state, lobby);
+    long startTime = 1000L;
+    handler.startMatch(startTime);
+
+    long endTime = handler.getRoundEndTimeMillis();
+
+    // verifying: middle of round
+    assertFalse(handler.isRoundTimeExpired(startTime + 1000L));
+    assertTrue(handler.getRemainingRoundTimeMillis(startTime + 1000L) > 0);
+
+    // verifying: after round-time
+    assertTrue(handler.isRoundTimeExpired(endTime + 10L));
+    assertEquals(0L, handler.getRemainingRoundTimeMillis(endTime + 10L));
   }
 }
