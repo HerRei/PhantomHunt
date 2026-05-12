@@ -187,7 +187,11 @@ public class LobbyHandler {
       player.setCurrentLobby(lobby);
       GameHandler gameHandler = lobby.getActiveGame().orElse(null);
       if (gameHandler != null) {
-        player.sendMessage(Packet.of(Command.GAME_START));
+        if (gameHandler.isMatchFinished()) {
+          player.sendMessage(Packet.of(Command.GAME_FINISH));
+        } else {
+          player.sendMessage(Packet.of(Command.GAME_START));
+        }
         gameHandler.broadcastGameState();
       }
     }
