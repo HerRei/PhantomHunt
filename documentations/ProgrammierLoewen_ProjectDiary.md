@@ -420,3 +420,27 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - **Whisper Dropdown:**
   - Das Whisperziel ist nun ein Dropdown statt einem Textfeld.
   - Das Dropdown wird automatisch mit allen verfügbaren Online Spielern gefüllt.
+
+## 2026-05-10 bis 2026-05-13 - Vera
+**Dauer:** ~10h
+**Ziel:** Software-Architektur bereinigen und Tests verbessern.
+**Was gemacht:** 
+- **Code-Trennung:**
+  - JavaFX-Reste aus der MapLogic und den Tests entfernt, damit das Backend sauber vom User-Interface getrennt ist.
+- **Test-Update:** 
+  - Die Unit-Tests überarbeitet und verfeinert, um die geforderten Metriken für die Abdeckung besser zu erreichen.
+- **Fehlerbehebung:** 
+  - Mögliche Abstürze im GameHandler gefixt, indem die Logik bei leeren Datenfeldern (Optionals) abgesichert wurde.
+- **Optimierung:** 
+  - Effizientere Text-Verarbeitung im GameModel eingebaut, um unnötigen Speicherverbrauch zu vermeiden.
+
+## 2026-05-10 bis 2026-05-13 - Vera
+**Dauer:** ~14h
+**Ziel:** QA-Bericht fertigstellen und das System technisch prüfen.
+**Was gemacht:**
+- **Dokumentation:** 
+  - Den kompletten QA-Bericht geschrieben, inklusive der Teststrategie und der Qualitätsziele für das Projekt.
+- **Code-Check:**
+  - Über 4000 Warnungen der statischen Analyse gesichtet und wichtige Sicherheits-Updates (z.B. log4j) durchgeführt.
+- **Belastungstest:**
+  - Mit dem RegistryConcurrencyTest erfolgreich geprüft, ob der Server stabil bleibt, wenn 100 Nutzer gleichzeitig darauf zugreifen.
