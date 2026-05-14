@@ -33,7 +33,6 @@ public class GUI extends Application {
     manager.setStage(primaryStage);
 
     // Register Scenes
-    manager.addScene(SceneProtocol.Intro, new IntroScene());
     manager.addScene(SceneProtocol.HOME, new HubScene());
     manager.addScene(SceneProtocol.NICKNAME, new NicknameScene());
     manager.addScene(SceneProtocol.CREATELOBBY, new CreateLobbyScene());
@@ -45,6 +44,10 @@ public class GUI extends Application {
     manager.addScene(SceneProtocol.HIGHSCORE, new HighscoreScene());
     manager.addScene(SceneProtocol.KEY_BINDING, new KeyBindingScene());
     manager.addScene(SceneProtocol.WISDOM, new WisdomScene());
+    IntroScene introScene = new IntroScene();
+    if (introScene.isAvailable()) {
+      manager.addScene(SceneProtocol.Intro, introScene);
+    }
 
     // Configure Window and Launch
     primaryStage.setTitle("Phantom Hunt");
@@ -53,7 +56,7 @@ public class GUI extends Application {
           MenuMusicController.getInstance().shutdown();
           soundManager.shutdown();
         });
-    manager.showScene(SceneProtocol.Intro);
+    manager.showScene(introScene.isAvailable() ? SceneProtocol.Intro : SceneProtocol.HOME);
 
     // We take address from Main and start Client
     if (Main.getTargetHost() != null) {
