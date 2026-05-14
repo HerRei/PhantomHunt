@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.scenes;
 
 import ch.unibas.dmi.dbis.cs108.phantomhunt.common.protocol.Command;
+import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.input.ControllerInputHandler;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.EventHandlers;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManager;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
@@ -42,6 +43,8 @@ public class GameScene implements SceneInterface {
   private final Pane gamePane = new Pane();
   private final TextArea chatArea = new TextArea();
   private final TextField chatInput = new TextField();
+  private final ControllerInputHandler controllerInputHandler =
+      new ControllerInputHandler(this::sendMovement, this::handleControllerPrimaryAction);
 
   // Sprite / animation state
   private final Map<Player, ImageView> playerSprites = new HashMap<>();
@@ -151,6 +154,7 @@ public class GameScene implements SceneInterface {
 
     scene.setOnKeyPressed(e -> handleKeyPress(e.getCode()));
     scene.setOnKeyReleased(e -> handleKeyReleased(e.getCode()));
+    setupControllerInputLifecycle();
   }
 
   /**
@@ -446,11 +450,34 @@ public class GameScene implements SceneInterface {
       }
     }
 
-    if (changed) EventHandlers.getInstance().sendInputs(vertical, horizontal);
+    if (changed) sendMovement(vertical, horizontal);
   }
 
   private void handleKeyReleased(KeyCode code) {
     // Reserved for future use
+  }
+
+  private void sendMovement(int vertical, int horizontal) {
+    EventHandlers.getInstance().sendInputs(vertical, horizontal);
+  }
+
+  private void handleControllerPrimaryAction() {
+    if (shouldShowWisdomBlessingHint()) {
+      EventHandlers.getInstance().sendMessage(Command.WISDOM, "BLESSING");
+    }
+  }
+
+  private void setupControllerInputLifecycle() {
+    scene
+        .windowProperty()
+        .addListener(
+            (observable, oldWindow, newWindow) -> {
+              if (newWindow == null) {
+                controllerInputHandler.stop();
+              } else {
+                controllerInputHandler.start();
+              }
+            });
   }
 
   private void setupPlayerTracking() {
