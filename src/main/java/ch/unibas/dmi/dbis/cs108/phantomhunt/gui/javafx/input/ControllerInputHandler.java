@@ -29,8 +29,6 @@ public final class ControllerInputHandler {
   private boolean unavailable;
   private int activeJoystick = -1;
 
-
-
   public ControllerInputHandler(
       BiConsumer<Integer, Integer> movementConsumer, Runnable primaryAction) {
     this.movementConsumer = Objects.requireNonNull(movementConsumer);
@@ -131,7 +129,6 @@ public final class ControllerInputHandler {
     lastMovement = ControllerInputMapper.IDLE;
     lastPrimaryPressed = false;
   }
-
 
   private void handleMovement(GLFWGamepadState state) {
     ControllerInputMapper.MovementInput movement =
