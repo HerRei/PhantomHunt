@@ -183,6 +183,10 @@ public class ServerHandler implements Runnable {
           } else if ("CANCELED".equals(text)) {
             model.setWisdomBonusReady(false);
             model.setWisdomStatus("");
+          } else if ("BLESSING_USED".equals(text)) {
+            model.setWisdomBlessingAvailable(false);
+          } else if ("BLIND_START".equals(text)) {
+            model.setWisdomBlindnessActive(true);
           }
         });
   }
@@ -246,10 +250,12 @@ public class ServerHandler implements Runnable {
     SoundManager.getInstance().play(SoundEffect.THE_VILLAINS_MIDNIGHT_WALTZ);
     Platform.runLater(
         () -> {
-          GameModel.getInstance().setWisdomBonusReady(false);
-          GameModel.getInstance().setWisdomStatus("");
+          GameModel model = GameModel.getInstance();
+          model.setWisdomBlessingAvailable(model.wisdomBonusReadyProperty().get());
+          model.setWisdomBonusReady(false);
+          model.setWisdomStatus("");
           SceneManager.getInstance().showScene(SceneProtocol.GAME);
-          GameModel.getInstance().clearChat();
+          model.clearChat();
         });
   }
 

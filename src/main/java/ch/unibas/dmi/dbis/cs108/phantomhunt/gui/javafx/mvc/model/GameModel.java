@@ -37,6 +37,8 @@ public class GameModel {
   private final IntegerProperty remainingTime = new SimpleIntegerProperty();
   private final IntegerProperty round = new SimpleIntegerProperty();
   private final BooleanProperty wisdomBonusReady = new SimpleBooleanProperty(false);
+  private final BooleanProperty wisdomBlessingAvailable = new SimpleBooleanProperty(false);
+  private final BooleanProperty wisdomBlindnessActive = new SimpleBooleanProperty(false);
   private final StringProperty wisdomStatus = new SimpleStringProperty("");
   private final ObservableList<String> chatMessages = FXCollections.observableArrayList();
   private final ObservableList<String> availableLobbies = FXCollections.observableArrayList();
@@ -357,6 +359,24 @@ public class GameModel {
     return wisdomBonusReady;
   }
 
+  /**
+   * Exposes whether this client can still use its once-per-match Wisdom Blessing.
+   *
+   * @return the local Wisdom Blessing availability property
+   */
+  public BooleanProperty wisdomBlessingAvailableProperty() {
+    return wisdomBlessingAvailable;
+  }
+
+  /**
+   * Exposes whether the local map view should be covered by the Wisdom Blessing overlay.
+   *
+   * @return the local Wisdom Blessing blindness property
+   */
+  public BooleanProperty wisdomBlindnessActiveProperty() {
+    return wisdomBlindnessActive;
+  }
+
   public StringProperty wisdomStatusProperty() {return wisdomStatus;}
 
 
@@ -371,6 +391,10 @@ public class GameModel {
   }
 
   public void setWisdomBonusReady(boolean value) {wisdomBonusReady.set(value);}
+
+  public void setWisdomBlessingAvailable(boolean value) {wisdomBlessingAvailable.set(value);}
+
+  public void setWisdomBlindnessActive(boolean value) {wisdomBlindnessActive.set(value);}
 
   public void setWisdomStatus(String value) {wisdomStatus.set(value == null ? "" : value);}
 
@@ -408,6 +432,8 @@ public class GameModel {
   public void resetModel() {
     this.lobbyPlayers.clear();
     this.playerScore.set(0);
+    this.wisdomBlessingAvailable.set(false);
+    this.wisdomBlindnessActive.set(false);
     this.clearChat();
     this.clearLobbyChat();
   }
