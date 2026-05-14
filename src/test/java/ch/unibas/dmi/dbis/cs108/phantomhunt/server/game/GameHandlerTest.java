@@ -282,6 +282,58 @@ class GameHandlerTest {
   }
 
   @Test
+  void wisdomBlessing_blindsOnlyPhantomsAfterDelayAndOnlyOnce() {
+    MapLogic map = new MapLogic(MapLogic.generateExampleMap());
+    GameFactory factory = new GameFactory();
+    List<GameState.PlayerSeed> seeds =
+        List.of(
+            new GameState.PlayerSeed("P1", "P1"),
+            new GameState.PlayerSeed("P2", "P2"),
+            new GameState.PlayerSeed("P3", "P3"),
+            new GameState.PlayerSeed("P4", "P4"));
+    GameState state = factory.createWithDefaultRules("Match_Wisdom_Blessing", seeds, map);
+
+    FakeClientHandler host = new FakeClientHandler("P1");
+    FakeClientHandler p2 = new FakeClientHandler("P2");
+    FakeClientHandler p3 = new FakeClientHandler("P3");
+    FakeClientHandler p4 = new FakeClientHandler("P4");
+    host.setWisdomRoundBonus(true);
+    Lobby lobby = new Lobby("L_Wisdom_Blessing", "TestLobby", host);
+    lobby.addPlayer(p2);
+    lobby.addPlayer(p3);
+    lobby.addPlayer(p4);
+
+    GameHandler handler = new GameHandler(state, lobby);
+    handler.startMatch(1_000L);
+    host.receivedPackets.clear();
+    p2.receivedPackets.clear();
+    p3.receivedPackets.clear();
+    p4.receivedPackets.clear();
+
+    assertFalse(handler.tryWisdomBlessing("P1", 15_999L), "Blessing is locked for 15 seconds.");
+    assertTrue(handler.tryWisdomBlessing("P1", 16_000L), "Human with wisdom can bless once.");
+    assertFalse(handler.tryWisdomBlessing("P1", 20_000L), "Blessing cannot be reused.");
+
+    assertEquals(0, wisdomBlindPackets(host), "The human should not be blinded.");
+    assertEquals(1, wisdomUsedPackets(host), "The human should be told the blessing was used.");
+    assertEquals(1, wisdomBlindPackets(p2), "Phantom P2 should be blinded once.");
+    assertEquals(1, wisdomBlindPackets(p3), "Phantom P3 should be blinded once.");
+    assertEquals(1, wisdomBlindPackets(p4), "Phantom P4 should be blinded once.");
+  }
+
+  private long wisdomBlindPackets(FakeClientHandler client) {
+    return client.receivedPackets.stream()
+        .filter(packet -> packet.cmd() == Command.WISDOM && "BLIND_START".equals(packet.text()))
+        .count();
+  }
+
+  private long wisdomUsedPackets(FakeClientHandler client) {
+    return client.receivedPackets.stream()
+        .filter(packet -> packet.cmd() == Command.WISDOM && "BLESSING_USED".equals(packet.text()))
+        .count();
+  }
+
+  @Test
   void tick_timeRunsOut_humanSurvives() {
     MapLogic map = new MapLogic(MapLogic.generateExampleMap());
     GameFactory factory = new GameFactory();

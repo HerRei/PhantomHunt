@@ -423,8 +423,23 @@ public class ClientHandler implements Runnable {
         cancelWisdomUnlock();
         sendMessage(Packet.of(Command.WISDOM, hasWisdomBonusReady() ? "ACTIVE" : "CANCELED"));
       }
+      case "BLESSING" -> handleWisdomBlessing(nowMillis);
       default -> sendMessage(Packet.of(Command.REJECT, "Unsupported wisdom action: " + action));
     }
+  }
+
+  private void handleWisdomBlessing(long nowMillis) {
+    Lobby lobby = this.getCurrentLobby();
+    if (lobby == null) {
+      return;
+    }
+
+    GameHandler gameHandler = lobby.getActiveGame().orElse(null);
+    if (gameHandler == null) {
+      return;
+    }
+
+    gameHandler.tryWisdomBlessing(getName(), nowMillis);
   }
 
   synchronized void startWisdomUnlock(long nowMillis) {
