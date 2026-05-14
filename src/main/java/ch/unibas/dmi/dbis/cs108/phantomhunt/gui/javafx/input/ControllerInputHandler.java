@@ -51,4 +51,30 @@ public final class ControllerInputHandler {
     lastPrimaryPressed = false;
   }
 
+  private void pollController() {
+    if (!ensureGlfwInitialized()) {
+      return;
+    }
+
+    int joystick = findActiveJoystick();
+    if (joystick == -1) {
+      return;
+    }
+
+    try {
+      if (!GLFW.glfwGetGamepadState(joystick, gamepadState)) {
+        disconnectActiveJoystick();
+        return;
+      }
+
+      handleMovement(gamepadState);
+      handlePrimaryAction(gamepadState);
+    } catch (Throwable e) {
+      unavailable = true;
+      pollingTimeline.stop();
+      LOGGER.warn("Controller support was disabled after a polling error.", e);
+    }
+  }
+
+
 }
