@@ -27,4 +27,28 @@ public final class ControllerInputHandler {
   private boolean glfwInitialized;
   private boolean unavailable;
   private int activeJoystick = -1;
+
+
+
+  public ControllerInputHandler(
+      BiConsumer<Integer, Integer> movementConsumer, Runnable primaryAction) {
+    this.movementConsumer = Objects.requireNonNull(movementConsumer);
+    this.primaryAction = Objects.requireNonNull(primaryAction);
+    this.pollingTimeline = new Timeline(new KeyFrame(POLL_INTERVAL, event -> pollController()));
+    this.pollingTimeline.setCycleCount(Timeline.INDEFINITE);
+  }
+
+  public void start() {
+    if (!unavailable && pollingTimeline.getStatus() != Timeline.Status.RUNNING) {
+      pollingTimeline.play();
+    }
+  }
+
+  public void stop() {
+    pollingTimeline.stop();
+    activeJoystick = -1;
+    lastMovement = ControllerInputMapper.IDLE;
+    lastPrimaryPressed = false;
+  }
+
 }
