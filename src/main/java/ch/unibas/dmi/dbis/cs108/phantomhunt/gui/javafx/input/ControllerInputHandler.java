@@ -130,4 +130,37 @@ public final class ControllerInputHandler {
     lastMovement = ControllerInputMapper.IDLE;
     lastPrimaryPressed = false;
   }
+
+
+  private void handleMovement(GLFWGamepadState state) {
+    ControllerInputMapper.MovementInput movement =
+        ControllerInputMapper.map(
+            state.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X),
+            state.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y),
+            isPressed(state, GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP),
+            isPressed(state, GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN),
+            isPressed(state, GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT),
+            isPressed(state, GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+
+    if (movement.equals(lastMovement)) {
+      return;
+    }
+
+    lastMovement = movement;
+    if (movement.isMoving()) {
+      movementConsumer.accept(movement.vertical(), movement.horizontal());
+    }
+  }
+
+  private void handlePrimaryAction(GLFWGamepadState state) {
+    boolean primaryPressed = isPressed(state, GLFW.GLFW_GAMEPAD_BUTTON_A);
+    if (primaryPressed && !lastPrimaryPressed) {
+      primaryAction.run();
+    }
+    lastPrimaryPressed = primaryPressed;
+  }
+
+  private boolean isPressed(GLFWGamepadState state, int button) {
+    return state.buttons(button) == GLFW.GLFW_PRESS;
+  }
 }
