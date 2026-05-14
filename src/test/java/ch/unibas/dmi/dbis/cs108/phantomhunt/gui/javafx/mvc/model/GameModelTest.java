@@ -68,6 +68,26 @@ class GameModelTest {
     }
 
     @Test
+    void updatePlayersFromServer_newRoundClearsWisdomBlindness() throws InterruptedException {
+        GameModel model = GameModel.getInstance();
+        String roundOne = "1 45000 Alice:HUMAN:10.5:20.5:150;Bob:PHANTOM:5.0:5.0:300 0.0 0.0 false";
+        String roundTwo = "2 45000 Alice:PHANTOM:10.5:20.5:150;Bob:HUMAN:5.0:5.0:300 0.0 0.0 false";
+
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            model.updatePlayersFromServer(roundOne);
+            model.setWisdomBlindnessActive(true);
+            model.updatePlayersFromServer(roundTwo);
+            latch.countDown();
+        });
+
+        assertTrue(latch.await(2, TimeUnit.SECONDS), "Timeout waiting for model update.");
+        assertFalse(
+            model.wisdomBlindnessActiveProperty().get(),
+            "Wisdom blindness must not carry into the next round.");
+    }
+
+    @Test
     void getWinner_returnsPlayerWithHighestScore() throws InterruptedException {
         GameModel model = GameModel.getInstance();
         // setup 3 players with different scores
