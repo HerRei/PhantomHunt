@@ -49,6 +49,9 @@ Tausche dich im globalen Chat mit allen Spielern auf dem Server aus. Willst du T
 Während du darauf wartest bis alle Spieler dem Server beitreten, kannst du dir die Zeit mit
 der Funktion Get Wisdom vertreiben. Ein Klick beschert dir eine kleine,
 inspirierende oder kuriose Weisheit.
+Bleibst du lange genug auf dem Wisdom-Screen, erhältst du für das nächste Match einen kleinen Bonus:
+Nach jeder Runde bekommst du +5 Punkte. Zusätzlich kannst du als Mensch einmal pro Match die
+Fähigkeit "Wisdom Blessing" einsetzen.
 
 **Lobby-System:**
 Um ein Match zu starten, müssen sich 4 Spieler in einer Lobby sammeln.
@@ -73,11 +76,12 @@ Damit ihr im Schloss überlebt oder erfolgreich jagt, müsst ihr eure Figur sich
 Egal ob du als Mensch oder als Geist spielst, du steuerst deine Spielfigur mit den klassischen Bewegungstasten:
 
 || Tastatur | Controller |
-| :--- | :--- | :--- |
-| **Oben** | W | Y / △ |
-| **Links** | A | X / □ |
-| **Unten** | S | A / ✕ |
-| **Rechts** | D | B / ○ |
+| :--- | :--- |:-----------|
+| **Oben** | W | Y / △      |
+| **Links** | A | X / □      |
+| **Unten** | S | A / ✕      |
+| **Rechts** | D | B / ○      |
+| **Wisdom Blessing** | R | R3         |
 
 **Individuelle Key Bindings:**
 Du möchtest nicht mit WASD spielen? Kein Problem! Im Home-Screen kannst
@@ -92,16 +96,19 @@ Um den Menschen zu erschrecken, muss ein Geist auf genau dasselbe Feld (die glei
 Sobald sich der Mensch und ein Geist auf derselben Stelle befinden, ist der Mensch gefangen! Die aktuelle Runde endet sofort zugunsten der Geister und die Punkte werden verteilt.
 
 ## Fähigkeiten:
-Jede Runde erscheinen zufällig 2 Fähigkeit auf der Karte.
+Jede Runde erscheinen zufällig 2 Fähigkeit auf der Karte. Zusätzlich kann ein Spieler,
+der vorher "Get Wisdom" abgeschlossen hat, als Mensch die Wisdom Blessing einsetzen.
 
 **Sichtbare Verwundbarkeit (Glitch-Effekt):** 
 Sobald der Mensch dieses Power-Up einsammelt, bleibt die Schwäche der Geister nicht verborgen. Solange der Mensch die Fähigkeit aktiv hat, wird die Form der Geister instabil. Sie flackern hektisch zwischen ihrer normalen Gestalt und einer verzerrten, "geglitchten" Form hin und her.
 
 Wenn der Mensch auf dasselbe Feld wie ein Geist trifft, scheidet der Geist dadurch nicht aus, wird aber magisch an einer andere, weit entfernten Position im Schloss teleportiert und der Mensch erhält 10 Punkt.
 
-**Flashbang:** 
-Wenn der Mensch dieses Power-Up aktiviert, werden die Geister geblendet. Ihre Sicht wird massiv eingeschränkt, sodass sie nur noch
-einen kleinen Bereich um sich herum sehen können.
+**Wisdom Blessing:** 
+Wenn der Mensch diese Fähigkeit vorbereitet hat, erscheint nach kurzer Zeit der Hinweis
+"Wisdom Blessing ready: Press R". Drückt der Mensch dann R, werden alle Geister für 8 Sekunden
+geblendet. Sie sehen in dieser Zeit eine Wisdom-Überlagerung mit einem Fortschrittsbalken,
+können sich aber weiterhin bewegen und Eingaben machen.
 
 ## Punkte und Siegbedingungen
 Am Ende der 4 Runden gewinnt nicht das Team, sondern der Einzelspieler mit den meisten Punkten. Punkte sammelst du wie folgt:
