@@ -76,5 +76,58 @@ public final class ControllerInputHandler {
     }
   }
 
+  private boolean ensureGlfwInitialized() {
+    if (glfwInitialized) {
+      return true;
+    }
+    if (unavailable) {
+      return false;
+    }
 
+    try {
+      glfwInitialized = GLFW.glfwInit();
+      if (!glfwInitialized) {
+        unavailable = true;
+        pollingTimeline.stop();
+        LOGGER.warn("Controller support is unavailable because GLFW could not be initialized.");
+      }
+      return glfwInitialized;
+    } catch (Throwable e) {
+      unavailable = true;
+      pollingTimeline.stop();
+      LOGGER.warn("Controller support is unavailable on this system.", e);
+      return false;
+    }
+  }
+
+  private int findActiveJoystick() {
+    if (activeJoystick != -1 && isUsableGamepad(activeJoystick)) {
+      return activeJoystick;
+    }
+
+    if (activeJoystick != -1) {
+      disconnectActiveJoystick();
+    }
+
+    for (int joystick = GLFW.GLFW_JOYSTICK_1; joystick <= GLFW.GLFW_JOYSTICK_LAST; joystick++) {
+      if (isUsableGamepad(joystick)) {
+        activeJoystick = joystick;
+        LOGGER.info("Controller connected: {}", GLFW.glfwGetGamepadName(joystick));
+        return activeJoystick;
+      }
+    }
+
+    return -1;
+  }
+
+  private boolean isUsableGamepad(int joystick) {
+    return GLFW.glfwJoystickPresent(joystick) && GLFW.glfwJoystickIsGamepad(joystick);
+  }
+
+  private void disconnectActiveJoystick() {
+    LOGGER.info("Controller disconnected.");
+    activeJoystick = -1;
+    lastMovement = ControllerInputMapper.IDLE;
+    lastPrimaryPressed = false;
+  }
 }
