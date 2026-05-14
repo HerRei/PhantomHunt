@@ -6,6 +6,8 @@ import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.controller.SceneManag
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.GameModel;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.mvc.model.Player;
 import ch.unibas.dmi.dbis.cs108.phantomhunt.server.game.util.MapLogic;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -17,6 +19,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +34,9 @@ public class GameScene implements SceneInterface {
 
   private static final int TILE_SIZE = 32;
   private static final int SIDEBAR_WIDTH = 250;
+  private static final int WISDOM_BLINDNESS_SECONDS = 8;
+  private static final String WISDOM_BLINDNESS_QUOTE =
+      "\"A wise player can still run into a wall. The wall remains unimpressed.\"";
 
   private final Scene scene;
   private final Pane gamePane = new Pane();
@@ -62,6 +68,10 @@ public class GameScene implements SceneInterface {
   // Status labels updated dynamically when player data arrives
   private final Label nameLabel = new Label();
   private final Label roleLabel = new Label();
+  private final Label wisdomBlessingLabel = new Label("Wisdom Blessing ready: Press R");
+  private ProgressBar wisdomBlindProgress;
+  private StackPane wisdomBlindOverlay;
+  private Timeline wisdomBlindTimeline;
 
   /** Initializes the game scene, building the map from tiles and scaling to fit the screen. */
   public GameScene() {
@@ -92,6 +102,7 @@ public class GameScene implements SceneInterface {
     gameStack.setAlignment(Pos.TOP_LEFT);
     gameStack.setStyle(SceneStyle.GAME_BACKGROUND);
     applyGameStackSize(baseScale);
+    setupWisdomBlindnessOverlay();
 
     VBox sidebar = createSidebar(model);
 
@@ -111,8 +122,28 @@ public class GameScene implements SceneInterface {
     });
 
     // Refresh status labels whenever role or name changes
-    model.getRole().addListener((obs, o, n) -> Platform.runLater(this::refreshStatusLabels));
+    model.getRole()
+        .addListener(
+            (obs, o, n) ->
+                Platform.runLater(
+                    () -> {
+                      refreshStatusLabels();
+                      refreshWisdomBlessingLabel();
+                    }));
     model.getName().addListener((obs, o, n) -> Platform.runLater(this::refreshStatusLabels));
+    model.wisdomBlessingAvailableProperty()
+        .addListener((obs, oldValue, newValue) -> Platform.runLater(this::refreshWisdomBlessingLabel));
+    model.wisdomBlindnessActiveProperty()
+        .addListener(
+            (obs, oldValue, active) ->
+                Platform.runLater(
+                    () -> {
+                      if (active) {
+                        startWisdomBlindnessOverlay();
+                      } else {
+                        hideWisdomBlindnessOverlay();
+                      }
+                    }));
 
     // Resize listener for fullscreen scaling
     scene.widthProperty().addListener((obs, o, n) -> onSceneResized());
@@ -254,6 +285,9 @@ public class GameScene implements SceneInterface {
 
     // Role label color is applied dynamically in refreshStatusLabels()
     roleLabel.setStyle(SceneStyle.ROLE_LABEL);
+    wisdomBlessingLabel.setStyle(SceneStyle.TIME_TEXT);
+    wisdomBlessingLabel.setVisible(false);
+    wisdomBlessingLabel.setManaged(false);
 
     Label roundLabel = new Label();
     roundLabel.setStyle(SceneStyle.SUBTLE_TEXT);
@@ -263,7 +297,7 @@ public class GameScene implements SceneInterface {
     timeLabel.setStyle(SceneStyle.TIME_TEXT);
     timeLabel.textProperty().bind(model.getTime().asString("Time: %d s"));
 
-    VBox statusBox = new VBox(5, nameLabel, roleLabel, roundLabel, timeLabel);
+    VBox statusBox = new VBox(5, nameLabel, roleLabel, wisdomBlessingLabel, roundLabel, timeLabel);
 
     // Score
     Label scoreTitle = new Label("Your Score:");
@@ -386,6 +420,11 @@ public class GameScene implements SceneInterface {
     if (chatInput.isFocused()) return;
 
     GameModel model = GameModel.getInstance();
+    if (code == KeyCode.R && shouldShowWisdomBlessingHint()) {
+      EventHandlers.getInstance().sendMessage(Command.WISDOM, "BLESSING");
+      return;
+    }
+
     int horizontal = 0, vertical = 0;
     boolean changed = false;
 
@@ -531,6 +570,78 @@ public class GameScene implements SceneInterface {
         .bind(GameModel.getInstance().getAbility().yPosition().multiply(baseScale));
     abilitySprite.visibleProperty().bind(GameModel.getInstance().isAbilityVisibleProperty());
     gamePane.getChildren().add(abilitySprite);
+  }
+
+  private void setupWisdomBlindnessOverlay() {
+    Label title = new Label("Daily Wisdom");
+    title.setStyle(SceneStyle.WISDOM_TITLE);
+
+    Label quote = new Label(WISDOM_BLINDNESS_QUOTE);
+    quote.setWrapText(true);
+    quote.setMaxWidth(560);
+    quote.setStyle(SceneStyle.WISDOM_QUOTE);
+
+    wisdomBlindProgress = new ProgressBar(0.0D);
+    wisdomBlindProgress.setMaxWidth(420);
+
+    VBox content = new VBox(18, title, quote, wisdomBlindProgress);
+    content.setAlignment(Pos.CENTER);
+    content.setPadding(new Insets(40));
+
+    wisdomBlindOverlay = new StackPane(content);
+    wisdomBlindOverlay.setAlignment(Pos.CENTER);
+    wisdomBlindOverlay.setStyle("-fx-background-color: rgba(43, 43, 43, 0.97);");
+    // The overlay hides the map, but it must not steal clicks or keyboard input.
+    wisdomBlindOverlay.setMouseTransparent(true);
+    wisdomBlindOverlay.setVisible(false);
+    gameStack.getChildren().add(wisdomBlindOverlay);
+  }
+
+  private void startWisdomBlindnessOverlay() {
+    if (wisdomBlindTimeline != null) {
+      wisdomBlindTimeline.stop();
+    }
+
+    long startedAtMillis = System.currentTimeMillis();
+    wisdomBlindOverlay.setVisible(true);
+    wisdomBlindProgress.setProgress(0.0D);
+
+    wisdomBlindTimeline =
+        new Timeline(
+            new KeyFrame(
+                Duration.millis(100),
+                e -> {
+                  double elapsed =
+                      (System.currentTimeMillis() - startedAtMillis)
+                          / (WISDOM_BLINDNESS_SECONDS * 1000.0D);
+                  wisdomBlindProgress.setProgress(Math.min(1.0D, elapsed));
+                  if (elapsed >= 1.0D) {
+                    GameModel.getInstance().setWisdomBlindnessActive(false);
+                  }
+                }));
+    wisdomBlindTimeline.setCycleCount(Timeline.INDEFINITE);
+    wisdomBlindTimeline.play();
+  }
+
+  private void hideWisdomBlindnessOverlay() {
+    if (wisdomBlindTimeline != null) {
+      wisdomBlindTimeline.stop();
+    }
+    wisdomBlindOverlay.setVisible(false);
+    wisdomBlindProgress.setProgress(0.0D);
+  }
+
+  private boolean shouldShowWisdomBlessingHint() {
+    GameModel model = GameModel.getInstance();
+    // The server still owns the 15-second rule; the client only shows local eligibility.
+    return model.wisdomBlessingAvailableProperty().get()
+        && "HUMAN".equals(model.getRole().get());
+  }
+
+  private void refreshWisdomBlessingLabel() {
+    boolean visible = shouldShowWisdomBlessingHint();
+    wisdomBlessingLabel.setVisible(visible);
+    wisdomBlessingLabel.setManaged(visible);
   }
 
   @Override
