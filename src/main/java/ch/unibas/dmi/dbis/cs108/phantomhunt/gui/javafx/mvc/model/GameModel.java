@@ -135,6 +135,8 @@ public class GameModel {
 
     int previousRound = round.get();
     if (currentRound > 0 && currentRound != previousRound) {
+      // A new round must start with clear vision, even if an old overlay timer is still running.
+      wisdomBlindnessActive.set(false);
       SoundManager.getInstance().stop(SoundEffect.RUNNING_ON_FLOOR);
       SoundManager.getInstance().stop(SoundEffect.DRAGGING_CHAIN);
       SoundManager.getInstance().stop(SoundEffect.THE_VILLAINS_MIDNIGHT_WALTZ);
