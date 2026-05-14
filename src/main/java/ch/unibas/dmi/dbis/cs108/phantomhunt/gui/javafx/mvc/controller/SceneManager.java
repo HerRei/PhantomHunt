@@ -142,14 +142,22 @@ public class SceneManager {
     if (scene == null || !managedScenes.add(scene)) {
       return;
     }
+
     scene.addEventFilter(
-        javafx.scene.input.KeyEvent.KEY_PRESSED,
-        event -> {
-          if (event.getCode() == KeyCode.F11) {
-            toggleFullscreen();
-            event.consume();
-          }
-        });
+            javafx.scene.input.KeyEvent.KEY_PRESSED,
+            event -> {
+              boolean windowsFullscreen =
+                      event.getCode() == KeyCode.F11;
+              boolean macFullscreen =
+                      event.getCode() == KeyCode.F
+                              && event.isControlDown()
+                              && event.isMetaDown();
+
+              if (windowsFullscreen || macFullscreen) {
+                toggleFullscreen();
+                event.consume();
+              }
+            });
   }
 
   private void updateWidth(Number value) {
