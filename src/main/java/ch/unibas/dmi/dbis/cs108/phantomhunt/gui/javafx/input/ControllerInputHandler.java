@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.cs108.phantomhunt.gui.javafx.input;
 
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
@@ -39,7 +40,7 @@ public final class ControllerInputHandler {
   }
 
   public void start() {
-    if (!unavailable && pollingTimeline.getStatus() != Timeline.Status.RUNNING) {
+    if (!unavailable && pollingTimeline.getStatus() != Animation.Status.RUNNING) {
       pollingTimeline.play();
     }
   }
