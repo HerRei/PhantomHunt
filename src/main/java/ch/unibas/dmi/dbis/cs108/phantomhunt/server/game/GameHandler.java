@@ -33,9 +33,13 @@ public class GameHandler {
   private static final long TICK_TIME_MS = 1000 / TICKS_PER_SECOND;
   private static final long ROUND_END_WAIT_MS = 3000;
   private static final int WISDOM_ROUND_SCORE_BONUS = 5;
+  private static final long WISDOM_BLESSING_DELAY_MILLIS = 15_000L;
+  private static final String WISDOM_BLESSING_USED = "BLESSING_USED";
+  private static final String WISDOM_BLIND_START = "BLIND_START";
   private static final String PLAYER_LEFT_ABORT_REASON =
       "Match aborted because a player left.";
   private final Set<String> wisdomBonusPlayerIds;
+  private final Set<String> wisdomBlessingUsedPlayerIds;
 
   public GameHandler(GameState gs, Lobby lobby) {
     this.lobby = lobby;
@@ -44,6 +48,7 @@ public class GameHandler {
         Objects.requireNonNull(LobbyHandler.getInstance(), "lobbyHandler must not be null");
     this.humanCatchesGhosts = false;
     this.wisdomBonusPlayerIds = consumeWisdomBonuses(lobby);
+    this.wisdomBlessingUsedPlayerIds = new HashSet<>();
     instance = this;
   }
 
@@ -564,6 +569,45 @@ public class GameHandler {
           10,
           TimeUnit.SECONDS);
     }
+  }
+
+  /**
+   * Activates Wisdom Blessing for a human who earned wisdom before the match.
+   *
+   * <p>The server keeps this check here because clients can press keys at the wrong time or send
+   * packets manually. Invalid attempts are ignored on purpose.
+   *
+   * @param playerId the player who tries to activate the blessing
+   * @param nowMillis current server time in milliseconds
+   * @return true if the blessing started
+   */
+  public synchronized boolean tryWisdomBlessing(String playerId, long nowMillis) {
+    Optional<PlayerState> playerSnapshot = gameState.findPlayer(playerId);
+    if (gameState.getPhase() != GamePhase.ROUND_RUNNING
+        || playerSnapshot.isEmpty()
+        || playerSnapshot.get().getRole() != PlayerRole.HUMAN
+        || !wisdomBonusPlayerIds.contains(playerId)
+        || wisdomBlessingUsedPlayerIds.contains(playerId)
+        || nowMillis - gameState.getRoundStartTimeMillis() < WISDOM_BLESSING_DELAY_MILLIS) {
+      return false;
+    }
+
+    wisdomBlessingUsedPlayerIds.add(playerId);
+    lobby.getPlayers()
+        .ifPresent(
+            players -> {
+              for (var client : players) {
+                if (client.getName().equals(playerId)) {
+                  client.sendMessage(Packet.of(Command.WISDOM, WISDOM_BLESSING_USED));
+                }
+                gameState
+                    .findPlayer(client.getName())
+                    .filter(player -> player.getRole() == PlayerRole.PHANTOM)
+                    .ifPresent(
+                        player -> client.sendMessage(Packet.of(Command.WISDOM, WISDOM_BLIND_START)));
+              }
+            });
+    return true;
   }
 
   public synchronized void tryLobbyChatAbility(String playerId) {
