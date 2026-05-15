@@ -1,4 +1,4 @@
-# PhantomHunt – Offizielles Spielhandbuch
+gi# PhantomHunt – Offizielles Spielhandbuch
 Willkommen bei PhantomHunt! Du stehst kurz davor, ein verfluchtes Schloss zu betreten. In diesem strategischen 2D-Multiplayer-Spiel ist Teamwork genauso wichtig wie der pure Überlebensinstinkt. Wirst du dem Wahnsinn entkommen oder die Eindringlinge als Geist in die Enge treiben?
 
 ## Das Spielprinzip (3 vs. 1)
@@ -75,13 +75,13 @@ Damit ihr im Schloss überlebt oder erfolgreich jagt, müsst ihr eure Figur sich
 **Steuerung (Tastatur & Controller):**
 Egal ob du als Mensch oder als Geist spielst, du steuerst deine Spielfigur mit den klassischen Bewegungstasten:
 
-|| Tastatur | Controller |
-| :--- | :--- |:-----------|
-| **Oben** | W | Y / △      |
-| **Links** | A | X / □      |
-| **Unten** | S | A / ✕      |
-| **Rechts** | D | B / ○      |
-| **Wisdom Blessing** | R | R3         |
+| Aktion | Tastatur | PS-Controller |
+| :--- | :--- | :--- |
+| **Oben** | W | Linker Stick ↑ / Steuerkreuz ↑ |
+| **Links** | A | Linker Stick ← / Steuerkreuz ← |
+| **Unten** | S | Linker Stick ↓ / Steuerkreuz ↓ |
+| **Rechts** | D | Linker Stick → / Steuerkreuz → |
+| **Wisdom Blessing** | Shift+R | ✕ |
 
 **Individuelle Key Bindings:**
 Du möchtest nicht mit WASD spielen? Kein Problem! Im Home-Screen kannst
@@ -107,7 +107,7 @@ Wenn der Mensch auf dasselbe Feld wie ein Geist trifft, scheidet der Geist dadur
 **Wisdom Blessing:** 
 Wenn der Mensch diese Fähigkeit vorbereitet hat, erscheint nach kurzer Zeit der Hinweis
 "Wisdom Blessing ready: Press R". Drückt der Mensch dann R, werden alle Geister für 8 Sekunden
-geblendet. Sie sehen in dieser Zeit eine Wisdom-Überlagerung mit einem Fortschrittsbalken,
+geblendet. Sie sehen in dieser Zeit einen InGame Wosdom Screen mit einem Fortschrittsbalken,
 können sich aber weiterhin bewegen und Eingaben machen.
 
 ## Punkte und Siegbedingungen
