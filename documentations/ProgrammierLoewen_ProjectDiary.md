@@ -411,7 +411,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
     - Die Get Wisdom Funktion ist nun auf einem eigenen Fenster.
     - Die Get Wisdom Funktion hat nun einen Timer, welcher nach 15 sek einen Bonus von +5 pt pro Runde gibt.
 
-## 2026-05-03 - Jan
+## 2026-05-03 - Jan ##
 **Dauer:** ~1h  
 **Ziel:** Hub Chat UI verbessern
 **Was gemacht:**
@@ -421,7 +421,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
   - Das Whisperziel ist nun ein Dropdown statt einem Textfeld.
   - Das Dropdown wird automatisch mit allen verfügbaren Online Spielern gefüllt.
 
-## 2026-05-10 bis 2026-05-13 - Vera
+## 2026-05-10 bis 2026-05-13 - Vera ##
 **Dauer:** ~10h
 **Ziel:** Software-Architektur bereinigen und Tests verbessern.
 **Was gemacht:** 
@@ -434,7 +434,7 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - **Optimierung:** 
   - Effizientere Text-Verarbeitung im GameModel eingebaut, um unnötigen Speicherverbrauch zu vermeiden.
 
-## 2026-05-10 bis 2026-05-13 - Vera
+## 2026-05-10 bis 2026-05-13 - Vera ##
 **Dauer:** ~14h
 **Ziel:** QA-Bericht fertigstellen und das System technisch prüfen.
 **Was gemacht:**
@@ -444,3 +444,14 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
   - Über 4000 Warnungen der statischen Analyse gesichtet und wichtige Sicherheits-Updates (z.B. log4j) durchgeführt.
 - **Belastungstest:**
   - Mit dem RegistryConcurrencyTest erfolgreich geprüft, ob der Server stabil bleibt, wenn 100 Nutzer gleichzeitig darauf zugreifen.
+
+## 2026-05-14 - Jan ##
+**Dauer:** ~8h
+**Ziel:** Wisdom Blessing erweitern und Controller-Support implementieren.
+**Was gemacht:**
+- **Wisdom Blessing:** Die Get Wisdom Belohnung wurde erweitert. Nun kann der Human nach 15 Sekunden einmal pro Match mit R eine Blindness für die Phantoms auslösen können.
+- **Server-Validierung:** Die Aktivierung wird serverseitig geprüft und funktioniert nur für berechtigte Humans, nach dem Delay und nur einmal pro Match.
+- **Client-Feedback:** Humans sehen einen Wisdom Blessing Hinweis und betroffene Phantoms erhalten ein 8 Sekunden langes Overlay, können sich aber weiterhin bewegen.
+- **Bugfixxing:** Der Wisdom - Flashbang Effect wird bei frühzeigigem Rundenende zurückgesetzt.
+- **Controller-Support:** LWJGL GLFW Gamepad Support hinzugefügt. Linker Stick und Steuerkreuz steuern die Bewegung, der X/Primary Button aktiviert Wisdom Blessing.
+- **Tests & Doku:** Tests für Wisdom Blessing, Round-Reset und Controller-Mapping ergänzt, Game Manual aktualisiert.
