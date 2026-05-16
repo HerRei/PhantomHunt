@@ -421,6 +421,15 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
   - Das Whisperziel ist nun ein Dropdown statt einem Textfeld.
   - Das Dropdown wird automatisch mit allen verfügbaren Online Spielern gefüllt.
 
+## 2026-05-06 — Hermes ##
+**Dauer:** ~5h
+**Ziel:** Menü-Musik und Soundstage ins Spiel einbauen.
+**Was gemacht:**
+- **Menü-Musik:** Mehrere neue Musikstücke in die Audio-Ressourcen aufgenommen und als Playlist für die Menü-Szenen vorbereitet.
+- **Synchronisierung:** Einen serverseitigen MenuMusicBroadcaster und einen clientseitigen MenuMusicController hinzugefügt, damit alle Clients die Menü-Musik am gleichen Punkt hören.
+- **Sound-System:** SoundEngine und SoundManager erweitert, damit Musik ab einem bestimmten Zeitpunkt gestartet und beim Szenenwechsel sauber gestoppt werden kann.
+- **Dokumentation:** Die neuen Audioquellen in den Asset-Sources ergänzt und die Audiodateien danach komprimiert.
+
 ## 2026-05-10 bis 2026-05-13 - Vera ##
 **Dauer:** ~10h
 **Ziel:** Software-Architektur bereinigen und Tests verbessern.
