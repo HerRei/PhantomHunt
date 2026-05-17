@@ -1,4 +1,4 @@
-gi# PhantomHunt – Offizielles Spielhandbuch
+# PhantomHunt – Offizielles Spielhandbuch
 Willkommen bei PhantomHunt! Du stehst kurz davor, ein verfluchtes Schloss zu betreten. In diesem strategischen 2D-Multiplayer-Spiel ist Teamwork genauso wichtig wie der pure Überlebensinstinkt. Wirst du dem Wahnsinn entkommen oder die Eindringlinge als Geist in die Enge treiben?
 
 ## Das Spielprinzip (3 vs. 1)
