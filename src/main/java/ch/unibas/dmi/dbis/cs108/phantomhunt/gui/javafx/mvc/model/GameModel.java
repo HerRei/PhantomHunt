@@ -147,14 +147,15 @@ public class GameModel {
     // Format per entry: "Name:Role:X:Y:Score"
     String[] playerEntries = sections[2].split(";");
     for (String entry : playerEntries) {
-      String[] data = entry.split(":");
+      String[] data = entry.split(":", -1);
       if (data.length < 5) continue;
 
-      String name  = data[0];
-      String role  = data[1];
-      double x     = Double.parseDouble(data[2]);
-      double y     = Double.parseDouble(data[3]);
-      int    score = Integer.parseInt(data[4]);
+      int n = data.length;
+      String name = String.join(":", java.util.Arrays.copyOfRange(data, 0, n - 4));
+      String role = data[n - 4];
+      double x = Double.parseDouble(data[n - 3]);
+      double y = Double.parseDouble(data[n - 2]);
+      int score = Integer.parseInt(data[n - 1]);
 
       String currentName = playerName.getValue();
       if (currentName != null && name.endsWith(currentName)) {
