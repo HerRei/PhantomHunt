@@ -430,6 +430,20 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
 - **Sound-System:** SoundEngine und SoundManager erweitert, damit Musik ab einem bestimmten Zeitpunkt gestartet und beim Szenenwechsel sauber gestoppt werden kann.
 - **Dokumentation:** Die neuen Audioquellen in den Asset-Sources ergänzt und die Audiodateien danach komprimiert.
 
+## 2026-05-09 — Ismail ##
+**Dauer:** ~4h
+**Ziel:** Ein Logo, Intro und Startsequenz erstellen.
+**Was gemacht:**
+- Verschiedene Konzepte entworfen und das finale Logo für das Spiel generiert.
+- Ein kurzes Intro mit unserem Logo animieren lassen und in den Startbildschirm des Spiels integriert.
+
+## 2026-05-11 - Ismail
+**Dauer:** ~2h
+**Ziel:** Stabilität und fehlerfreie Logik beim Einsammeln der Fähigkeit sicherstellen.
+**Was gemacht:**
+- Unittest im GameHandler hinzugefügt, der die Kollision zwischen einem menschlichen Spieler und der Fähigkeit simuliert.
+- Im Testfall erfolgreich verifiziert, dass die Fähigkeit nach der Kollision korrekt verarbeitet wird und danach auf der Map nicht mehr verfügbar ist.
+
 ## 2026-05-10 bis 2026-05-13 - Vera ##
 **Dauer:** ~10h
 **Ziel:** Software-Architektur bereinigen und Tests verbessern.
@@ -453,6 +467,13 @@ build.gradle aktualisiert, um nur noch ein einziges JAR-File anstelle von separa
   - Über 4000 Warnungen der statischen Analyse gesichtet und wichtige Sicherheits-Updates (z.B. log4j) durchgeführt.
 - **Belastungstest:**
   - Mit dem RegistryConcurrencyTest erfolgreich geprüft, ob der Server stabil bleibt, wenn 100 Nutzer gleichzeitig darauf zugreifen.
+
+## 2026-05-13 — Ismail ##
+**Dauer:** ~3h
+**Ziel:** Ein trailer anfertigen, um das Gameplay und die Stimmung des Spiels nach außen präsentieren zu können.
+**Was gemacht:**
+- Passende Gameplayszenen und Highlights im Spiel aufgenommen.
+- Das Videomaterial geschnitten, mit dem neuen Intro versehen und passende Musik generiert.
 
 ## 2026-05-14 - Jan ##
 **Dauer:** ~8h
