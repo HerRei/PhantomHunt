@@ -134,6 +134,7 @@ public class LobbyHandler {
    * @return the created lobby
    */
   public Lobby createLobby(String name, ClientHandler host) {
+    name = name.replaceAll("[\\p{Cntrl}\\p{Cf}]", "");
     name = name.replace(":", "");
     name = name.replace(" ", "");
     while (findLobbyById(name).isPresent()) {

@@ -221,6 +221,7 @@ public class ClientHandler implements Runnable {
     }
     String lobbyName = String.join(" ", p.args());
     lobbyName = lobbyName.trim();
+    lobbyName = lobbyName.replaceAll("[\\p{Cntrl}\\p{Cf}]", "");
     lobbyName = lobbyName.replace(" ", "");
     lobbyName = lobbyName.replace(":", "");
     lobbyName = lobbyName.replace(";", "");
