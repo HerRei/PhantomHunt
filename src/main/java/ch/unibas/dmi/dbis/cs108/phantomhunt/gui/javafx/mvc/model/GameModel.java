@@ -152,6 +152,12 @@ public class GameModel {
 
       int n = data.length;
       String name = String.join(":", java.util.Arrays.copyOfRange(data, 0, n - 4));
+      if (name.startsWith("b64.")) {
+        name =
+            new String(
+                java.util.Base64.getUrlDecoder().decode(name.substring(4)),
+                java.nio.charset.StandardCharsets.UTF_8);
+      }
       String role = data[n - 4];
       double x = Double.parseDouble(data[n - 3]);
       double y = Double.parseDouble(data[n - 2]);

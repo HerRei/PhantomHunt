@@ -82,7 +82,11 @@ public class GameState {
             p ->
                 String.format(
                     "%s:%s:%.2f:%.2f:%s",
-                    p.getNickname(),
+                    "b64."
+                        + java.util.Base64.getUrlEncoder()
+                            .withoutPadding()
+                            .encodeToString(
+                                p.getNickname().getBytes(java.nio.charset.StandardCharsets.UTF_8)),
                     p.getRole().name(),
                     p.getPosition().getX(),
                     p.getPosition().getY(),

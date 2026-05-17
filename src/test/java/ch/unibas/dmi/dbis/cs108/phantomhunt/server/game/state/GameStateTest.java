@@ -27,9 +27,9 @@ class GameStateTest {
     // catch serialization-string
     String payload = state.getSerializedPlayers();
 
-    // format must be -> Name:Role:X:Y:Score;
-    assertTrue(payload.contains("Alice:PHANTOM:"), "Alice is missing or her role is wrong");
-    assertTrue(payload.contains("Bob:PHANTOM:"), "Bob is missing or his role is wrong");
+    // format must be -> EncodedName:Role:X:Y:Score;
+    assertTrue(payload.contains(":PHANTOM:"), "Player role is missing or wrong");
+    assertFalse(payload.contains("Alice:PHANTOM:"), "Names must be encoded in GSU payloads");
 
     // 4 players get separated by 3 semicolons
     long semicolonCount = payload.chars().filter(ch -> ch == ';').count();
