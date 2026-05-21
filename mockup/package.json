@@ -1,0 +1,25 @@
+{
+  "name": "cs108_mockup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "game.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HerRei/mockup.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HerRei/mockup/issues"
+  },
+  "homepage": "https://github.com/HerRei/mockup#readme",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}

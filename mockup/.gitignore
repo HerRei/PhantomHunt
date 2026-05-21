@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Mac system files
+.DS_Store
+
+# Testing coverage output
+coverage/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories
+.vscode/
+.idea/
+
+# Local env files (if we add them later)
+.env
+# macOS
+.DS_Store
