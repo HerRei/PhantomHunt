@@ -1,5 +1,7 @@
 # PhantomHunt
 
+[![CI](https://github.com/HerRei/PhantomHunt/actions/workflows/ci.yml/badge.svg)](https://github.com/HerRei/PhantomHunt/actions/workflows/ci.yml)
+
 ![PhantomHunt gameplay screenshot](outreach/screenshot.png)
 
 **PhantomHunt** is a Java/JavaFX multiplayer game developed for the CS108 Programming Project at the University of Basel in 2026.
@@ -89,7 +91,7 @@ A full match consists of four rounds. Roles rotate after each round so every pla
 
 ## Requirements
 
-- Java 21 or newer
+- Java 25
 - Gradle wrapper included
 
 ---
