@@ -1,5 +1,7 @@
 # README
 
+[![CI](https://github.com/HerRei/PhantomHunt/actions/workflows/ci.yml/badge.svg)](https://github.com/HerRei/PhantomHunt/actions/workflows/ci.yml)
+
 ## PhantomHunt - Multiplayer Game ##
 
 PhantomHunt is a strategic, turn-based 2D multiplayer game developed as part of the CS108 programming project. Experience thrilling chases inside a cursed castle where teamwork meets pure survival instinct.
@@ -21,6 +23,10 @@ In PhantomHunt, two unequal teams compete against each other: three ghosts versu
 A match consists of four rounds. Each player takes the role of the human exactly once. After the final round, the player with the highest total score wins the match.
 
 ## How to Start the Game
+
+**Requirements**
+- Java 25
+- A shell that can run the included Gradle wrapper (`./gradlew`)
 
 **Build the Executable Jar**
 Before running the game, you need to compile the code and build the executable .jar file. Open your terminal in the root directory of the project and run:
