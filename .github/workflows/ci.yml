@@ -12,6 +12,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     name: Build and test
@@ -26,9 +29,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "25"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
