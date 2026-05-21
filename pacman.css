@@ -1,0 +1,9 @@
+body {
+    text-align: center;
+  }
+  
+  #board {
+    border: 4px solid black;
+    display: block;
+    margin: 20px auto;
+  }
