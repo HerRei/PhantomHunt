@@ -142,10 +142,18 @@ class PhantomHuntDemo {
   }
 
   async init() {
-    await this.loadAssets();
-    this.reset();
-    this.bindControls();
-    this.draw();
+    this.drawMessage("Loading PhantomHunt demo...");
+    try {
+      await this.loadAssets();
+      this.reset();
+      this.bindControls();
+      this.draw();
+    } catch (error) {
+      console.error(error);
+      this.status = "Asset error";
+      this.updateUi();
+      this.drawMessage("Demo assets could not load", "Refresh the page or open it from the GitHub Pages URL.");
+    }
   }
 
   async loadAssets() {
@@ -676,6 +684,38 @@ class PhantomHuntDemo {
     }
   }
 
+  drawMessage(title, subtitle = "") {
+    const ctx = this.ctx;
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.fillStyle = "#090a0c";
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+    for (let x = 0; x <= this.canvas.width; x += this.tile) {
+      ctx.beginPath();
+      ctx.moveTo(x + 0.5, 0);
+      ctx.lineTo(x + 0.5, this.canvas.height);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= this.canvas.height; y += this.tile) {
+      ctx.beginPath();
+      ctx.moveTo(0, y + 0.5);
+      ctx.lineTo(this.canvas.width, y + 0.5);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = "#f4f2ed";
+    ctx.textAlign = "center";
+    ctx.font = "700 28px system-ui, sans-serif";
+    ctx.fillText(title, this.canvas.width / 2, this.canvas.height / 2 - 10);
+    if (subtitle) {
+      ctx.fillStyle = "#b9b4aa";
+      ctx.font = "16px system-ui, sans-serif";
+      ctx.fillText(subtitle, this.canvas.width / 2, this.canvas.height / 2 + 24);
+    }
+  }
+
   drawHuman() {
     const dir = this.human.direction === "up" ? "back" : this.human.direction === "down" ? "front" : this.human.direction;
     const img = this.humanImages[`${dir}${this.human.frame + 1}`] || this.humanImages.front1;
@@ -708,9 +748,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!canvas) return;
 
   const demo = new PhantomHuntDemo(canvas);
-  demo.init().catch((error) => {
-    console.error(error);
-    const status = document.querySelector("#demoStatus");
-    if (status) status.textContent = "Asset error";
-  });
+  demo.init();
 });

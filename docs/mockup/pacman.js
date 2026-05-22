@@ -108,6 +108,7 @@ window.onload = async () => {
 
   ctx = board.getContext("2d");
   ctx.imageSmoothingEnabled = false;
+  drawLoading("Loading mockup...");
 
   try {
     const [playerImg, ghostImg, wallImg] = await Promise.all([
@@ -120,8 +121,19 @@ window.onload = async () => {
     gameLoop();
   } catch (err) {
     console.error("asset loading failed:", err);
+    drawLoading("Mockup assets could not load");
   }
 };
+
+function drawLoading(message) {
+  if (!ctx) return;
+  ctx.fillStyle = "rgb(123, 112, 112)";
+  ctx.fillRect(0, 0, boardWidth, boardHeight);
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.font = "22px sans-serif";
+  ctx.fillText(message, boardWidth / 2, boardHeight / 2);
+}
 
 function buildMap(playerImg, ghostImg, wallImg) {
   walls.clear();
