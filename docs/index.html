@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="PhantomHunt portfolio showcase: Java/JavaFX multiplayer game, browser mockup, gameplay media, and implementation work."
+    />
+    <title>PhantomHunt | Project Showcase</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="showcase-game.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="PhantomHunt home">
+        <span class="brand-mark">PH</span>
+        <span>PhantomHunt</span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="#prototype">Mockup</a>
+        <a href="#real-game">Real game</a>
+        <a href="#work">My work</a>
+        <a href="#run">Run it</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-media" aria-hidden="true">
+          <img src="assets/media/screenshot.png" alt="" />
+        </div>
+        <div class="hero-content">
+          <p class="eyebrow">CS108 Programming Project, University of Basel</p>
+          <h1>PhantomHunt</h1>
+          <p class="hero-copy">
+            An asymmetric 3 vs 1 multiplayer chase game in a haunted castle:
+            one human survives, three phantoms coordinate the hunt.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#real-game">Play the showcase</a>
+            <a class="button secondary" href="assets/media/manual.pdf">Open manual</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section intro-section" aria-labelledby="overview-title">
+        <div class="section-heading">
+          <p class="eyebrow">Project overview</p>
+          <h2 id="overview-title">From playable mockup to multiplayer Java game</h2>
+        </div>
+        <div class="stat-strip" aria-label="Project highlights">
+          <div>
+            <strong>4</strong>
+            <span>players per match</span>
+          </div>
+          <div>
+            <strong>4</strong>
+            <span>role-rotating rounds</span>
+          </div>
+          <div>
+            <strong>3</strong>
+            <span>phantoms versus one human</span>
+          </div>
+          <div>
+            <strong>JavaFX</strong>
+            <span>client-server final build</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section split-section" id="prototype" aria-labelledby="prototype-title">
+        <div class="section-heading">
+          <p class="eyebrow">Early prototype</p>
+          <h2 id="prototype-title">Browser mockup</h2>
+          <p>
+            The first prototype was a small HTML5 Canvas game used to test the chase loop,
+            wall collision, restart flow, and pathfinding ideas before the Java version existed.
+          </p>
+        </div>
+        <div class="mockup-layout">
+          <figure class="media-frame sketch-frame">
+            <img src="assets/media/mockup-sketch.png" alt="Early PhantomHunt mockup sketch" />
+            <figcaption>Initial mockup sketch and concept exploration.</figcaption>
+          </figure>
+          <div class="play-frame">
+            <iframe
+              src="mockup/index.html"
+              title="Playable PhantomHunt browser mockup"
+              loading="lazy"
+            ></iframe>
+            <p class="frame-note">Click inside the frame, then use the arrow keys.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section game-section" id="real-game" aria-labelledby="real-title">
+        <div class="section-heading compact">
+          <p class="eyebrow">Interactive final-game showcase</p>
+          <h2 id="real-title">Real game assets, browser-ready demo</h2>
+          <p>
+            This playable preview uses the final tile map, custom floor tiles, human sprites,
+            phantom sprites, and ability image. The movement and chase logic is adapted for a
+            static GitHub Pages page.
+          </p>
+        </div>
+
+        <div class="game-shell">
+          <div class="canvas-wrap">
+            <canvas id="realGame" width="608" height="640" tabindex="0" aria-label="Playable PhantomHunt showcase demo"></canvas>
+          </div>
+          <aside class="game-panel" aria-label="Game controls and state">
+            <div class="score-grid">
+              <div>
+                <span>Time</span>
+                <strong id="demoTime">0s</strong>
+              </div>
+              <div>
+                <span>Score</span>
+                <strong id="demoScore">0</strong>
+              </div>
+              <div>
+                <span>Round</span>
+                <strong id="demoRound">1 / 4</strong>
+              </div>
+              <div>
+                <span>Status</span>
+                <strong id="demoStatus">Ready</strong>
+              </div>
+            </div>
+
+            <div class="control-group" aria-label="Demo controls">
+              <button class="button primary" id="startDemo" type="button">Start</button>
+              <button class="button secondary" id="resetDemo" type="button">Reset</button>
+              <button class="button secondary" id="abilityDemo" type="button">Wisdom Blessing</button>
+            </div>
+
+            <div class="mode-group" aria-label="Phantom AI mode">
+              <span>Phantom pressure</span>
+              <label>
+                <input type="radio" name="demoMode" value="steady" checked />
+                Steady
+              </label>
+              <label>
+                <input type="radio" name="demoMode" value="aggressive" />
+                Aggressive
+              </label>
+            </div>
+
+            <div class="mobile-pad" aria-label="Touch movement controls">
+              <button type="button" data-hold="up" aria-label="Move up">W</button>
+              <button type="button" data-hold="left" aria-label="Move left">A</button>
+              <button type="button" data-hold="down" aria-label="Move down">S</button>
+              <button type="button" data-hold="right" aria-label="Move right">D</button>
+            </div>
+
+            <p class="control-note">
+              Use WASD or arrow keys. Movement continues until a wall, and new directions are
+              queued for the next valid tile turn.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section media-section" aria-labelledby="media-title">
+        <div class="section-heading">
+          <p class="eyebrow">Media</p>
+          <h2 id="media-title">Trailer and gameplay</h2>
+        </div>
+        <div class="video-grid">
+          <figure class="media-frame">
+            <video controls preload="metadata" poster="assets/media/screenshot.png">
+              <source src="assets/media/trailer.mp4" type="video/mp4" />
+            </video>
+            <figcaption>Project trailer.</figcaption>
+          </figure>
+          <figure class="media-frame">
+            <video controls preload="metadata" poster="assets/media/screenshot.png">
+              <source src="assets/media/gameplay.mp4" type="video/mp4" />
+            </video>
+            <figcaption>Gameplay recording of the JavaFX game.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section work-section" id="work" aria-labelledby="work-title">
+        <div class="section-heading">
+          <p class="eyebrow">Implementation focus</p>
+          <h2 id="work-title">My work on the project</h2>
+          <p>
+            This personal repository highlights the parts I worked on most: networking,
+            backend game state, lobby behavior, scoring, protocol handling, and the browser mockup.
+          </p>
+        </div>
+
+        <div class="work-tabs" role="tablist" aria-label="Contribution details">
+          <button class="active" type="button" data-work-tab="backend">Backend</button>
+          <button type="button" data-work-tab="networking">Networking</button>
+          <button type="button" data-work-tab="gameplay">Gameplay</button>
+          <button type="button" data-work-tab="quality">Quality</button>
+        </div>
+        <div class="work-detail" id="workDetail" aria-live="polite"></div>
+
+        <div class="architecture">
+          <button type="button" data-arch="client" class="active">Client</button>
+          <button type="button" data-arch="server">Server</button>
+          <button type="button" data-arch="game">Game state</button>
+          <button type="button" data-arch="protocol">Protocol</button>
+        </div>
+        <p class="architecture-text" id="architectureText"></p>
+      </section>
+
+      <section class="section run-section" id="run" aria-labelledby="run-title">
+        <div class="section-heading">
+          <p class="eyebrow">Run the real game</p>
+          <h2 id="run-title">Build locally with the Gradle wrapper</h2>
+        </div>
+        <div class="command-grid">
+          <div>
+            <h3>Build</h3>
+            <pre><code>./gradlew jar</code></pre>
+          </div>
+          <div>
+            <h3>Start server</h3>
+            <pre><code>java -jar build/libs/phantom-hunt.jar server 2222</code></pre>
+          </div>
+          <div>
+            <h3>Join as client</h3>
+            <pre><code>java -jar build/libs/phantom-hunt.jar client 127.0.0.1:2222</code></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>PhantomHunt by ProgrammierLoewen</span>
+      <span>Personal showcase repository: HerRei/PhantomHunt</span>
+    </footer>
+  </body>
+</html>
