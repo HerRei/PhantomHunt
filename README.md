@@ -11,7 +11,7 @@ It is an asymmetric **3-vs-1 chase game** set in a haunted castle: one player tr
 This repository is my personal GitHub version of the original team project. It contains the final Java/JavaFX multiplayer game and also includes my early browser-based mockup in `mockup/`, which I built at the start of the project to test whether the core game idea felt playable.
 
 The groups website created for the game is: https://phantom-hunt-programmierloewen.netlify.app/
-My own website created as a showcase is: 
+My own website created as a showcase is: https://herrei.github.io/PhantomHunt/
 
 ---
 
